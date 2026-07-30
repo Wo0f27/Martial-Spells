@@ -43,12 +43,3 @@ Future spells will focus on martial archetypes such as:
 The intended design is for spells to enhance positioning, threat management,
 defensive timing, melee pressure, and battlefield control.
 
-## Building from Source
-
-1. Clone the repository.
-2. Install JDK 17.
-3. Open the project as a Gradle project in IntelliJ IDEA.
-4. Generate the development runs:
-
-```bash
-gradlew genIntellijRuns
