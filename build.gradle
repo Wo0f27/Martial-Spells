@@ -140,6 +140,13 @@ repositories {
         name = "KosmX"
         url = "https://maven.kosmx.dev/"
     }
+
+    maven {
+        url = "https://cursemaven.com"
+        content {
+            includeGroup "curse.maven"
+        }
+    }
 }
 
 dependencies {
@@ -193,6 +200,16 @@ dependencies {
         runtimeOnly fg.deobf(
                 "top.theillusivec4.curios:curios-forge:${curios_version}"
         )
+
+    // Development testing only — not required by Martial Spells.
+    runtimeOnly fg.deobf(
+            "curse.maven:lendercataclysm-551586:8246047"
+    )
+
+    runtimeOnly fg.deobf(
+            "curse.maven:lionfish-api-1001614:8095554"
+    )
+
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.
