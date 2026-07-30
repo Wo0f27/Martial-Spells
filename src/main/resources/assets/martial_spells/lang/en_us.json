@@ -2,5 +2,7 @@
   "spell.martial_spells.guardians_cry": "Guardian's Cry",
   "spell.martial_spells.guardians_cry.guide": "Forces nearby hostile creatures to target the caster for a short duration.",
   "effect.martial_spells.guardians_cry": "Guardian's Cry",
-  "effect.martial_spells.guardians_cry_active": "Guardian's Cry"
+  "effect.martial_spells.guardians_cry_active": "Guardian's Cry",
+  "ui.martial_spells.fixed_cooldown": "Fixed Cooldown: %s seconds",
+  "ui.martial_spells.cooldown_reduction_immune": "Unaffected by Cooldown Reduction"
 }
