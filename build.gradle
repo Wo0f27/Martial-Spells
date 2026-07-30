@@ -1,8 +1,12 @@
 plugins {
-    id 'eclipse'
-    id 'idea'
-    id 'maven-publish'
     id 'net.minecraftforge.gradle' version '[6.0,6.2)'
+
+    id 'org.parchmentmc.librarian.forgegradle' version '1.+'
+    id 'org.spongepowered.mixin' version '0.7.+'
+
+    id 'eclipse'
+    id 'maven-publish'
+    id 'idea'
 }
 
 version = mod_version
@@ -112,14 +116,30 @@ minecraft {
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 repositories {
-    // Put repositories for dependencies here
-    // ForgeGradle automatically adds the Forge maven and Maven Central for you
+    maven {
+        name = "Iron's Maven - Release"
+        url = "https://code.redspace.io/releases"
+    }
 
-    // If you have mod jar dependencies in ./libs, you can declare them as a repository like so.
-    // See https://docs.gradle.org/current/userguide/declaring_repositories.html#sub:flat_dir_resolver
-    // flatDir {
-    //     dir 'libs'
-    // }
+    maven {
+        name = "Iron's Maven - Snapshots"
+        url = "https://code.redspace.io/snapshots"
+    }
+
+    maven {
+        name = "GeckoLib"
+        url = "https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/"
+    }
+
+    maven {
+        name = "IllusiveC4"
+        url = "https://maven.theillusivec4.top"
+    }
+
+    maven {
+        name = "KosmX"
+        url = "https://maven.kosmx.dev/"
+    }
 }
 
 dependencies {
@@ -129,21 +149,50 @@ dependencies {
     // If the group id is "net.minecraft" and the artifact id is one of ["client", "server", "joined"],
     // then special handling is done to allow a setup of a vanilla dependency without the use of an external repository.
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+    annotationProcessor "org.spongepowered:mixin:${mixin_version}:processor"
 
-    // Example mod dependency with JEI - using fg.deobf() ensures the dependency is remapped to your development mappings
-    // The JEI API is declared for compile time use, while the full JEI artifact is used at runtime
-    // compileOnly fg.deobf("mezz.jei:jei-${mc_version}-common-api:${jei_version}")
-    // compileOnly fg.deobf("mezz.jei:jei-${mc_version}-forge-api:${jei_version}")
-    // runtimeOnly fg.deobf("mezz.jei:jei-${mc_version}-forge:${jei_version}")
+    // Iron's Spells 'n Spellbooks API for compilation
+        compileOnly fg.deobf(
+                "io.redspace:irons_spellbooks:${irons_spells_version}:api"
+        )
 
-    // Example mod dependency using a mod jar from ./libs with a flat dir repository
-    // This maps to ./libs/coolmod-${mc_version}-${coolmod_version}.jar
-    // The group id is ignored when searching -- in this case, it is "blank"
-    // implementation fg.deobf("blank:coolmod-${mc_version}:${coolmod_version}")
+    // Full Iron's mod in the development client
+        runtimeOnly fg.deobf(
+                "io.redspace:irons_spellbooks:${irons_spells_version}"
+        )
 
-    // For more info:
-    // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
-    // http://www.gradle.org/docs/current/userguide/dependency_management.html
+    // Iron's shared library
+        implementation fg.deobf(
+                "io.redspace:irons_lib:${irons_lib_version}"
+        )
+
+    // GeckoLib
+        implementation fg.deobf(
+                "software.bernie.geckolib:geckolib-forge-${geckolib_version}"
+        )
+
+    // Caelus
+        compileOnly fg.deobf(
+                "top.theillusivec4.caelus:caelus-forge:${caelus_version}:api"
+        )
+
+        runtimeOnly fg.deobf(
+                "top.theillusivec4.caelus:caelus-forge:${caelus_version}"
+        )
+
+    // Player Animator
+        implementation fg.deobf(
+                "dev.kosmx.player-anim:player-animation-lib-forge:${player_animator_version}"
+        )
+
+    // Curios
+        implementation fg.deobf(
+                "top.theillusivec4.curios:curios-forge:${curios_version}:api"
+        )
+
+        runtimeOnly fg.deobf(
+                "top.theillusivec4.curios:curios-forge:${curios_version}"
+        )
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.
