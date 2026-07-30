@@ -276,10 +276,6 @@ public final class GuardiansCrySpell extends AbstractSpell {
             mob.setTarget(caster);
             mob.setAggressive(true);
 
-            if (caster instanceof Player player) {
-                mob.setLastHurtByPlayer(player);
-            }
-
             serverLevel.sendParticles(
                     ParticleTypes.ANGRY_VILLAGER,
                     mob.getX(),
