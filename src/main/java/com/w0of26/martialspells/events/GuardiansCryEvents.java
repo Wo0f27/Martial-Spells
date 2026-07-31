@@ -7,6 +7,8 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraftforge.event.entity.living.MobEffectEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraft.world.entity.Mob;
+import net.minecraftforge.event.entity.living.LivingEvent;
 
 @Mod.EventBusSubscriber(
         modid = MartialSpells.MOD_ID,
@@ -32,5 +34,20 @@ public final class GuardiansCryEvents {
                 == MartialEffectRegistry.GUARDIANS_CRY.get()) {
             GuardiansCryEffect.clearTaunt(event.getEntity());
         }
+    }
+
+    @SubscribeEvent
+    public static void onLivingTick(
+            LivingEvent.LivingTickEvent event
+    ) {
+        if (!(event.getEntity() instanceof Mob mob)) {
+            return;
+        }
+
+        if (!GuardiansCryEffect.hasFallbackTaunt(mob)) {
+            return;
+        }
+
+        GuardiansCryEffect.tickFallbackTaunt(mob);
     }
 }

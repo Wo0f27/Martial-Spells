@@ -23,6 +23,7 @@ import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
+import com.w0of26.martialspells.tag.MartialEntityTypeTags;
 
 import java.util.List;
 
@@ -206,21 +207,28 @@ public final class GuardiansCrySpell extends AbstractSpell {
         int tauntedCount = 0;
 
         for (Mob mob : nearbyHostiles) {
-            boolean alreadyTaunted =
+            boolean normalTauntActive =
                     mob.hasEffect(
                             MartialEffectRegistry.GUARDIANS_CRY.get()
                     );
 
+            boolean fallbackTauntActive =
+                    GuardiansCryEffect.hasFallbackTaunt(mob);
+
+            boolean alreadyTaunted =
+                    normalTauntActive || fallbackTauntActive;
+
             /*
-             * Save the original target only when beginning a fresh
-             * taunt. Refreshing or transferring an existing taunt
-             * must not overwrite the original restoration target.
+             * Save the original target only when beginning a completely fresh
+             * taunt. Refreshing either the normal effect or fallback must preserve
+             * the original restoration target.
              */
             if (!alreadyTaunted) {
                 LivingEntity previousTarget = mob.getTarget();
 
                 if (previousTarget != null
-                        && previousTarget.isAlive()) {
+                        && previousTarget.isAlive()
+                        && !previousTarget.isDeadOrDying()) {
                     mob.getPersistentData().putUUID(
                             GuardiansCryEffect
                                     .PREVIOUS_TARGET_UUID_TAG,
@@ -249,24 +257,63 @@ public final class GuardiansCrySpell extends AbstractSpell {
                     mob.addEffect(effectInstance);
 
             /*
-             * A fresh application failed, usually because the entity
-             * rejects the effect.
+             * addEffect may return false when an equivalent or stronger instance
+             * is already present. Recheck the actual effect state before treating
+             * the entity as effect-immune.
              */
-            if (!effectApplied && !alreadyTaunted) {
-                mob.getPersistentData().remove(
-                        GuardiansCryEffect.TARGET_UUID_TAG
-                );
-                mob.getPersistentData().remove(
-                        GuardiansCryEffect
-                                .PREVIOUS_TARGET_UUID_TAG
-                );
+            boolean normalPathActive =
+                    effectApplied
+                            || mob.hasEffect(
+                            MartialEffectRegistry
+                                    .GUARDIANS_CRY
+                                    .get()
+                    );
 
+            boolean fallbackPathActive = false;
+
+            /*
+             * Only explicitly allowlisted entities may bypass effect immunity.
+             * Every other entity retains its normal MobEffect immunity.
+             */
+            if (!normalPathActive
+                    && mob.getType().is(
+                    MartialEntityTypeTags
+                            .GUARDIANS_CRY_EFFECT_IMMUNE_COMPATIBLE
+            )) {
+                fallbackPathActive =
+                        GuardiansCryEffect
+                                .startOrRefreshFallbackTaunt(
+                                        mob,
+                                        caster,
+                                        durationTicks
+                                );
+            }
+
+            /*
+             * Neither the normal effect nor the allowlisted fallback succeeded.
+             * clearTaunt also removes any temporary previous-target data that was
+             * stored before attempting the application.
+             */
+            if (!normalPathActive && !fallbackPathActive) {
+                GuardiansCryEffect.clearTaunt(mob);
                 continue;
             }
 
             /*
-             * Store or replace the caster currently forcing this
-             * mob's attention.
+             * A successfully applied normal effect should not retain a stale
+             * fallback-expiration marker.
+             */
+            if (normalPathActive) {
+                mob.getPersistentData().remove(
+                        GuardiansCryEffect
+                                .FALLBACK_EXPIRES_AT_TAG
+                );
+            }
+
+            /*
+             * The fallback helper already sets these values, but assigning them
+             * here as well keeps the final established-taunt state identical for
+             * both execution paths.
              */
             mob.getPersistentData().putUUID(
                     GuardiansCryEffect.TARGET_UUID_TAG,

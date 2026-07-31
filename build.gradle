@@ -200,7 +200,7 @@ dependencies {
         runtimeOnly fg.deobf(
                 "top.theillusivec4.curios:curios-forge:${curios_version}"
         )
-/*
+
     // Development testing only — not required by Martial Spells.
     runtimeOnly fg.deobf(
             "curse.maven:lendercataclysm-551586:8246047"
@@ -209,9 +209,19 @@ dependencies {
     runtimeOnly fg.deobf(
             "curse.maven:lionfish-api-1001614:8095554"
     )
-*/
+
     runtimeOnly fg.deobf(
-            "curse.maven:mowzies-mobs-250498:7815705"
+        "curse.maven:mowzies-mobs-250498:7815705"
+    )
+
+    runtimeOnly fg.deobf(
+        "curse.maven:bossesrise-1314084:8123166"
+    )
+
+
+    // Test-only Legendary Monsters compatibility dependency
+    runtimeOnly fg.deobf(
+            "curse.maven:legendary-monsters-944035:8444425"
     )
 }
 

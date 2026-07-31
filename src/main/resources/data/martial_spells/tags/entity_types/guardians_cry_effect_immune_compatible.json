@@ -1,0 +1,21 @@
+{
+  "replace": false,
+  "values": [
+    {
+      "id": "legendary_monsters:the_obliterator",
+      "required": false
+    },
+    {
+      "id": "legendary_monsters:shulker_mimic",
+      "required": false
+    },
+    {
+      "id": "legendary_monsters:cloud_golem",
+      "required": false
+    },
+    {
+      "id": "legendary_monsters:posessed_paladin",
+      "required": false
+    }
+  ]
+}
