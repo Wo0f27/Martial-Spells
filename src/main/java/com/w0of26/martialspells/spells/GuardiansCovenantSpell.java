@@ -1,5 +1,6 @@
 package com.w0of26.martialspells.spells;
 
+import com.w0of26.martialspells.damage.GuardiansCovenantRedirectManager;
 import com.w0of26.martialspells.MartialSpells;
 import com.w0of26.martialspells.effects.GuardiansCovenantTankEffect;
 import com.w0of26.martialspells.registry.MartialEffectRegistry;
@@ -57,11 +58,11 @@ public final class GuardiansCovenantSpell extends AbstractSpell {
     };
 
     private static final float[] REDIRECT_PERCENTAGES = {
-            15.0F,
-            17.5F,
             20.0F,
-            22.5F,
-            25.0F
+            25.0F,
+            30.0F,
+            35.0F,
+            40.0F
     };
 
     /*
@@ -277,6 +278,8 @@ public final class GuardiansCovenantSpell extends AbstractSpell {
                         true
                 )
         );
+
+        GuardiansCovenantRedirectManager.start(caster);
 
         List<ServerPlayer> nearbyAllies =
                 level.getEntitiesOfClass(

@@ -14,6 +14,10 @@ import net.minecraftforge.event.entity.living.MobEffectEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.joml.Vector3f;
+import com.w0of26.martialspells.damage.GuardiansCovenantRedirectManager;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.server.ServerStoppedEvent;
 
 import java.util.UUID;
 
@@ -64,6 +68,17 @@ public final class GuardiansCovenantEvents {
             GuardiansCovenantLinkData.clearLink(
                     event.getEntity()
             );
+
+            return;
+        }
+
+        if (effectInstance.getEffect()
+                == MartialEffectRegistry
+                .GUARDIANS_COVENANT_TANK
+                .get()
+                && event.getEntity()
+                instanceof ServerPlayer tank) {
+            GuardiansCovenantRedirectManager.stop(tank);
         }
     }
 
@@ -78,7 +93,52 @@ public final class GuardiansCovenantEvents {
             GuardiansCovenantLinkData.clearLink(
                     event.getEntity()
             );
+
+            return;
         }
+
+        if (event.getEffect()
+                == MartialEffectRegistry
+                .GUARDIANS_COVENANT_TANK
+                .get()
+                && event.getEntity()
+                instanceof ServerPlayer tank) {
+            GuardiansCovenantRedirectManager.stop(tank);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onPlayerTick(
+            TickEvent.PlayerTickEvent event
+    ) {
+        if (event.phase != TickEvent.Phase.END) {
+            return;
+        }
+
+        if (!(event.player instanceof ServerPlayer tank)) {
+            return;
+        }
+
+        GuardiansCovenantRedirectManager.tick(tank);
+    }
+
+    @SubscribeEvent
+    public static void onPlayerLoggedOut(
+            PlayerEvent.PlayerLoggedOutEvent event
+    ) {
+        if (event.getEntity()
+                instanceof ServerPlayer player) {
+            GuardiansCovenantRedirectManager.stop(
+                    player
+            );
+        }
+    }
+
+    @SubscribeEvent
+    public static void onServerStopped(
+            ServerStoppedEvent event
+    ) {
+        GuardiansCovenantRedirectManager.clear();
     }
 
     @SubscribeEvent
