@@ -24,6 +24,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import com.w0of26.martialspells.tag.MartialEntityTypeTags;
+import net.minecraft.world.entity.TamableAnimal;
 
 import java.util.List;
 
@@ -195,7 +196,19 @@ public final class GuardiansCrySpell extends AbstractSpell {
                 level.getEntitiesOfClass(
                         Mob.class,
                         searchArea,
-                        mob -> mob instanceof Enemy
+                        mob -> (
+                                mob instanceof Enemy
+                                        || (
+                                        mob.getType().is(
+                                                MartialEntityTypeTags
+                                                        .GUARDIANS_CRY_NON_ENEMY_HOSTILE_COMPATIBLE
+                                        )
+                                                && (
+                                                !(mob instanceof TamableAnimal tamable)
+                                                        || !tamable.isTame()
+                                        )
+                                )
+                        )
                                 && mob.isAlive()
                                 && !mob.isDeadOrDying()
                                 && !mob.isAlliedTo(caster)

@@ -17,6 +17,16 @@ public final class MartialEntityTypeTags {
                     )
             );
 
+    public static final TagKey<EntityType<?>>
+            GUARDIANS_CRY_NON_ENEMY_HOSTILE_COMPATIBLE =
+            TagKey.create(
+                    Registries.ENTITY_TYPE,
+                    new ResourceLocation(
+                            MartialSpells.MOD_ID,
+                            "guardians_cry_non_enemy_hostile_compatible"
+                    )
+            );
+
     private MartialEntityTypeTags() {
     }
 }

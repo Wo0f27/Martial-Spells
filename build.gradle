@@ -223,6 +223,15 @@ dependencies {
     runtimeOnly fg.deobf(
             "curse.maven:legendary-monsters-944035:8444425"
     )
+
+    // Test-only Ice and Fire compatibility dependencies
+    runtimeOnly fg.deobf(
+            "curse.maven:citadel-331936:7476570"
+    )
+
+    runtimeOnly fg.deobf(
+            "curse.maven:ice-and-fire-dragons-264231:5633453"
+    )
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.
