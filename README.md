@@ -7,18 +7,6 @@ It adds martial-focused spells designed for tanks, bruisers, duelists, and
 assassins. These spells support melee combat rather than replacing it with
 conventional ranged magic.
 
-## Current Content
-
-### Guardian's Cry
-
-Guardian's Cry is an area taunt spell that:
-
-- Affects hostile mobs within a fixed radius.
-- Forces affected mobs to target the caster for a limited duration.
-- Displays a duration indicator on the caster.
-- Restores each mob's previous valid target when the taunt expires.
-- Supports target restoration between players and ordinary mobs.
-
 ## Development Status
 
 Martial Spells is currently in early development and is being created for a
