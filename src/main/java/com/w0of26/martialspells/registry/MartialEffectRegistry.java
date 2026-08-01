@@ -1,5 +1,7 @@
 package com.w0of26.martialspells.registry;
 
+import com.w0of26.martialspells.effects.GuardiansCovenantLinkedEffect;
+import com.w0of26.martialspells.effects.GuardiansCovenantTankEffect;
 import com.w0of26.martialspells.MartialSpells;
 import com.w0of26.martialspells.effects.GuardiansCryActiveEffect;
 import com.w0of26.martialspells.effects.GuardiansCryEffect;
@@ -26,6 +28,18 @@ public final class MartialEffectRegistry {
             MOB_EFFECTS.register(
                     "guardians_cry_active",
                     GuardiansCryActiveEffect::new
+            );
+
+    public static final RegistryObject<MobEffect> GUARDIANS_COVENANT_TANK =
+            MOB_EFFECTS.register(
+                    "guardians_covenant_tank",
+                    GuardiansCovenantTankEffect::new
+            );
+
+    public static final RegistryObject<MobEffect> GUARDIANS_COVENANT_LINKED =
+            MOB_EFFECTS.register(
+                    "guardians_covenant_linked",
+                    GuardiansCovenantLinkedEffect::new
             );
 
     private MartialEffectRegistry() {
