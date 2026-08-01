@@ -1,5 +1,7 @@
 package com.w0of26.martialspells.damage;
 
+import net.minecraft.server.MinecraftServer;
+
 import com.w0of26.martialspells.registry.MartialEffectRegistry;
 import net.minecraft.server.level.ServerPlayer;
 
@@ -92,11 +94,11 @@ public final class GuardiansCovenantRedirectManager {
     }
 
     /**
-     * Runs once at the end of each server-side tank tick.
+     * Runs once for each active tank at the end of the server tick.
      *
-     * It validates the Covenant, refills the token bucket, and
-     * applies all redirected damage collected during the tick as
-     * one mitigable damage call.
+     * It validates the Covenant, refills the token bucket, and applies
+     * all redirected damage collected during the tick as one mitigable
+     * damage call.
      */
     public static void tick(ServerPlayer tank) {
         RedirectState state =
@@ -246,5 +248,40 @@ public final class GuardiansCovenantRedirectManager {
                                     + refillPerTick
                     );
         }
+    }
+    /**
+     * Flushes active Covenant tanks after the server has completed
+     * the current tick.
+     *
+     * This also reconstructs missing manager state when a player still
+     * has the tank effect after reconnecting or reloading the world.
+     */
+    public static void tickAll(
+            MinecraftServer server
+    ) {
+        for (ServerPlayer tank
+                : server.getPlayerList().getPlayers()) {
+
+            boolean hasTankEffect =
+                    tank.hasEffect(
+                            MartialEffectRegistry
+                                    .GUARDIANS_COVENANT_TANK
+                                    .get()
+                    );
+
+            if (hasState(tank) || hasTankEffect) {
+                tick(tank);
+            }
+        }
+
+        /*
+         * Defensive cleanup for any state whose player is no longer
+         * connected.
+         */
+        STATES.keySet().removeIf(
+                tankUuid ->
+                        server.getPlayerList()
+                                .getPlayer(tankUuid) == null
+        );
     }
 }

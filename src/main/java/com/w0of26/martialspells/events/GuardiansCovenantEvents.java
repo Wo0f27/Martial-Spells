@@ -108,18 +108,16 @@ public final class GuardiansCovenantEvents {
     }
 
     @SubscribeEvent
-    public static void onPlayerTick(
-            TickEvent.PlayerTickEvent event
+    public static void onServerTick(
+            TickEvent.ServerTickEvent event
     ) {
         if (event.phase != TickEvent.Phase.END) {
             return;
         }
 
-        if (!(event.player instanceof ServerPlayer tank)) {
-            return;
-        }
-
-        GuardiansCovenantRedirectManager.tick(tank);
+        GuardiansCovenantRedirectManager.tickAll(
+                event.getServer()
+        );
     }
 
     @SubscribeEvent

@@ -38,7 +38,7 @@ public final class GuardiansCovenantSpell extends AbstractSpell {
             10,
             12,
             14,
-            16
+            20 //16 is the actual value, this is for testing purposes only
     };
 
     private static final double[] RADIUS_BLOCKS = {
@@ -54,7 +54,7 @@ public final class GuardiansCovenantSpell extends AbstractSpell {
             100,
             80,
             60,
-            40
+            20 //40 is the actual cooldown, this is for testing purposes
     };
 
     private static final float[] REDIRECT_PERCENTAGES = {
