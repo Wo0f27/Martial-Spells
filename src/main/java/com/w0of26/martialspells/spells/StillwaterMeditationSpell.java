@@ -362,17 +362,6 @@ public final class StillwaterMeditationSpell extends AbstractSpell {
             );
         }
 
-        if (KiHelper.getCurrentKi(player)
-                >= maximumKi) {
-            return new CastResult(
-                    CastResult.Type.FAILURE,
-                    Component.translatable(
-                                    "ui.martial_spells.ki_full"
-                            )
-                            .withStyle(ChatFormatting.RED)
-            );
-        }
-
         return new CastResult(
                 CastResult.Type.SUCCESS
         );
@@ -431,6 +420,9 @@ public final class StillwaterMeditationSpell extends AbstractSpell {
                 ),
                 Component.translatable(
                         "ui.martial_spells.interrupted_cooldown"
+                ),
+                Component.translatable(
+                        "ui.martial_spells.monk_codex_only"
                 )
         );
     }
@@ -488,7 +480,7 @@ public final class StillwaterMeditationSpell extends AbstractSpell {
 
     @Override
     public boolean allowCrafting() {
-        return false;
+        return true;
     }
 
     @Override
