@@ -59,6 +59,44 @@ public final class StillwaterMeditationSpell extends AbstractSpell {
             5
     };
 
+    private static final float[] HEALING_PERCENT_PER_PULSE = {
+            0.020F,
+            0.025F,
+            0.030F,
+            0.035F,
+            0.040F
+    };
+
+    private static final float[] DAMAGE_REDUCTION = {
+            0.00F,
+            0.00F,
+            0.00F,
+            0.25F,
+            0.30F
+    };
+
+    private static final int HEALING_PULSE_INTERVAL = 20;
+
+    /*
+     * The fourth pulse is applied in onCast when the channel succeeds.
+     * onServerCastTick handles only the first three pulses.
+     */
+    private static final int TICKED_HEALING_PULSES = 3;
+
+    private static final int EARLY_INTERRUPTION_COOLDOWN_TICKS =
+            5 * 20;
+
+    private static final int HEALED_INTERRUPTION_COOLDOWN_TICKS =
+            15 * 20;
+
+    private static final String CHANNEL_TICKS_TAG =
+            MartialSpells.MOD_ID
+                    + "_stillwater_meditation_channel_ticks";
+
+    private static final String HEALING_PULSES_TAG =
+            MartialSpells.MOD_ID
+                    + "_stillwater_meditation_healing_pulses";
+
     private static final String START_X_TAG =
             MartialSpells.MOD_ID
                     + "_stillwater_meditation_start_x";
@@ -126,39 +164,92 @@ public final class StillwaterMeditationSpell extends AbstractSpell {
                 ];
     }
 
+    public static float getHealingPercentPerPulse(
+            int spellLevel
+    ) {
+        return HEALING_PERCENT_PER_PULSE[
+                getLevelIndex(spellLevel)
+                ];
+    }
+
+    public static float getTotalHealingPercent(
+            int spellLevel
+    ) {
+        return getHealingPercentPerPulse(spellLevel) * 4.0F;
+    }
+
+    public static float getDamageReduction(
+            int spellLevel
+    ) {
+        return DAMAGE_REDUCTION[
+                getLevelIndex(spellLevel)
+                ];
+    }
+
     public static int getChannelTicks() {
         return CHANNEL_TICKS;
     }
-
     /**
-     * Checks whether an entity is actively channeling Stillwater
-     * Meditation at or above the requested spell level.
+     * Returns the active Meditation level, or zero when the entity
+     * is not currently channeling Stillwater Meditation.
      */
+    public static int getActiveMeditationLevel(
+            LivingEntity entity
+    ) {
+        if (!(entity instanceof Player player)) {
+            return 0;
+        }
+
+        MagicData magicData =
+                MagicData.getPlayerMagicData(player);
+
+        if (!magicData.isCasting()) {
+            return 0;
+        }
+
+        if (!SPELL_ID.toString().equals(
+                magicData.getCastingSpellId()
+        )) {
+            return 0;
+        }
+
+        return clampLevel(
+                magicData.getCastingSpellLevel()
+        );
+    }
+
     public static boolean isMeditating(
             LivingEntity entity
     ) {
-        return isMeditatingAtOrAbove(entity, 1);
+        return getActiveMeditationLevel(entity) > 0;
     }
 
     public static boolean isMeditatingAtOrAbove(
             LivingEntity entity,
             int minimumLevel
     ) {
-        if (!(entity instanceof Player player)) {
-            return false;
-        }
-
-        MagicData magicData =
-                MagicData.getPlayerMagicData(player);
-
-        return magicData.isCasting()
-                && SPELL_ID.toString().equals(
-                magicData.getCastingSpellId()
-        )
-                && magicData.getCastingSpellLevel()
+        return getActiveMeditationLevel(entity)
                 >= minimumLevel;
     }
 
+
+    private static void applyHealingPulse(
+            ServerPlayer player,
+            int spellLevel
+    ) {
+        if (!player.isAlive()
+                || player.isDeadOrDying()) {
+            return;
+        }
+
+        float healingAmount =
+                player.getMaxHealth()
+                        * getHealingPercentPerPulse(
+                        spellLevel
+                );
+
+        player.heal(healingAmount);
+    }
     /**
      * Level IV and V Meditation cannot be interrupted by incoming damage.
      *
@@ -313,6 +404,33 @@ public final class StillwaterMeditationSpell extends AbstractSpell {
                 ),
                 Component.translatable(
                         "ui.martial_spells.attacking_cancels_meditation"
+                ),
+                Component.translatable(
+                        "ui.martial_spells.meditation_healing",
+                        Utils.stringTruncation(
+                                getHealingPercentPerPulse(spellLevel)
+                                        * 100.0F,
+                                1
+                        )
+                ),
+                Component.translatable(
+                        "ui.martial_spells.meditation_total_healing",
+                        Utils.stringTruncation(
+                                getTotalHealingPercent(spellLevel)
+                                        * 100.0F,
+                                1
+                        )
+                ),
+                Component.translatable(
+                        "ui.martial_spells.meditation_damage_reduction",
+                        Utils.stringTruncation(
+                                getDamageReduction(spellLevel)
+                                        * 100.0F,
+                                1
+                        )
+                ),
+                Component.translatable(
+                        "ui.martial_spells.interrupted_cooldown"
                 )
         );
     }
@@ -344,6 +462,15 @@ public final class StillwaterMeditationSpell extends AbstractSpell {
         if (!codexEquipped) {
             return;
         }
+
+        /*
+         * The fourth pulse occurs only after successfully completing
+         * the full four-second channel.
+         */
+        applyHealingPulse(
+                player,
+                spellLevel
+        );
 
         KiHelper.addKi(
                 player,
@@ -396,6 +523,16 @@ public final class StillwaterMeditationSpell extends AbstractSpell {
                 START_Z_TAG,
                 player.getZ()
         );
+
+        player.getPersistentData().putInt(
+                CHANNEL_TICKS_TAG,
+                0
+        );
+
+        player.getPersistentData().putInt(
+                HEALING_PULSES_TAG,
+                0
+        );
     }
 
     @Override
@@ -415,7 +552,6 @@ public final class StillwaterMeditationSpell extends AbstractSpell {
 
         if (!hasStoredStartPosition(player)) {
             storeStartPosition(player);
-            return;
         }
 
         double startX =
@@ -445,7 +581,49 @@ public final class StillwaterMeditationSpell extends AbstractSpell {
         if (distanceSquared
                 > MOVEMENT_TOLERANCE_SQUARED) {
             Utils.serverSideCancelCast(player);
+            return;
         }
+
+        int elapsedTicks =
+                player.getPersistentData().getInt(
+                        CHANNEL_TICKS_TAG
+                ) + 1;
+
+        player.getPersistentData().putInt(
+                CHANNEL_TICKS_TAG,
+                elapsedTicks
+        );
+
+        /*
+         * Pulses occur at elapsed ticks 20, 40, and 60.
+         *
+         * The final pulse is applied in onCast because Iron's executes
+         * the successful cast instead of onServerCastTick at tick 80.
+         */
+        boolean shouldHeal =
+                elapsedTicks % HEALING_PULSE_INTERVAL == 0
+                        && elapsedTicks
+                        <= HEALING_PULSE_INTERVAL
+                        * TICKED_HEALING_PULSES;
+
+        if (!shouldHeal) {
+            return;
+        }
+
+        applyHealingPulse(
+                player,
+                spellLevel
+        );
+
+        int completedPulses =
+                player.getPersistentData().getInt(
+                        HEALING_PULSES_TAG
+                ) + 1;
+
+        player.getPersistentData().putInt(
+                HEALING_PULSES_TAG,
+                completedPulses
+        );
     }
 
     @Override
@@ -457,13 +635,34 @@ public final class StillwaterMeditationSpell extends AbstractSpell {
             boolean cancelled
     ) {
         if (entity instanceof ServerPlayer player) {
-            clearStartPosition(player);
+            if (cancelled) {
+                int completedHealingPulses =
+                        player.getPersistentData().getInt(
+                                HEALING_PULSES_TAG
+                        );
+
+                int cooldownTicks =
+                        completedHealingPulses > 0
+                                ? HEALED_INTERRUPTION_COOLDOWN_TICKS
+                                : EARLY_INTERRUPTION_COOLDOWN_TICKS;
+
+                /*
+                 * Interrupted long casts do not receive Iron's normal
+                 * successful-cast cooldown, so add the partial cooldown
+                 * directly and synchronize it to the player.
+                 */
+                magicData.getPlayerCooldowns().addCooldown(
+                        this,
+                        cooldownTicks
+                );
+
+                magicData.getPlayerCooldowns()
+                        .syncToPlayer(player);
+            }
+
+            clearMeditationState(player);
         }
 
-        /*
-         * Required: Iron's uses this to reset the casting state and
-         * synchronize the finished/cancelled cast.
-         */
         super.onServerCastComplete(
                 level,
                 spellLevel,
@@ -506,11 +705,19 @@ public final class StillwaterMeditationSpell extends AbstractSpell {
         );
     }
 
-    private static void clearStartPosition(
+    private static void clearMeditationState(
             ServerPlayer player
     ) {
         player.getPersistentData().remove(START_X_TAG);
         player.getPersistentData().remove(START_Y_TAG);
         player.getPersistentData().remove(START_Z_TAG);
+
+        player.getPersistentData().remove(
+                CHANNEL_TICKS_TAG
+        );
+
+        player.getPersistentData().remove(
+                HEALING_PULSES_TAG
+        );
     }
 }

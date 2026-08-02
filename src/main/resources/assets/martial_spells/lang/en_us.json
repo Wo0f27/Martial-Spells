@@ -32,5 +32,9 @@
   "ui.martial_spells.ki_full": "Your Ki is already full.",
   "ui.martial_spells.epic_meditation_mastery": "Level IV+: Cannot be interrupted by damage or knocked back",
   "ui.martial_spells.movement_cancels_meditation": "Movement cancels Meditation",
-  "ui.martial_spells.attacking_cancels_meditation": "Attacking cancels Meditation"
+  "ui.martial_spells.attacking_cancels_meditation": "Attacking cancels Meditation",
+  "ui.martial_spells.meditation_healing": "Healing: %s%% max health per second",
+  "ui.martial_spells.meditation_total_healing": "Full Channel Healing: %s%% max health",
+  "ui.martial_spells.meditation_damage_reduction": "Damage Reduction: %s%%",
+  "ui.martial_spells.interrupted_cooldown": "Interrupted Cooldown: 5–15 seconds"
 }

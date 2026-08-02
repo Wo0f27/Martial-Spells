@@ -4,15 +4,17 @@ import com.w0of26.martialspells.MartialSpells;
 import com.w0of26.martialspells.spells.StillwaterMeditationSpell;
 import io.redspace.ironsspellbooks.api.util.Utils;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingKnockBackEvent;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 /**
- * Handles external Meditation rules not directly managed by Iron's
- * casting framework.
+ * Handles external Meditation rules not directly managed by
+ * Iron's spell-casting framework.
  */
 @Mod.EventBusSubscriber(
         modid = MartialSpells.MOD_ID,
@@ -25,7 +27,7 @@ public final class StillwaterMeditationEvents {
     /**
      * Level IV and V Meditation completely prevent knockback.
      *
-     * Damage still applies, but it does not interrupt the cast.
+     * Damage still applies, but knockback does not move the player.
      */
     @SubscribeEvent
     public static void onLivingKnockback(
@@ -44,10 +46,9 @@ public final class StillwaterMeditationEvents {
     }
 
     /**
-     * Attempting a melee attack manually cancels Meditation.
+     * Attempting a melee attack cancels Meditation.
      *
-     * The triggering attack is canceled, so the player must attack
-     * again after leaving Meditation.
+     * The triggering attack is consumed.
      */
     @SubscribeEvent
     public static void onAttackEntity(
@@ -68,8 +69,9 @@ public final class StillwaterMeditationEvents {
     }
 
     /**
-     * Prevents block breaking during Meditation and treats the
-     * attempt as a voluntary cancellation.
+     * Attempting to break a block cancels Meditation.
+     *
+     * The triggering block-breaking action is consumed.
      */
     @SubscribeEvent
     public static void onLeftClickBlock(
@@ -87,5 +89,44 @@ public final class StillwaterMeditationEvents {
 
         event.setCanceled(true);
         Utils.serverSideCancelCast(player);
+    }
+
+    /**
+     * Applies Meditation's post-mitigation damage reduction.
+     *
+     * Levels I-III currently have 0% damage reduction.
+     * Levels IV-V receive their configured protection.
+     */
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public static void onLivingDamage(
+            LivingDamageEvent event
+    ) {
+        int meditationLevel =
+                StillwaterMeditationSpell
+                        .getActiveMeditationLevel(
+                                event.getEntity()
+                        );
+
+        if (meditationLevel <= 0) {
+            return;
+        }
+
+        float damageReduction =
+                StillwaterMeditationSpell
+                        .getDamageReduction(
+                                meditationLevel
+                        );
+
+        if (damageReduction <= 0.0F) {
+            return;
+        }
+
+        float reducedDamage =
+                event.getAmount()
+                        * (1.0F - damageReduction);
+
+        event.setAmount(
+                Math.max(0.0F, reducedDamage)
+        );
     }
 }
