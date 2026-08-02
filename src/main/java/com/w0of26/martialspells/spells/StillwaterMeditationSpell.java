@@ -21,6 +21,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import javax.annotation.Nullable;
 import io.redspace.ironsspellbooks.api.util.Utils;
+import io.redspace.ironsspellbooks.api.util.AnimationHolder;
 
 import java.util.List;
 
@@ -42,6 +43,13 @@ public final class StillwaterMeditationSpell extends AbstractSpell {
     private static final int CHANNEL_SECONDS = 4;
     private static final int CHANNEL_TICKS =
             CHANNEL_SECONDS * 20;
+
+    private static final AnimationHolder MEDITATION_ANIMATION =
+            new AnimationHolder(
+                    SPELL_ID,
+                    true,
+                    true
+            );
 
     /**
      * Level IV represents the Epic Codex tier.
@@ -144,6 +152,7 @@ public final class StillwaterMeditationSpell extends AbstractSpell {
 
         this.castTime = CHANNEL_TICKS;
     }
+
 
     private static int clampLevel(int spellLevel) {
         return Math.max(
@@ -284,6 +293,16 @@ public final class StillwaterMeditationSpell extends AbstractSpell {
     @Override
     public CastType getCastType() {
         return CastType.LONG;
+    }
+
+    @Override
+    public AnimationHolder getCastStartAnimation() {
+        return MEDITATION_ANIMATION;
+    }
+
+    @Override
+    public AnimationHolder getCastFinishAnimation() {
+        return AnimationHolder.none();
     }
 
     /**

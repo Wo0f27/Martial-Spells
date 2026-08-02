@@ -192,6 +192,10 @@ dependencies {
                 "dev.kosmx.player-anim:player-animation-lib-forge:${player_animator_version}"
         )
 
+    runtimeOnly fg.deobf(
+            "curse.maven:bendy-lib-623373:4550371"
+    )
+
     // Curios
         implementation fg.deobf(
                 "top.theillusivec4.curios:curios-forge:${curios_version}:api"
