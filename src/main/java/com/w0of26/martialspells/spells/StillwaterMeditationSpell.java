@@ -19,6 +19,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import javax.annotation.Nullable;
 
 import java.util.List;
 
@@ -40,6 +41,12 @@ public final class StillwaterMeditationSpell extends AbstractSpell {
     private static final int CHANNEL_SECONDS = 4;
     private static final int CHANNEL_TICKS =
             CHANNEL_SECONDS * 20;
+
+    /**
+     * Level IV represents the Epic Codex tier.
+     */
+    public static final int UNINTERRUPTIBLE_LEVEL = 4;
+
 
     private static final int COOLDOWN_SECONDS = 50;
 
@@ -99,6 +106,50 @@ public final class StillwaterMeditationSpell extends AbstractSpell {
 
     public static int getChannelTicks() {
         return CHANNEL_TICKS;
+    }
+
+    /**
+     * Checks whether an entity is actively channeling Stillwater
+     * Meditation at or above the requested spell level.
+     */
+    public static boolean isMeditatingAtOrAbove(
+            LivingEntity entity,
+            int minimumLevel
+    ) {
+        if (!(entity instanceof Player player)) {
+            return false;
+        }
+
+        MagicData magicData =
+                MagicData.getPlayerMagicData(player);
+
+        return magicData.isCasting()
+                && SPELL_ID.toString().equals(
+                magicData.getCastingSpellId()
+        )
+                && magicData.getCastingSpellLevel()
+                >= minimumLevel;
+    }
+
+    /**
+     * Level IV and V Meditation cannot be interrupted by incoming damage.
+     *
+     * Lower levels retain Iron's normal interruption rules, including
+     * compatibility with the Concentration Amulet.
+     */
+    @Override
+    public boolean canBeInterrupted(
+            @Nullable Player player
+    ) {
+        if (player != null
+                && isMeditatingAtOrAbove(
+                player,
+                UNINTERRUPTIBLE_LEVEL
+        )) {
+            return false;
+        }
+
+        return super.canBeInterrupted(player);
     }
 
     @Override
@@ -225,6 +276,9 @@ public final class StillwaterMeditationSpell extends AbstractSpell {
                 Component.translatable(
                         "ui.martial_spells.fixed_cooldown",
                         COOLDOWN_SECONDS
+                ),
+                Component.translatable(
+                        "ui.martial_spells.epic_meditation_mastery"
                 )
         );
     }
