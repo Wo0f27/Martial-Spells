@@ -20,5 +20,7 @@
   "ui.martial_spells.damage_redirect": "Damage Redirect: %s%%",
   "ui.martial_spells.absorption_health": "Absorption: %s health",
   "ui.martial_spells.armor_bonus": "Armor: +%s",
-  "ui.martial_spells.toughness_bonus": "Armor Toughness: +%s"
+  "ui.martial_spells.toughness_bonus": "Armor Toughness: +%s",
+
+  "item.martial_spells.monk_codex": "Monk Codex"
 }

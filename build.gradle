@@ -164,7 +164,7 @@ dependencies {
         )
 
     // Full Iron's mod in the development client
-        runtimeOnly fg.deobf(
+        implementation fg.deobf(
                 "io.redspace:irons_spellbooks:${irons_spells_version}"
         )
 
