@@ -3,6 +3,7 @@ package com.w0of26.martialspells.registry;
 import com.w0of26.martialspells.MartialSpells;
 import com.w0of26.martialspells.spells.GuardiansCrySpell;
 import com.w0of26.martialspells.spells.GuardiansCovenantSpell;
+import com.w0of26.martialspells.spells.StillwaterMeditationSpell;
 import io.redspace.ironsspellbooks.api.registry.SpellRegistry;
 import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -26,6 +27,13 @@ public final class MartialSpellRegistry {
             SPELLS.register(
                     "guardians_covenant",
                     GuardiansCovenantSpell::new
+            );
+
+    public static final RegistryObject<AbstractSpell>
+            STILLWATER_MEDITATION =
+            SPELLS.register(
+                    "stillwater_meditation",
+                    StillwaterMeditationSpell::new
             );
 
     private MartialSpellRegistry() {

@@ -22,5 +22,12 @@
   "ui.martial_spells.armor_bonus": "Armor: +%s",
   "ui.martial_spells.toughness_bonus": "Armor Toughness: +%s",
 
-  "item.martial_spells.monk_codex": "Monk Codex"
+  "item.martial_spells.monk_codex": "Monk Codex",
+
+  "spell.martial_spells.stillwater_meditation": "Stillwater Meditation",
+  "spell.martial_spells.stillwater_meditation.description": "Enter a state of deliberate stillness, gathering inner energy and restoring Ki upon completing the meditation.",
+  "ui.martial_spells.ki_generated": "Ki Generated: %s",
+  "ui.martial_spells.fixed_channel_time": "Fixed Channel Time: %s seconds",
+  "ui.martial_spells.requires_monk_codex": "This technique requires an equipped Monk Codex.",
+  "ui.martial_spells.ki_full": "Your Ki is already full."
 }
