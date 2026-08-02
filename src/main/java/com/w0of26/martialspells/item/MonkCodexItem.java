@@ -18,6 +18,7 @@ public final class MonkCodexItem extends SpellBook {
     public static final int CODEX_TIER = 1;
     public static final int MAXIMUM_KI = 3;
     public static final int MEDITATION_SLOT = 0;
+    public static final int FLURRY_SLOT = 1;
     /*
      * Two future locked core-technique slots and two open slots.
      */
@@ -75,6 +76,23 @@ public final class MonkCodexItem extends SpellBook {
                         MEDITATION_SLOT,
                         true
                 );
+
+        boolean flurryAdded =
+                spellContainer.addSpellAtIndex(
+                        MartialSpellRegistry
+                                .FLURRY_OF_BLOWS
+                                .get(),
+                        CODEX_TIER,
+                        FLURRY_SLOT,
+                        true
+                );
+
+        if (!flurryAdded) {
+            MartialSpells.LOGGER.error(
+                    "Failed to add Flurry of Blows "
+                            + "to the Monk Codex"
+            );
+        }
 
         if (!meditationAdded) {
             MartialSpells.LOGGER.error(

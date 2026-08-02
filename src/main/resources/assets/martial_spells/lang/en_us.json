@@ -37,5 +37,16 @@
   "ui.martial_spells.meditation_healing": "Healing: %s%% max health per second",
   "ui.martial_spells.meditation_total_healing": "Full Channel Healing: %s%% max health",
   "ui.martial_spells.meditation_damage_reduction": "Damage Reduction: %s%%",
-  "ui.martial_spells.interrupted_cooldown": "Interrupted Cooldown: 5–15 seconds"
+  "ui.martial_spells.interrupted_cooldown": "Interrupted Cooldown: 5–15 seconds",
+
+  "spell.martial_spells.flurry_of_blows": "Flurry of Blows",
+  "spell.martial_spells.flurry_of_blows.description": "Unleash two rapid martial strikes against an enemy directly in front of you.",
+  "ui.martial_spells.ki_cost": "Ki Cost: %s",
+  "ui.martial_spells.flurry_strikes": "Strikes: %s",
+  "ui.martial_spells.flurry_damage_per_strike": "Damage per Strike: %s%% attack damage",
+  "ui.martial_spells.flurry_range": "Range: %s blocks",
+  "ui.martial_spells.requires_monk_weapon": "Requires empty hands, gauntlets, a quarterstaff, or a Monk weapon.",
+  "ui.martial_spells.not_enough_ki": "You do not have enough Ki.",
+  "ui.martial_spells.no_flurry_target": "No valid target is within striking range.",
+  "ui.martial_spells.server_player_required": "This technique requires a server-side player."
 }

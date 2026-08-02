@@ -11,6 +11,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
 
 /**
  * Prevents Monk techniques from being inscribed into ordinary
@@ -28,16 +29,22 @@ public final class MonkTechniqueRestrictionEvents {
     public static void onInscribeSpell(
             InscribeSpellEvent event
     ) {
-        /*
-         * Ignore ordinary Iron's spells and non-Monk spells.
-         */
-        if (!event.getSpellData()
-                .getSpell()
-                .equals(
+        AbstractSpell spell =
+                event.getSpellData().getSpell();
+
+        boolean isMonkTechnique =
+                spell.equals(
                         MartialSpellRegistry
                                 .STILLWATER_MEDITATION
                                 .get()
-                )) {
+                )
+                        || spell.equals(
+                        MartialSpellRegistry
+                                .FLURRY_OF_BLOWS
+                                .get()
+                );
+
+        if (!isMonkTechnique) {
             return;
         }
 
