@@ -147,6 +147,15 @@ repositories {
             includeGroup "curse.maven"
         }
     }
+
+    maven {
+        name = "Modrinth"
+        url = "https://api.modrinth.com/maven"
+
+        content {
+            includeGroup "maven.modrinth"
+        }
+    }
 }
 
 dependencies {
@@ -194,6 +203,14 @@ dependencies {
 
     runtimeOnly fg.deobf(
             "curse.maven:bendy-lib-623373:4550371"
+    )
+
+    runtimeOnly fg.deobf(
+            "maven.modrinth:5sy6g3kz:rnhiaw3t"
+    )
+
+    runtimeOnly fg.deobf(
+            "maven.modrinth:9s6osm5g:t8TXrZvZ"
     )
 
     // Curios

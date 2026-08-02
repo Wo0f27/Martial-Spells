@@ -1,7 +1,9 @@
 package com.w0of26.martialspells.spells;
 
 import com.w0of26.martialspells.MartialSpells;
+import io.redspace.ironsspellbooks.api.util.AnimationHolder;
 import com.w0of26.martialspells.combat.FlurrySequenceManager;
+import net.minecraft.resources.ResourceLocation;
 import com.w0of26.martialspells.combat.MonkWeaponHelper;
 import com.w0of26.martialspells.ki.KiHelper;
 import com.w0of26.martialspells.registry.MartialItemRegistry;
@@ -17,7 +19,6 @@ import io.redspace.ironsspellbooks.api.util.RaycastBuilder;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -25,7 +26,10 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
-
+import com.w0of26.martialspells.client.animation.FlurryClientAnimations;
+import net.minecraft.world.InteractionHand;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
 import javax.annotation.Nullable;
 import java.util.List;
 
@@ -354,5 +358,54 @@ public final class FlurryOfBlowsSpell
     @Override
     public boolean allowCrafting() {
         return true;
+    }
+
+    /*
+     * Temporary animation reference.
+     *
+     * This uses Better Combat's existing fist animation only to verify
+     * that Flurry correctly enters Iron's PlayerAnimator pipeline.
+     *
+     * It does not invoke Better Combat's damage or attack system.
+     */
+
+    @Override
+    public AnimationHolder getCastStartAnimation() {
+        /*
+         * The correct animation is selected by spell level
+         * inside onClientPreCast.
+         */
+        return AnimationHolder.none();
+    }
+
+    @Override
+    public AnimationHolder getCastFinishAnimation() {
+        return AnimationHolder.pass();
+    }
+
+    @Override
+    public void onClientPreCast(
+            Level level,
+            int spellLevel,
+            LivingEntity entity,
+            InteractionHand hand,
+            @Nullable MagicData magicData
+    ) {
+        super.onClientPreCast(
+                level,
+                spellLevel,
+                entity,
+                hand,
+                magicData
+        );
+
+        DistExecutor.unsafeRunWhenOn(
+                Dist.CLIENT,
+                () -> () ->
+                        FlurryClientAnimations.play(
+                                entity,
+                                spellLevel
+                        )
+        );
     }
 }
