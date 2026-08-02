@@ -20,6 +20,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import javax.annotation.Nullable;
+import io.redspace.ironsspellbooks.api.util.Utils;
 
 import java.util.List;
 
@@ -57,6 +58,27 @@ public final class StillwaterMeditationSpell extends AbstractSpell {
             4,
             5
     };
+
+    private static final String START_X_TAG =
+            MartialSpells.MOD_ID
+                    + "_stillwater_meditation_start_x";
+
+    private static final String START_Y_TAG =
+            MartialSpells.MOD_ID
+                    + "_stillwater_meditation_start_y";
+
+    private static final String START_Z_TAG =
+            MartialSpells.MOD_ID
+                    + "_stillwater_meditation_start_z";
+
+    /*
+     * Allows tiny floating-point position differences without treating
+     * them as deliberate movement.
+     *
+     * 0.05 blocks squared = 0.0025.
+     */
+    private static final double MOVEMENT_TOLERANCE_SQUARED =
+            0.0025D;
 
     private final DefaultConfig defaultConfig =
             new DefaultConfig()
@@ -112,6 +134,12 @@ public final class StillwaterMeditationSpell extends AbstractSpell {
      * Checks whether an entity is actively channeling Stillwater
      * Meditation at or above the requested spell level.
      */
+    public static boolean isMeditating(
+            LivingEntity entity
+    ) {
+        return isMeditatingAtOrAbove(entity, 1);
+    }
+
     public static boolean isMeditatingAtOrAbove(
             LivingEntity entity,
             int minimumLevel
@@ -279,6 +307,12 @@ public final class StillwaterMeditationSpell extends AbstractSpell {
                 ),
                 Component.translatable(
                         "ui.martial_spells.epic_meditation_mastery"
+                ),
+                Component.translatable(
+                        "ui.martial_spells.movement_cancels_meditation"
+                ),
+                Component.translatable(
+                        "ui.martial_spells.attacking_cancels_meditation"
                 )
         );
     }
@@ -328,5 +362,155 @@ public final class StillwaterMeditationSpell extends AbstractSpell {
     @Override
     public boolean allowCrafting() {
         return false;
+    }
+
+    @Override
+    public void onServerPreCast(
+            Level level,
+            int spellLevel,
+            LivingEntity entity,
+            @Nullable MagicData magicData
+    ) {
+        super.onServerPreCast(
+                level,
+                spellLevel,
+                entity,
+                magicData
+        );
+
+        if (!(entity instanceof ServerPlayer player)) {
+            return;
+        }
+
+        player.getPersistentData().putDouble(
+                START_X_TAG,
+                player.getX()
+        );
+
+        player.getPersistentData().putDouble(
+                START_Y_TAG,
+                player.getY()
+        );
+
+        player.getPersistentData().putDouble(
+                START_Z_TAG,
+                player.getZ()
+        );
+    }
+
+    @Override
+    public void onServerCastTick(
+            Level level,
+            int spellLevel,
+            LivingEntity entity,
+            @Nullable MagicData magicData
+    ) {
+        if (!(entity instanceof ServerPlayer player)) {
+            return;
+        }
+
+        if (!isMeditating(player)) {
+            return;
+        }
+
+        if (!hasStoredStartPosition(player)) {
+            storeStartPosition(player);
+            return;
+        }
+
+        double startX =
+                player.getPersistentData().getDouble(
+                        START_X_TAG
+                );
+
+        double startY =
+                player.getPersistentData().getDouble(
+                        START_Y_TAG
+                );
+
+        double startZ =
+                player.getPersistentData().getDouble(
+                        START_Z_TAG
+                );
+
+        double deltaX = player.getX() - startX;
+        double deltaY = player.getY() - startY;
+        double deltaZ = player.getZ() - startZ;
+
+        double distanceSquared =
+                deltaX * deltaX
+                        + deltaY * deltaY
+                        + deltaZ * deltaZ;
+
+        if (distanceSquared
+                > MOVEMENT_TOLERANCE_SQUARED) {
+            Utils.serverSideCancelCast(player);
+        }
+    }
+
+    @Override
+    public void onServerCastComplete(
+            Level level,
+            int spellLevel,
+            LivingEntity entity,
+            MagicData magicData,
+            boolean cancelled
+    ) {
+        if (entity instanceof ServerPlayer player) {
+            clearStartPosition(player);
+        }
+
+        /*
+         * Required: Iron's uses this to reset the casting state and
+         * synchronize the finished/cancelled cast.
+         */
+        super.onServerCastComplete(
+                level,
+                spellLevel,
+                entity,
+                magicData,
+                cancelled
+        );
+    }
+
+    private static void storeStartPosition(
+            ServerPlayer player
+    ) {
+        player.getPersistentData().putDouble(
+                START_X_TAG,
+                player.getX()
+        );
+
+        player.getPersistentData().putDouble(
+                START_Y_TAG,
+                player.getY()
+        );
+
+        player.getPersistentData().putDouble(
+                START_Z_TAG,
+                player.getZ()
+        );
+    }
+
+    private static boolean hasStoredStartPosition(
+            ServerPlayer player
+    ) {
+        return player.getPersistentData().contains(
+                START_X_TAG
+        )
+                && player.getPersistentData().contains(
+                START_Y_TAG
+        )
+                && player.getPersistentData().contains(
+                START_Z_TAG
+        );
+    }
+
+    private static void clearStartPosition(
+            ServerPlayer player
+    ) {
+        player.getPersistentData().remove(START_X_TAG);
+        player.getPersistentData().remove(START_Y_TAG);
+        player.getPersistentData().remove(START_Z_TAG);
     }
 }

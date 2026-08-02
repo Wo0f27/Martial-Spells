@@ -30,5 +30,7 @@
   "ui.martial_spells.fixed_channel_time": "Fixed Channel Time: %s seconds",
   "ui.martial_spells.requires_monk_codex": "This technique requires an equipped Monk Codex.",
   "ui.martial_spells.ki_full": "Your Ki is already full.",
-  "ui.martial_spells.epic_meditation_mastery": "Level IV+: Cannot be interrupted by damage or knocked back"
+  "ui.martial_spells.epic_meditation_mastery": "Level IV+: Cannot be interrupted by damage or knocked back",
+  "ui.martial_spells.movement_cancels_meditation": "Movement cancels Meditation",
+  "ui.martial_spells.attacking_cancels_meditation": "Attacking cancels Meditation"
 }
