@@ -17,7 +17,9 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-
+import net.minecraft.core.particles.SimpleParticleType;
+import net.minecraft.world.entity.HumanoidArm;
+import net.minecraft.world.phys.Vec3;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -48,6 +50,8 @@ public final class FlurrySequenceManager {
             {3, 7, 11, 15, 19, 23}
     };
 
+    private static final SimpleParticleType PUNCH_PARTICLE =
+            ParticleTypes.CLOUD;
     /*
      * Flurry permits movement, but reduces movement speed to 65%
      * while the active punch sequence is running.
@@ -168,6 +172,14 @@ public final class FlurrySequenceManager {
                 >= strikeSchedule[
                 sequence.nextStrikeIndex
                 ]) {
+
+            boolean offhandPunch =
+                    sequence.nextStrikeIndex % 2 == 1;
+
+            spawnPunchParticles(
+                    player,
+                    offhandPunch
+            );
 
             performStrike(
                     player,
@@ -351,6 +363,71 @@ public final class FlurrySequenceManager {
             this.levelIndex = levelIndex;
             this.damagePerStrike = damagePerStrike;
             this.nextStrikeIndex = 0;
+        }
+    }
+
+    private static void spawnPunchParticles(
+            ServerPlayer player,
+            boolean offhandPunch
+    ) {
+        Vec3 lookDirection =
+                player.getLookAngle().normalize();
+
+        double yawRadians =
+                Math.toRadians(player.getYRot());
+
+        Vec3 rightDirection =
+                new Vec3(
+                        Math.cos(yawRadians),
+                        0.0D,
+                        Math.sin(yawRadians)
+                );
+
+        boolean punchingFromRight =
+                player.getMainArm() == HumanoidArm.RIGHT;
+
+        if (offhandPunch) {
+            punchingFromRight = !punchingFromRight;
+        }
+
+        double sideOffset =
+                punchingFromRight
+                        ? 0.30D
+                        : -0.30D;
+
+        Vec3 fistStart =
+                player.position()
+                        .add(
+                                0.0D,
+                                player.getBbHeight() * 0.72D,
+                                0.0D
+                        )
+                        .add(
+                                rightDirection.scale(sideOffset)
+                        )
+                        .add(
+                                lookDirection.scale(0.25D)
+                        );
+
+        for (int point = 0; point < 4; point++) {
+            Vec3 particlePosition =
+                    fistStart.add(
+                            lookDirection.scale(
+                                    point * 0.20D
+                            )
+                    );
+
+            player.serverLevel().sendParticles(
+                    PUNCH_PARTICLE,
+                    particlePosition.x,
+                    particlePosition.y,
+                    particlePosition.z,
+                    1,
+                    0.025D,
+                    0.025D,
+                    0.025D,
+                    0.01D
+            );
         }
     }
 }

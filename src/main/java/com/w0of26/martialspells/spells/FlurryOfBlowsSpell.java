@@ -67,15 +67,6 @@ public final class FlurryOfBlowsSpell
             0.60F
     };
 
-    private static final AnimationHolder FLURRY_WINDUP_ANIMATION =
-            new AnimationHolder(
-                    ResourceLocation.fromNamespaceAndPath(
-                            MartialSpells.MOD_ID,
-                            "flurry_windup"
-                    ),
-                    true,
-                    true
-            );
 
     private final DefaultConfig defaultConfig =
             new DefaultConfig()
@@ -147,20 +138,8 @@ public final class FlurryOfBlowsSpell
 
     @Override
     public CastType getCastType() {
-        return CastType.LONG;
+        return CastType.INSTANT;
     }
-
-    @Override
-    public int getCastTime(int spellLevel) {return 10;}
-
-    @Override
-    public int getEffectiveCastTime(
-            int spellLevel,
-            @Nullable LivingEntity entity
-    ) {
-        return 10;
-    }
-
 
     @Override
     public int getManaCost(int spellLevel) {
@@ -318,7 +297,7 @@ public final class FlurryOfBlowsSpell
         }
 
         /*
-         * Revalidate the weapon after the wind-up.
+         * Validate the weapon when the technique executes.
          */
         if (!MonkWeaponHelper
                 .hasValidMainHand(player)) {
@@ -326,7 +305,7 @@ public final class FlurryOfBlowsSpell
         }
 
         /*
-         * Ki is consumed when the wind-up successfully completes,
+         * Ki is consumed immediately when the technique executes,
          * even when every subsequent punch misses.
          */
         int effectiveKiCost =
@@ -442,7 +421,7 @@ public final class FlurryOfBlowsSpell
 
     @Override
     public AnimationHolder getCastStartAnimation() {
-        return FLURRY_WINDUP_ANIMATION;
+        return AnimationHolder.none();
     }
 
     @Override
