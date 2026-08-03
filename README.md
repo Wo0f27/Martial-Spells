@@ -1,4 +1,4 @@
-# Martial Spells
+﻿# Martial Spells
 
 Martial Spells is a Forge 1.20.1 addon for
 [Iron's Spells 'n Spellbooks](https://www.curseforge.com/minecraft/mc-mods/irons-spells-n-spellbooks).

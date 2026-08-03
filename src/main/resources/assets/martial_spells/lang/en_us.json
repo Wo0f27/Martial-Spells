@@ -48,5 +48,6 @@
   "ui.martial_spells.requires_monk_weapon": "Requires empty hands, gauntlets, a quarterstaff, or a Monk weapon.",
   "ui.martial_spells.not_enough_ki": "You do not have enough Ki.",
   "ui.martial_spells.no_flurry_target": "No valid target is within striking range.",
-  "ui.martial_spells.server_player_required": "This technique requires a server-side player."
+  "ui.martial_spells.server_player_required": "This technique requires a server-side player.",
+  "ui.martial_spells.heavy_armor_penalty": "Heavy Armor: +50% Ki cost and -25% technique damage."
 }

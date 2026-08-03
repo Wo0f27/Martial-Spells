@@ -1,6 +1,7 @@
 package com.w0of26.martialspells.spells;
 
 import com.w0of26.martialspells.MartialSpells;
+import io.redspace.ironsspellbooks.api.spells.*;
 import io.redspace.ironsspellbooks.api.util.AnimationHolder;
 import com.w0of26.martialspells.combat.FlurrySequenceManager;
 import net.minecraft.resources.ResourceLocation;
@@ -10,11 +11,6 @@ import com.w0of26.martialspells.registry.MartialItemRegistry;
 import io.redspace.ironsspellbooks.api.config.DefaultConfig;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.api.registry.SchoolRegistry;
-import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
-import io.redspace.ironsspellbooks.api.spells.CastResult;
-import io.redspace.ironsspellbooks.api.spells.CastSource;
-import io.redspace.ironsspellbooks.api.spells.CastType;
-import io.redspace.ironsspellbooks.api.spells.SpellRarity;
 import io.redspace.ironsspellbooks.api.util.RaycastBuilder;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -27,11 +23,11 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import com.w0of26.martialspells.client.animation.FlurryClientAnimations;
-import net.minecraft.world.InteractionHand;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 import javax.annotation.Nullable;
 import java.util.List;
+import com.w0of26.martialspells.combat.MonkEncumbranceHelper;
 
 public final class FlurryOfBlowsSpell
         extends AbstractSpell {
@@ -54,14 +50,32 @@ public final class FlurryOfBlowsSpell
     private static final float
             MINIMUM_EFFECTIVE_ATTACK_DAMAGE = 4.0F;
 
+    private static final int[] STRIKE_COUNTS = {
+            2,
+            3,
+            4,
+            5,
+            6
+    };
+
     private static final float[]
             DAMAGE_MULTIPLIERS = {
             0.60F,
             0.65F,
-            0.70F,
-            0.75F,
-            0.80F
+            0.675F,
+            0.64F,
+            0.60F
     };
+
+    private static final AnimationHolder FLURRY_WINDUP_ANIMATION =
+            new AnimationHolder(
+                    ResourceLocation.fromNamespaceAndPath(
+                            MartialSpells.MOD_ID,
+                            "flurry_windup"
+                    ),
+                    true,
+                    true
+            );
 
     private final DefaultConfig defaultConfig =
             new DefaultConfig()
@@ -101,10 +115,18 @@ public final class FlurryOfBlowsSpell
         return clampLevel(spellLevel) - 1;
     }
 
-    public static float getDamageMultiplier(
+    public static float getDamagePerStrikeMultiplier(
             int spellLevel
     ) {
         return DAMAGE_MULTIPLIERS[
+                getLevelIndex(spellLevel)
+                ];
+    }
+
+    public static int getStrikeCount(
+            int spellLevel
+    ) {
+        return STRIKE_COUNTS[
                 getLevelIndex(spellLevel)
                 ];
     }
@@ -125,8 +147,20 @@ public final class FlurryOfBlowsSpell
 
     @Override
     public CastType getCastType() {
-        return CastType.INSTANT;
+        return CastType.LONG;
     }
+
+    @Override
+    public int getCastTime(int spellLevel) {return 10;}
+
+    @Override
+    public int getEffectiveCastTime(
+            int spellLevel,
+            @Nullable LivingEntity entity
+    ) {
+        return 10;
+    }
+
 
     @Override
     public int getManaCost(int spellLevel) {
@@ -186,19 +220,19 @@ public final class FlurryOfBlowsSpell
             );
         }
 
-        if (!KiHelper.hasKi(serverPlayer, KI_COST)) {
+        int effectiveKiCost =
+                MonkEncumbranceHelper
+                        .getEffectiveKiCost(
+                                KI_COST,
+                                serverPlayer
+                        );
+
+        if (!KiHelper.hasKi(
+                serverPlayer,
+                effectiveKiCost
+        )) {
             return failure(
                     "ui.martial_spells.not_enough_ki"
-            );
-        }
-
-        if (findTarget(
-                player.level(),
-                player
-        ) == null) {
-            return failure(
-                    "ui.martial_spells."
-                            + "no_flurry_target"
             );
         }
 
@@ -212,20 +246,31 @@ public final class FlurryOfBlowsSpell
             int spellLevel,
             LivingEntity caster
     ) {
+
+        int displayedKiCost =
+                caster == null
+                        ? KI_COST
+                        : MonkEncumbranceHelper
+                        .getEffectiveKiCost(
+                                KI_COST,
+                                caster
+                        );
+
         int percentage =
                 Math.round(
-                        getDamageMultiplier(spellLevel)
-                                * 100.0F
+                        getDamagePerStrikeMultiplier(
+                                spellLevel
+                        ) * 100.0F
                 );
 
         return List.of(
                 Component.translatable(
                         "ui.martial_spells.ki_cost",
-                        KI_COST
+                        displayedKiCost
                 ),
                 Component.translatable(
                         "ui.martial_spells.flurry_strikes",
-                        2
+                        getStrikeCount(spellLevel)
                 ),
                 Component.translatable(
                         "ui.martial_spells."
@@ -240,6 +285,10 @@ public final class FlurryOfBlowsSpell
                 Component.translatable(
                         "ui.martial_spells."
                                 + "requires_monk_weapon"
+                ),
+                Component.translatable(
+                        "ui.martial_spells."
+                                + "heavy_armor_penalty"
                 )
         );
     }
@@ -252,31 +301,45 @@ public final class FlurryOfBlowsSpell
             CastSource castSource,
             MagicData magicData
     ) {
-        if (!(caster
-                instanceof ServerPlayer player)) {
+        if (!(caster instanceof ServerPlayer player)) {
             return;
         }
 
-        if (!MartialItemRegistry
+        /*
+         * Command casting is allowed for development testing.
+         * Normal gameplay still requires the Monk Codex.
+         */
+        if (castSource != CastSource.COMMAND
+                && !MartialItemRegistry
                 .MONK_CODEX
                 .get()
                 .isEquippedBy(player)) {
             return;
         }
 
+        /*
+         * Revalidate the weapon after the wind-up.
+         */
         if (!MonkWeaponHelper
                 .hasValidMainHand(player)) {
             return;
         }
 
-        LivingEntity target =
-                findTarget(level, player);
+        /*
+         * Ki is consumed when the wind-up successfully completes,
+         * even when every subsequent punch misses.
+         */
+        int effectiveKiCost =
+                MonkEncumbranceHelper
+                        .getEffectiveKiCost(
+                                KI_COST,
+                                player
+                        );
 
-        if (target == null) {
-            return;
-        }
-
-        if (!KiHelper.consumeKi(player, KI_COST)) {
+        if (!KiHelper.consumeKi(
+                player,
+                effectiveKiCost
+        )) {
             return;
         }
 
@@ -291,24 +354,32 @@ public final class FlurryOfBlowsSpell
                         attackDamage
                 );
 
-        float damagePerStrike =
+        float baseDamagePerStrike =
                 effectiveAttackDamage
-                        * getDamageMultiplier(
+                        * getDamagePerStrikeMultiplier(
                         spellLevel
                 );
 
+        float damagePerStrike =
+                MonkEncumbranceHelper
+                        .applyDamagePenalty(
+                                baseDamagePerStrike,
+                                player
+                        );
+
         FlurrySequenceManager.begin(
                 player,
-                target,
+                clampLevel(spellLevel),
                 damagePerStrike
         );
     }
 
     @Nullable
-    private static LivingEntity findTarget(
-            Level level,
-            Player player
+    public static LivingEntity findTarget(
+            ServerPlayer player
     ) {
+        Level level = player.level();
+
         HitResult hitResult =
                 RaycastBuilder
                         .begin(level, player)
@@ -371,11 +442,7 @@ public final class FlurryOfBlowsSpell
 
     @Override
     public AnimationHolder getCastStartAnimation() {
-        /*
-         * The correct animation is selected by spell level
-         * inside onClientPreCast.
-         */
-        return AnimationHolder.none();
+        return FLURRY_WINDUP_ANIMATION;
     }
 
     @Override
@@ -383,20 +450,19 @@ public final class FlurryOfBlowsSpell
         return AnimationHolder.pass();
     }
 
+
     @Override
-    public void onClientPreCast(
+    public void onClientCast(
             Level level,
             int spellLevel,
             LivingEntity entity,
-            InteractionHand hand,
-            @Nullable MagicData magicData
+            ICastData castData
     ) {
-        super.onClientPreCast(
+        super.onClientCast(
                 level,
                 spellLevel,
                 entity,
-                hand,
-                magicData
+                castData
         );
 
         DistExecutor.unsafeRunWhenOn(

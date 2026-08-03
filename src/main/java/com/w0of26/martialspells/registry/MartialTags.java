@@ -20,6 +20,9 @@ public final class MartialTags {
         public static final TagKey<Item> QUARTERSTAFFS =
                 create("quarterstaffs");
 
+        public static final TagKey<Item> HEAVY_ARMOR =
+                create("heavy_armor");
+
         private Items() {
         }
 

@@ -1,12 +1,18 @@
 package com.w0of26.martialspells.combat;
 
 import com.w0of26.martialspells.MartialSpells;
+import com.w0of26.martialspells.damage.MartialDamageTypes;
+import com.w0of26.martialspells.spells.FlurryOfBlowsSpell;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -21,43 +27,90 @@ import java.util.UUID;
         bus = Mod.EventBusSubscriber.Bus.FORGE
 )
 public final class FlurrySequenceManager {
-    private static final int SECOND_STRIKE_DELAY_TICKS =
-            11;
+    /*
+     * Strike timings relative to the moment the 10-tick wind-up
+     * successfully finishes.
+     *
+     * Level I:   2 strikes
+     * Level II:  3 strikes
+     * Level III: 4 strikes
+     * Level IV:  5 strikes
+     * Level V:   6 strikes
+     *
+     * These timings should later be aligned with the exact contact
+     * frames of each level's animation.
+     */
+    private static final int[][] STRIKE_TICKS = {
+            {3, 7},
+            {3, 7, 11},
+            {3, 7, 11, 15},
+            {3, 7, 11, 15, 19},
+            {3, 7, 11, 15, 19, 23}
+    };
 
     /*
-     * Allows slight movement after starting Flurry.
-     * 4.5 blocks squared.
+     * Flurry permits movement, but reduces movement speed to 65%
+     * while the active punch sequence is running.
+     *
+     * MULTIPLY_TOTAL with -0.35 means:
+     * 100% - 35% = 65% movement speed.
      */
-    private static final double
-            CONTINUATION_RANGE_SQUARED = 20.25D;
+    private static final UUID MOVEMENT_SLOWDOWN_ID =
+            UUID.fromString(
+                    "4580dfaa-aec2-4ced-a39a-4243cc061f10"
+            );
 
-    private static final Map<UUID, PendingStrike>
-            PENDING_STRIKES = new HashMap<>();
+    private static final AttributeModifier
+            MOVEMENT_SLOWDOWN =
+            new AttributeModifier(
+                    MOVEMENT_SLOWDOWN_ID,
+                    MartialSpells.MOD_ID
+                            + ".flurry_movement_slowdown",
+                    -0.35D,
+                    AttributeModifier.Operation.MULTIPLY_TOTAL
+            );
+
+    private static final Map<UUID, ActiveSequence>
+            ACTIVE_SEQUENCES = new HashMap<>();
 
     private FlurrySequenceManager() {
     }
 
+    /**
+     * Starts a target-independent Flurry sequence.
+     *
+     * No target is stored. Every scheduled strike performs a new
+     * raycast using the player's current position and look direction.
+     */
     public static void begin(
             ServerPlayer player,
-            LivingEntity target,
-            float damage
+            int spellLevel,
+            float damagePerStrike
     ) {
-        performStrike(player, target, damage);
+        int levelIndex =
+                Math.max(
+                        0,
+                        Math.min(
+                                spellLevel - 1,
+                                STRIKE_TICKS.length - 1
+                        )
+                );
 
-        if (!target.isAlive()) {
-            return;
-        }
+        /*
+         * Prevent duplicate movement modifiers or overlapping
+         * sequences, including command-cast testing.
+         */
+        stopSequence(player);
 
-        long executionTick =
-                player.serverLevel().getGameTime()
-                        + SECOND_STRIKE_DELAY_TICKS;
+        applyMovementSlowdown(player);
 
-        PENDING_STRIKES.put(
+        ACTIVE_SEQUENCES.put(
                 player.getUUID(),
-                new PendingStrike(
-                        target.getUUID(),
-                        executionTick,
-                        damage
+                new ActiveSequence(
+                        player.level().dimension(),
+                        player.serverLevel().getGameTime(),
+                        levelIndex,
+                        damagePerStrike
                 )
         );
     }
@@ -73,78 +126,96 @@ public final class FlurrySequenceManager {
             return;
         }
 
-        PendingStrike pending =
-                PENDING_STRIKES.get(
+        ActiveSequence sequence =
+                ACTIVE_SEQUENCES.get(
                         player.getUUID()
                 );
 
-        if (pending == null) {
+        if (sequence == null) {
             return;
         }
 
-        if (player.serverLevel().getGameTime()
-                < pending.executionTick()) {
+        /*
+         * Cancel the remaining sequence when the caster can no
+         * longer validly perform the technique.
+         */
+        if (!player.isAlive()
+                || player.isDeadOrDying()
+                || player.isRemoved()
+                || !player.level()
+                .dimension()
+                .equals(sequence.startDimension)
+                || !MonkWeaponHelper
+                .hasValidMainHand(player)) {
+            stopSequence(player);
             return;
         }
 
-        PENDING_STRIKES.remove(
-                player.getUUID()
-        );
+        long elapsedTicks =
+                player.serverLevel().getGameTime()
+                        - sequence.startTick;
 
-        Entity entity =
-                player.serverLevel().getEntity(
-                        pending.targetId()
-                );
+        int[] strikeSchedule =
+                STRIKE_TICKS[sequence.levelIndex];
 
-        if (!(entity instanceof LivingEntity target)) {
-            return;
+        /*
+         * The while loop allows the sequence to catch up when the
+         * server skips ticks under load.
+         */
+        while (sequence.nextStrikeIndex
+                < strikeSchedule.length
+                && elapsedTicks
+                >= strikeSchedule[
+                sequence.nextStrikeIndex
+                ]) {
+
+            performStrike(
+                    player,
+                    sequence.damagePerStrike
+            );
+
+            sequence.nextStrikeIndex++;
         }
 
-        if (!canContinue(player, target)) {
-            return;
+        if (sequence.nextStrikeIndex
+                >= strikeSchedule.length) {
+            stopSequence(player);
         }
-
-        performStrike(
-                player,
-                target,
-                pending.damage()
-        );
     }
 
-    @SubscribeEvent
-    public static void onPlayerLogout(
-            PlayerEvent.PlayerLoggedOutEvent event
-    ) {
-        PENDING_STRIKES.remove(
-                event.getEntity().getUUID()
-        );
-    }
-
-    private static boolean canContinue(
-            ServerPlayer player,
-            LivingEntity target
-    ) {
-        return player.isAlive()
-                && target.isAlive()
-                && !target.isSpectator()
-                && !player.isAlliedTo(target)
-                && player.distanceToSqr(target)
-                <= CONTINUATION_RANGE_SQUARED
-                && player.hasLineOfSight(target);
-    }
-
+    /**
+     * Each strike searches for a target independently.
+     *
+     * Missing does not cancel the sequence. The player may turn
+     * toward another enemy before the next strike.
+     */
     private static void performStrike(
             ServerPlayer player,
-            LivingEntity target,
             float damage
     ) {
+        LivingEntity target =
+                FlurryOfBlowsSpell.findTarget(player);
+
+        /*
+         * This punch whiffs, but later punches still occur.
+         */
+        if (target == null) {
+            return;
+        }
+
         boolean damaged =
                 target.hurt(
-                        player.damageSources()
-                                .playerAttack(player),
+                        MartialDamageTypes
+                                .flurryOfBlows(player),
                         damage
                 );
 
+        /*
+         * Shields, invulnerability, event cancellation, or another
+         * system may still prevent the damage.
+         *
+         * The remaining sequence continues regardless.
+         */
         if (!damaged) {
             return;
         }
@@ -175,10 +246,111 @@ public final class FlurrySequenceManager {
         );
     }
 
-    private record PendingStrike(
-            UUID targetId,
-            long executionTick,
-            float damage
+    private static void applyMovementSlowdown(
+            ServerPlayer player
     ) {
+        AttributeInstance movementSpeed =
+                player.getAttribute(
+                        Attributes.MOVEMENT_SPEED
+                );
+
+        if (movementSpeed == null) {
+            return;
+        }
+
+        /*
+         * Remove a stale copy before adding the modifier.
+         */
+        movementSpeed.removeModifier(
+                MOVEMENT_SLOWDOWN_ID
+        );
+
+        movementSpeed.addTransientModifier(
+                MOVEMENT_SLOWDOWN
+        );
+    }
+
+    private static void removeMovementSlowdown(
+            ServerPlayer player
+    ) {
+        AttributeInstance movementSpeed =
+                player.getAttribute(
+                        Attributes.MOVEMENT_SPEED
+                );
+
+        if (movementSpeed != null) {
+            movementSpeed.removeModifier(
+                    MOVEMENT_SLOWDOWN_ID
+            );
+        }
+    }
+
+    private static void stopSequence(
+            ServerPlayer player
+    ) {
+        ACTIVE_SEQUENCES.remove(
+                player.getUUID()
+        );
+
+        removeMovementSlowdown(player);
+    }
+
+    @SubscribeEvent
+    public static void onPlayerLogout(
+            PlayerEvent.PlayerLoggedOutEvent event
+    ) {
+        if (event.getEntity()
+                instanceof ServerPlayer player) {
+            stopSequence(player);
+        } else {
+            ACTIVE_SEQUENCES.remove(
+                    event.getEntity().getUUID()
+            );
+        }
+    }
+
+    @SubscribeEvent
+    public static void onPlayerChangedDimension(
+            PlayerEvent.PlayerChangedDimensionEvent event
+    ) {
+        if (event.getEntity()
+                instanceof ServerPlayer player) {
+            stopSequence(player);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onPlayerClone(
+            PlayerEvent.Clone event
+    ) {
+        /*
+         * Prevent a sequence from carrying across death and respawn.
+         * Transient attribute modifiers do not need to be copied.
+         */
+        ACTIVE_SEQUENCES.remove(
+                event.getEntity().getUUID()
+        );
+    }
+
+    private static final class ActiveSequence {
+        private final ResourceKey<Level> startDimension;
+        private final long startTick;
+        private final int levelIndex;
+        private final float damagePerStrike;
+
+        private int nextStrikeIndex;
+
+        private ActiveSequence(
+                ResourceKey<Level> startDimension,
+                long startTick,
+                int levelIndex,
+                float damagePerStrike
+        ) {
+            this.startDimension = startDimension;
+            this.startTick = startTick;
+            this.levelIndex = levelIndex;
+            this.damagePerStrike = damagePerStrike;
+            this.nextStrikeIndex = 0;
+        }
     }
 }
