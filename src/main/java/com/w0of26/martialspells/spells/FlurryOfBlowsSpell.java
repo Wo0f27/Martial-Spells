@@ -28,6 +28,7 @@ import net.minecraftforge.fml.DistExecutor;
 import javax.annotation.Nullable;
 import java.util.List;
 import com.w0of26.martialspells.combat.MonkEncumbranceHelper;
+import net.minecraft.world.InteractionHand;
 
 public final class FlurryOfBlowsSpell
         extends AbstractSpell {
@@ -431,17 +432,19 @@ public final class FlurryOfBlowsSpell
 
 
     @Override
-    public void onClientCast(
+    public void onClientPreCast(
             Level level,
             int spellLevel,
             LivingEntity entity,
-            ICastData castData
+            InteractionHand hand,
+            @Nullable MagicData magicData
     ) {
-        super.onClientCast(
+        super.onClientPreCast(
                 level,
                 spellLevel,
                 entity,
-                castData
+                hand,
+                magicData
         );
 
         DistExecutor.unsafeRunWhenOn(

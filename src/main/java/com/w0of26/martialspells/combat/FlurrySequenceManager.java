@@ -162,6 +162,12 @@ public final class FlurrySequenceManager {
         int[] strikeSchedule =
                 STRIKE_TICKS[sequence.levelIndex];
 
+        spawnHandParticles(
+                player,
+                elapsedTicks,
+                strikeSchedule
+        );
+
         /*
          * The while loop allows the sequence to catch up when the
          * server skips ticks under load.
@@ -173,13 +179,20 @@ public final class FlurrySequenceManager {
                 sequence.nextStrikeIndex
                 ]) {
 
-            boolean offhandPunch =
-                    sequence.nextStrikeIndex % 2 == 1;
+            while (sequence.nextStrikeIndex
+                    < strikeSchedule.length
+                    && elapsedTicks
+                    >= strikeSchedule[
+                    sequence.nextStrikeIndex
+                    ]) {
 
-            spawnPunchParticles(
-                    player,
-                    offhandPunch
-            );
+                performStrike(
+                        player,
+                        sequence.damagePerStrike
+                );
+
+                sequence.nextStrikeIndex++;
+            }
 
             performStrike(
                     player,
@@ -231,22 +244,6 @@ public final class FlurrySequenceManager {
         if (!damaged) {
             return;
         }
-
-        double effectY =
-                target.getY()
-                        + target.getBbHeight() * 0.5D;
-
-        player.serverLevel().sendParticles(
-                ParticleTypes.CRIT,
-                target.getX(),
-                effectY,
-                target.getZ(),
-                6,
-                0.20D,
-                0.20D,
-                0.20D,
-                0.05D
-        );
 
         player.serverLevel().playSound(
                 null,
@@ -366,16 +363,57 @@ public final class FlurrySequenceManager {
         }
     }
 
-    private static void spawnPunchParticles(
+    private static void spawnHandParticles(
             ServerPlayer player,
-            boolean offhandPunch
+            long elapsedTicks,
+            int[] strikeSchedule
     ) {
+        int punchIndex = -1;
+        long punchStartTick = 0L;
+
+        /*
+         * Every punch begins three ticks before its damage-contact tick.
+         *
+         * Contact ticks: 3, 7, 11...
+         * Punch starts:  0, 4, 8...
+         */
+        for (int index = 0;
+             index < strikeSchedule.length;
+             index++) {
+
+            long startTick =
+                    strikeSchedule[index] - 3L;
+
+            long contactTick =
+                    strikeSchedule[index];
+
+            if (elapsedTicks >= startTick
+                    && elapsedTicks <= contactTick) {
+                punchIndex = index;
+                punchStartTick = startTick;
+                break;
+            }
+        }
+
+        /*
+         * No punch is currently active.
+         */
+        if (punchIndex < 0) {
+            return;
+        }
+
+        boolean offhandPunch =
+                punchIndex % 2 == 1;
+
         Vec3 lookDirection =
                 player.getLookAngle().normalize();
 
         double yawRadians =
                 Math.toRadians(player.getYRot());
 
+        /*
+         * Horizontal vector pointing toward the player's right.
+         */
         Vec3 rightDirection =
                 new Vec3(
                         Math.cos(yawRadians),
@@ -384,50 +422,69 @@ public final class FlurrySequenceManager {
                 );
 
         boolean punchingFromRight =
-                player.getMainArm() == HumanoidArm.RIGHT;
+                player.getMainArm()
+                        == HumanoidArm.RIGHT;
 
         if (offhandPunch) {
-            punchingFromRight = !punchingFromRight;
+            punchingFromRight =
+                    !punchingFromRight;
         }
 
         double sideOffset =
                 punchingFromRight
-                        ? 0.30D
-                        : -0.30D;
+                        ? 0.32D
+                        : -0.32D;
 
-        Vec3 fistStart =
+        /*
+         * Move the approximate fist position forward as the punch
+         * approaches its contact tick.
+         */
+        double punchProgress =
+                (elapsedTicks - punchStartTick)
+                        / 3.0D;
+
+        punchProgress =
+                Math.max(
+                        0.0D,
+                        Math.min(1.0D, punchProgress)
+                );
+
+        double forwardOffset =
+                0.20D
+                        + 0.50D * punchProgress;
+
+        Vec3 handPosition =
                 player.position()
                         .add(
                                 0.0D,
-                                player.getBbHeight() * 0.72D,
+                                player.getBbHeight()
+                                        * 0.72D,
                                 0.0D
                         )
                         .add(
-                                rightDirection.scale(sideOffset)
+                                rightDirection.scale(
+                                        sideOffset
+                                )
                         )
                         .add(
-                                lookDirection.scale(0.25D)
+                                lookDirection.scale(
+                                        forwardOffset
+                                )
                         );
 
-        for (int point = 0; point < 4; point++) {
-            Vec3 particlePosition =
-                    fistStart.add(
-                            lookDirection.scale(
-                                    point * 0.20D
-                            )
-                    );
-
-            player.serverLevel().sendParticles(
-                    PUNCH_PARTICLE,
-                    particlePosition.x,
-                    particlePosition.y,
-                    particlePosition.z,
-                    1,
-                    0.025D,
-                    0.025D,
-                    0.025D,
-                    0.01D
-            );
-        }
+        /*
+         * Small cloud cluster around the approximate fist position.
+         */
+        player.serverLevel().sendParticles(
+                PUNCH_PARTICLE,
+                handPosition.x,
+                handPosition.y,
+                handPosition.z,
+                3,
+                0.055D,
+                0.055D,
+                0.055D,
+                0.005D
+        );
     }
 }
