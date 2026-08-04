@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.w0of26.martialspells.mixin.client",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "martial_spells.refmap.json",
+  "client": [
+    "PlayerItemInHandLayerMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
