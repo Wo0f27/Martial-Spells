@@ -23,6 +23,11 @@ import net.minecraft.world.phys.Vec3;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import com.w0of26.martialspells.network.MartialNetwork;
+import com.w0of26.martialspells.network.SyncFlurryVisualPacket;
+import com.w0of26.martialspells.registry.MartialTags;
+import com.w0of26.martialspells.visual.FlurryVisualMode;
+import net.minecraft.world.item.ItemStack;
 
 @Mod.EventBusSubscriber(
         modid = MartialSpells.MOD_ID,
@@ -117,6 +122,64 @@ public final class FlurrySequenceManager {
                         damagePerStrike
                 )
         );
+        ItemStack heldWeapon =
+                player.getMainHandItem().copy();
+
+        FlurryVisualMode visualMode =
+                determineVisualMode(
+                        heldWeapon
+                );
+
+        int visualDurationTicks =
+                getVisualDurationTicks(
+                        levelIndex
+                );
+
+        MartialNetwork.sendToTrackingAndSelf(
+                SyncFlurryVisualPacket.start(
+                        player.getUUID(),
+                        visualMode,
+                        heldWeapon,
+                        visualDurationTicks
+                ),
+                player
+        );
+    }
+    private static FlurryVisualMode
+    determineVisualMode(
+            ItemStack heldWeapon
+    ) {
+        if (heldWeapon.isEmpty()) {
+            return FlurryVisualMode.EMPTY_HAND;
+        }
+
+        if (heldWeapon.is(
+                MartialTags.Items.GAUNTLETS
+        )) {
+            return FlurryVisualMode.GAUNTLET;
+        }
+
+        /*
+         * begin() is reached only after the normal Monk-weapon
+         * validation succeeds.
+         */
+        return FlurryVisualMode.STOWED_WEAPON;
+    }
+
+    private static int getVisualDurationTicks(
+            int levelIndex
+    ) {
+        int[] schedule =
+                STRIKE_TICKS[levelIndex];
+
+        int finalStrikeTick =
+                schedule[schedule.length - 1];
+
+        /*
+         * Keep the weapon stowed briefly after the final contact
+         * so the last punch animation can finish.
+         */
+        return finalStrikeTick + 4;
     }
 
     @SubscribeEvent
@@ -188,7 +251,7 @@ public final class FlurrySequenceManager {
 
         if (sequence.nextStrikeIndex
                 >= strikeSchedule.length) {
-            stopSequence(player);
+            finishSequence(player);
         }
     }
 
@@ -281,11 +344,37 @@ public final class FlurrySequenceManager {
     private static void stopSequence(
             ServerPlayer player
     ) {
+        boolean wasActive =
+                ACTIVE_SEQUENCES.remove(
+                        player.getUUID()
+                ) != null;
+
+        removeMovementSlowdown(player);
+
+        if (wasActive) {
+            MartialNetwork.sendToTrackingAndSelf(
+                    SyncFlurryVisualPacket.stop(
+                            player.getUUID()
+                    ),
+                    player
+            );
+        }
+    }
+
+    private static void finishSequence(
+            ServerPlayer player
+    ) {
         ACTIVE_SEQUENCES.remove(
                 player.getUUID()
         );
 
         removeMovementSlowdown(player);
+
+        /*
+         * Do not send an immediate stop packet here.
+         * The client's short duration allows the final punch
+         * animation to finish before the weapon returns.
+         */
     }
 
     @SubscribeEvent
@@ -294,7 +383,11 @@ public final class FlurrySequenceManager {
     ) {
         if (event.getEntity()
                 instanceof ServerPlayer player) {
-            stopSequence(player);
+            ACTIVE_SEQUENCES.remove(
+                    player.getUUID()
+            );
+
+            removeMovementSlowdown(player);
         } else {
             ACTIVE_SEQUENCES.remove(
                     event.getEntity().getUUID()
