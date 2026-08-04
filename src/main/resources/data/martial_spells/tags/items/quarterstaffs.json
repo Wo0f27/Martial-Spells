@@ -1,0 +1,34 @@
+{
+  "replace": false,
+  "values": [
+    {
+      "id": "spartanweaponry:wooden_quarterstaff",
+      "required": false
+    },
+    {
+      "id": "spartanweaponry:stone_quarterstaff",
+      "required": false
+    },
+    {
+      "id": "spartanweaponry:copper_quarterstaff",
+      "required": false
+    },
+    {
+      "id": "spartanweaponry:iron_quarterstaff",
+      "required": false
+    },
+    {
+      "id": "spartanweaponry:golden_quarterstaff",
+      "required": false
+    },
+    {
+      "id": "spartanweaponry:diamond_quarterstaff",
+      "required": false
+    },
+    {
+      "id": "spartanweaponry:netherite_quarterstaff",
+      "required": false
+    }
+
+  ]
+}

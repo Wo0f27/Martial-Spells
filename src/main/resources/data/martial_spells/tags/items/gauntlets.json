@@ -1,0 +1,13 @@
+{
+  "replace": false,
+  "values": [
+    {
+      "id": "spartanweaponry:cestus",
+      "required": false
+    },
+    {
+      "id": "spartanweaponry:studded_cestus",
+      "required": false
+    }
+  ]
+}

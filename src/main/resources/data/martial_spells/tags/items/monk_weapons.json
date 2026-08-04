@@ -1,0 +1,11 @@
+  {
+  "replace": false,
+  "values": [
+    "#martial_spells:gauntlets",
+    "#martial_spells:quarterstaffs",
+    {
+      "id": "spartanweaponry:iron_katana",
+      "required": false
+    }
+  ]
+}

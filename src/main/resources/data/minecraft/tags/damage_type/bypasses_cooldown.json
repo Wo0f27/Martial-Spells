@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "martial_spells:guardians_covenant_redirect"
+    "martial_spells:guardians_covenant_redirect",
+    "martial_spells:flurry_of_blows"
   ]
 }
