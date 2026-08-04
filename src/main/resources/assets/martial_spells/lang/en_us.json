@@ -24,6 +24,8 @@
 
   "item.martial_spells.monk_codex": "Monk Codex",
   "ui.martial_spells.monk_codex_only": "Monk techniques can only be inscribed into a Monk Codex.",
+  "tooltip.martial_spells.monk_codex_tier": "Codex Tier: %s",
+  "tooltip.martial_spells.monk_codex_max_ki": "Maximum Ki: %s",
 
   "spell.martial_spells.stillwater_meditation": "Stillwater Meditation",
   "spell.martial_spells.stillwater_meditation.description": "Enter a state of deliberate stillness, gathering inner energy and restoring Ki upon completing the meditation.",
