@@ -177,12 +177,18 @@ public final class FlurryClientAnimations {
                 sequence.nextPunchIndex
                 ]) {
 
-            performStrike(
-                    player,
-                    sequence.damagePerStrike
+            /*
+             * Alternate between main-hand and offhand punches.
+             */
+            boolean offhandPunch =
+                    sequence.nextPunchIndex % 2 == 1;
+
+            playPunch(
+                    sequence.player,
+                    offhandPunch
             );
 
-            sequence.nextStrikeIndex++;
+            sequence.nextPunchIndex++;
         }
     }
 

@@ -169,8 +169,7 @@ public final class FlurrySequenceManager {
         );
 
         /*
-         * The while loop allows the sequence to catch up when the
-         * server skips ticks under load.
+         * Catch up safely if the server skips ticks.
          */
         while (sequence.nextStrikeIndex
                 < strikeSchedule.length
@@ -178,21 +177,6 @@ public final class FlurrySequenceManager {
                 >= strikeSchedule[
                 sequence.nextStrikeIndex
                 ]) {
-
-            while (sequence.nextStrikeIndex
-                    < strikeSchedule.length
-                    && elapsedTicks
-                    >= strikeSchedule[
-                    sequence.nextStrikeIndex
-                    ]) {
-
-                performStrike(
-                        player,
-                        sequence.damagePerStrike
-                );
-
-                sequence.nextStrikeIndex++;
-            }
 
             performStrike(
                     player,
