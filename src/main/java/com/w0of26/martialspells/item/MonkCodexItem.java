@@ -44,7 +44,14 @@ public final class MonkCodexItem
          * their attached ISpellContainer.
          */
         super(
-                MonkCodexTier.TIER_I
+                /*
+                 * Advertise the maximum capacity supported by this
+                 * upgradeable item type.
+                 *
+                 * Each individual ItemStack still receives its actual
+                 * Tier I-V capacity through its ISpellContainer.
+                 */
+                MonkCodexTier.TIER_V
                         .getTotalSpellSlots(),
                 new Item.Properties()
                         .stacksTo(1)
