@@ -27,6 +27,11 @@
   "tooltip.martial_spells.monk_codex_tier": "Codex Tier: %s",
   "tooltip.martial_spells.monk_codex_max_ki": "Maximum Ki: %s",
 
+  "item.martial_spells.monk_codex_advancement_ii": "Monk Codex Advancement: Tier II",
+  "item.martial_spells.monk_codex_advancement_iii": "Monk Codex Advancement: Tier III",
+  "item.martial_spells.monk_codex_advancement_iv": "Monk Codex Advancement: Tier IV",
+  "item.martial_spells.monk_codex_advancement_v": "Monk Codex Advancement: Tier V",
+
   "spell.martial_spells.stillwater_meditation": "Stillwater Meditation",
   "spell.martial_spells.stillwater_meditation.description": "Enter a state of deliberate stillness, gathering inner energy and restoring Ki upon completing the meditation.",
   "ui.martial_spells.ki_generated": "Ki Generated: %s",
