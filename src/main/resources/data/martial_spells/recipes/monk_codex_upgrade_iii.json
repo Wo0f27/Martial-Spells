@@ -1,0 +1,13 @@
+{
+  "type": "martial_spells:monk_codex_upgrade",
+  "template": {
+    "item": "martial_spells:monk_codex_advancement_iii"
+  },
+  "base": {
+    "item": "martial_spells:monk_codex"
+  },
+  "addition": {
+    "tag": "martial_spells:codex_upgrade_materials/tier_iii"
+  },
+  "target_tier": 3
+}
