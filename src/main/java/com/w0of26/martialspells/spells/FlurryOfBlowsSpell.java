@@ -6,13 +6,10 @@ import io.redspace.ironsspellbooks.api.util.AnimationHolder;
 import com.w0of26.martialspells.combat.FlurrySequenceManager;
 import net.minecraft.resources.ResourceLocation;
 import com.w0of26.martialspells.combat.MonkWeaponHelper;
-import com.w0of26.martialspells.ki.KiHelper;
-import com.w0of26.martialspells.registry.MartialItemRegistry;
 import io.redspace.ironsspellbooks.api.config.DefaultConfig;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.api.registry.SchoolRegistry;
 import io.redspace.ironsspellbooks.api.util.RaycastBuilder;
-import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerPlayer;
@@ -31,7 +28,7 @@ import com.w0of26.martialspells.combat.MonkEncumbranceHelper;
 import net.minecraft.world.InteractionHand;
 
 public final class FlurryOfBlowsSpell
-        extends AbstractSpell {
+        extends AbstractMonkTechniqueSpell {
     public static final ResourceLocation SPELL_ID =
             ResourceLocation.fromNamespaceAndPath(
                     MartialSpells.MOD_ID,
@@ -86,10 +83,7 @@ public final class FlurryOfBlowsSpell
                     .build();
 
     public FlurryOfBlowsSpell() {
-        this.baseManaCost = 0;
-        this.manaCostPerLevel = 0;
-        this.baseSpellPower = 0;
-        this.spellPowerPerLevel = 0;
+        super(MAX_LEVEL);
     }
 
     private static int clampLevel(
@@ -97,7 +91,10 @@ public final class FlurryOfBlowsSpell
     ) {
         return Math.max(
                 1,
-                Math.min(spellLevel, MAX_LEVEL)
+                Math.min(
+                        spellLevel,
+                        MAX_LEVEL
+                )
         );
     }
 
@@ -111,7 +108,9 @@ public final class FlurryOfBlowsSpell
             int spellLevel
     ) {
         return DAMAGE_MULTIPLIERS[
-                getLevelIndex(spellLevel)
+                getLevelIndex(
+                        spellLevel
+                )
                 ];
     }
 
@@ -119,7 +118,9 @@ public final class FlurryOfBlowsSpell
             int spellLevel
     ) {
         return STRIKE_COUNTS[
-                getLevelIndex(spellLevel)
+                getLevelIndex(
+                        spellLevel
+                )
                 ];
     }
 
@@ -140,11 +141,6 @@ public final class FlurryOfBlowsSpell
     @Override
     public CastType getCastType() {
         return CastType.INSTANT;
-    }
-
-    @Override
-    public int getManaCost(int spellLevel) {
-        return 0;
     }
 
     @Override
@@ -173,23 +169,14 @@ public final class FlurryOfBlowsSpell
             );
         }
 
-        if (castSource != CastSource.COMMAND) {
-            boolean validSource =
-                    castSource
-                            == CastSource.SPELLBOOK;
-
-            boolean codexEquipped =
-                    MartialItemRegistry
-                            .MONK_CODEX
-                            .get()
-                            .isEquippedBy(player);
-
-            if (!validSource || !codexEquipped) {
-                return failure(
-                        "ui.martial_spells."
-                                + "requires_monk_codex"
+        CastResult sourceResult =
+                validateMonkTechniqueSource(
+                        castSource,
+                        player
                 );
-            }
+
+        if (!sourceResult.isSuccess()) {
+            return sourceResult;
         }
 
         if (!MonkWeaponHelper
@@ -200,16 +187,9 @@ public final class FlurryOfBlowsSpell
             );
         }
 
-        int effectiveKiCost =
-                MonkEncumbranceHelper
-                        .getEffectiveKiCost(
-                                KI_COST,
-                                serverPlayer
-                        );
-
-        if (!KiHelper.hasKi(
+        if (!hasTechniqueKi(
                 serverPlayer,
-                effectiveKiCost
+                KI_COST
         )) {
             return failure(
                     "ui.martial_spells.not_enough_ki"
@@ -230,11 +210,10 @@ public final class FlurryOfBlowsSpell
         int displayedKiCost =
                 caster == null
                         ? KI_COST
-                        : MonkEncumbranceHelper
-                        .getEffectiveKiCost(
-                                KI_COST,
-                                caster
-                        );
+                        : getEffectiveTechniqueKiCost(
+                        KI_COST,
+                        caster
+                );
 
         int percentage =
                 Math.round(
@@ -289,11 +268,10 @@ public final class FlurryOfBlowsSpell
          * Command casting is allowed for development testing.
          * Normal gameplay still requires the Monk Codex.
          */
-        if (castSource != CastSource.COMMAND
-                && !MartialItemRegistry
-                .MONK_CODEX
-                .get()
-                .isEquippedBy(player)) {
+        if (!isValidMonkTechniqueSource(
+                castSource,
+                player
+        )) {
             return;
         }
 
@@ -309,16 +287,20 @@ public final class FlurryOfBlowsSpell
          * Ki is consumed immediately when the technique executes,
          * even when every subsequent punch misses.
          */
-        int effectiveKiCost =
-                MonkEncumbranceHelper
+        if (!consumeTechniqueKi(
+                player,
+                KI_COST
+        )) {
+            return;
+        }                MonkEncumbranceHelper
                         .getEffectiveKiCost(
                                 KI_COST,
                                 player
                         );
 
-        if (!KiHelper.consumeKi(
+        if (!consumeTechniqueKi(
                 player,
-                effectiveKiCost
+                KI_COST
         )) {
             return;
         }
@@ -341,15 +323,16 @@ public final class FlurryOfBlowsSpell
                 );
 
         float damagePerStrike =
-                MonkEncumbranceHelper
-                        .applyDamagePenalty(
-                                baseDamagePerStrike,
-                                player
-                        );
+                applyTechniqueDamagePenalty(
+                        baseDamagePerStrike,
+                        player
+                );
 
         FlurrySequenceManager.begin(
                 player,
-                clampLevel(spellLevel),
+                clampTechniqueLevel(
+                        spellLevel
+                ),
                 damagePerStrike
         );
     }
@@ -388,17 +371,6 @@ public final class FlurryOfBlowsSpell
         }
 
         return null;
-    }
-
-    private static CastResult failure(
-            String translationKey
-    ) {
-        return new CastResult(
-                CastResult.Type.FAILURE,
-                Component.translatable(
-                        translationKey
-                ).withStyle(ChatFormatting.RED)
-        );
     }
 
     @Override
