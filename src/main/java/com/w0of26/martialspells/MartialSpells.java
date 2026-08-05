@@ -10,6 +10,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
 import com.w0of26.martialspells.network.MartialNetwork;
 import com.w0of26.martialspells.registry.MartialItemRegistry;
+import com.w0of26.martialspells.registry.MartialRecipeRegistry;
 
 @Mod(MartialSpells.MOD_ID)
 public final class MartialSpells {
@@ -25,6 +26,7 @@ public final class MartialSpells {
         MartialEffectRegistry.register(modEventBus);
         MartialSpellRegistry.register(modEventBus);
         MartialItemRegistry.register(modEventBus);
+        MartialRecipeRegistry.register(modEventBus);
 
         /*
          * Register custom capability types.
