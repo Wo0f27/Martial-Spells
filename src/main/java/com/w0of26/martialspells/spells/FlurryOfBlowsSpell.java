@@ -373,16 +373,6 @@ public final class FlurryOfBlowsSpell
         return null;
     }
 
-    @Override
-    public boolean allowLooting() {
-        return false;
-    }
-
-    @Override
-    public boolean allowCrafting() {
-        return true;
-    }
-
     /*
      * Temporary animation reference.
      *

@@ -202,4 +202,24 @@ public abstract class AbstractMonkTechniqueSpell
                 )
         );
     }
+
+    /**
+     * Monk techniques are learned through the Monk Codex rather
+     * than appearing as random spell loot.
+     */
+    @Override
+    public final boolean allowLooting() {
+        return false;
+    }
+
+    /**
+     * Crafting remains enabled for administrative, datapack, and
+     * progression-system compatibility.
+     *
+     * Technique-scroll restrictions are enforced separately.
+     */
+    @Override
+    public final boolean allowCrafting() {
+        return true;
+    }
 }

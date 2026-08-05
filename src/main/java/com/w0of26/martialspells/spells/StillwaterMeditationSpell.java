@@ -455,18 +455,6 @@ public final class StillwaterMeditationSpell
         );
     }
 
-    /**
-     * This is a permanent core Codex technique rather than random loot.
-     */
-    @Override
-    public boolean allowLooting() {
-        return false;
-    }
-
-    @Override
-    public boolean allowCrafting() {
-        return true;
-    }
 
     @Override
     public void onServerPreCast(
