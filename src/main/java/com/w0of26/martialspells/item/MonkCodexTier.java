@@ -12,35 +12,35 @@ public enum MonkCodexTier {
             "I",
             4,
             1,
-            3
+            4
     ),
     TIER_II(
             2,
             "II",
             5,
             2,
-            3
+            5
     ),
     TIER_III(
             3,
             "III",
             6,
             3,
-            4
+            6
     ),
     TIER_IV(
             4,
             "IV",
-            7,
+            8,
             4,
-            4
+            8
     ),
     TIER_V(
             5,
             "V",
-            8,
+            10,
             5,
-            5
+            10
     );
 
     private static final int CORE_SLOT_COUNT = 2;
