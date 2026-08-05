@@ -2,16 +2,13 @@ package com.w0of26.martialspells.spells;
 
 import com.w0of26.martialspells.MartialSpells;
 import com.w0of26.martialspells.ki.KiHelper;
-import com.w0of26.martialspells.registry.MartialItemRegistry;
 import io.redspace.ironsspellbooks.api.config.DefaultConfig;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.api.registry.SchoolRegistry;
-import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
 import io.redspace.ironsspellbooks.api.spells.CastResult;
 import io.redspace.ironsspellbooks.api.spells.CastSource;
 import io.redspace.ironsspellbooks.api.spells.CastType;
 import io.redspace.ironsspellbooks.api.spells.SpellRarity;
-import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -31,7 +28,8 @@ import java.util.List;
  * The first implementation proves the complete casting-to-Ki loop.
  * Custom animation and explicit interruption rules are added separately.
  */
-public final class StillwaterMeditationSpell extends AbstractSpell {
+public final class StillwaterMeditationSpell
+        extends AbstractMonkTechniqueSpell {
     public static final ResourceLocation SPELL_ID =
             ResourceLocation.fromNamespaceAndPath(
                     MartialSpells.MOD_ID,
@@ -141,14 +139,7 @@ public final class StillwaterMeditationSpell extends AbstractSpell {
                     .build();
 
     public StillwaterMeditationSpell() {
-        /*
-         * Monk techniques use Ki rather than mana.
-         */
-        this.baseManaCost = 0;
-        this.manaCostPerLevel = 0;
-
-        this.baseSpellPower = 0;
-        this.spellPowerPerLevel = 0;
+        super(MAX_LEVEL);
 
         this.castTime = CHANNEL_TICKS;
     }
@@ -320,11 +311,6 @@ public final class StillwaterMeditationSpell extends AbstractSpell {
     }
 
     @Override
-    public int getManaCost(int spellLevel) {
-        return 0;
-    }
-
-    @Override
     public CastResult canBeCastedBy(
             int spellLevel,
             CastSource castSource,
@@ -348,42 +334,27 @@ public final class StillwaterMeditationSpell extends AbstractSpell {
          * Normal gameplay requires the technique to come from an
          * equipped Monk Codex.
          */
-        if (castSource != CastSource.COMMAND) {
-            boolean validSource =
-                    castSource == CastSource.SPELLBOOK;
-
-            boolean codexEquipped =
-                    MartialItemRegistry.MONK_CODEX
-                            .get()
-                            .isEquippedBy(player);
-
-            if (!validSource || !codexEquipped) {
-                return new CastResult(
-                        CastResult.Type.FAILURE,
-                        Component.translatable(
-                                        "ui.martial_spells.requires_monk_codex"
-                                )
-                                .withStyle(ChatFormatting.RED)
+        CastResult sourceResult =
+                validateMonkTechniqueSource(
+                        castSource,
+                        player
                 );
-            }
+
+        if (!sourceResult.isSuccess()) {
+            return sourceResult;
         }
 
         int maximumKi =
                 KiHelper.getMaximumKi(player);
 
         if (maximumKi <= 0) {
-            return new CastResult(
-                    CastResult.Type.FAILURE,
-                    Component.translatable(
-                                    "ui.martial_spells.requires_monk_codex"
-                            )
-                            .withStyle(ChatFormatting.RED)
+            return failure(
+                    "ui.martial_spells."
+                            + "requires_monk_codex"
             );
         }
 
-        return new CastResult(
-                CastResult.Type.SUCCESS
-        );
+        return success();
     }
 
     @Override
@@ -465,12 +436,7 @@ public final class StillwaterMeditationSpell extends AbstractSpell {
          * Revalidate at completion. Removing the Codex during the
          * four-second channel must not grant Ki.
          */
-        boolean codexEquipped =
-                MartialItemRegistry.MONK_CODEX
-                        .get()
-                        .isEquippedBy(player);
-
-        if (!codexEquipped) {
+        if (!hasEquippedMonkCodex(player)) {
             return;
         }
 
@@ -489,18 +455,6 @@ public final class StillwaterMeditationSpell extends AbstractSpell {
         );
     }
 
-    /**
-     * This is a permanent core Codex technique rather than random loot.
-     */
-    @Override
-    public boolean allowLooting() {
-        return false;
-    }
-
-    @Override
-    public boolean allowCrafting() {
-        return true;
-    }
 
     @Override
     public void onServerPreCast(
