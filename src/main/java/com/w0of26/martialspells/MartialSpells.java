@@ -11,6 +11,8 @@ import org.slf4j.Logger;
 import com.w0of26.martialspells.network.MartialNetwork;
 import com.w0of26.martialspells.registry.MartialItemRegistry;
 import com.w0of26.martialspells.registry.MartialRecipeRegistry;
+import com.w0of26.martialspells.registry.MartialAttributeRegistry;
+import com.w0of26.martialspells.registry.MartialSchoolRegistry;
 
 @Mod(MartialSpells.MOD_ID)
 public final class MartialSpells {
@@ -27,6 +29,8 @@ public final class MartialSpells {
         MartialSpellRegistry.register(modEventBus);
         MartialItemRegistry.register(modEventBus);
         MartialRecipeRegistry.register(modEventBus);
+        MartialAttributeRegistry.register(modEventBus);
+        MartialSchoolRegistry.register(modEventBus);
 
         /*
          * Register custom capability types.
