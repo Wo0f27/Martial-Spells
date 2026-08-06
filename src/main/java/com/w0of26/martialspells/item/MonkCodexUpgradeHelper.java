@@ -72,16 +72,41 @@ public final class MonkCodexUpgradeHelper {
             return UpgradeResult.MISSING_CONTAINER;
         }
 
+        int oldCapacity =
+                oldContainer.getMaxSpellCount();
+
+        int currentBaseCapacity =
+                currentTier.getTotalSpellSlots();
+
+        /*
+         * Any capacity above the current tier's normal amount came from
+         * an external spell-slot improvement.
+         */
+        int preservedBonusSlots =
+                Math.max(
+                        0,
+                        oldCapacity
+                                - currentBaseCapacity
+                );
+
+        int targetCapacity =
+                Math.min(
+                        MonkCodexItem.ABSOLUTE_SLOT_LIMIT,
+                        targetTier.getTotalSpellSlots()
+                                + preservedBonusSlots
+                );
+
         /*
          * Build a completely separate container first.
          */
         ISpellContainerMutable newContainer =
                 ISpellContainer.create(
-                        targetTier
-                                .getTotalSpellSlots(),
+                        targetCapacity,
                         oldContainer.isSpellWheel(),
                         oldContainer.mustEquip()
                 ).mutableCopy();
+
+
 
         /*
          * Preserve Iron's improved-container flag.
@@ -130,11 +155,11 @@ public final class MonkCodexUpgradeHelper {
 
         int copiedSlotLimit =
                 Math.min(
-                        oldContainer
-                                .getMaxSpellCount(),
-                        targetTier
-                                .getTotalSpellSlots()
+                        oldCapacity,
+                        targetCapacity
                 );
+
+
 
         /*
          * Slots 0 and 1 are rebuilt above.

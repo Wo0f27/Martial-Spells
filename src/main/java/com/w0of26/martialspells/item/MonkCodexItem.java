@@ -29,6 +29,7 @@ public final class MonkCodexItem
 
     public static final int MEDITATION_SLOT = 0;
     public static final int FLURRY_SLOT = 1;
+    public static final int ABSOLUTE_SLOT_LIMIT = 15;
 
     private static final String CODEX_DATA_TAG =
             "MartialSpells";
@@ -38,21 +39,14 @@ public final class MonkCodexItem
 
     public MonkCodexItem() {
         /*
-         * The base item begins with Tier I capacity.
+         * Advertise the absolute capacity supported by this upgradeable
+         * item type.
          *
-         * Higher-tier stacks receive their actual slot count through
-         * their attached ISpellContainer.
+         * Each individual ItemStack still receives its actual tier-based
+         * starting capacity through its attached ISpellContainer.
          */
         super(
-                /*
-                 * Advertise the maximum capacity supported by this
-                 * upgradeable item type.
-                 *
-                 * Each individual ItemStack still receives its actual
-                 * Tier I-V capacity through its ISpellContainer.
-                 */
-                MonkCodexTier.TIER_V
-                        .getTotalSpellSlots(),
+                ABSOLUTE_SLOT_LIMIT,
                 new Item.Properties()
                         .stacksTo(1)
                         .rarity(Rarity.UNCOMMON)
