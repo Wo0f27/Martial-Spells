@@ -75,25 +75,20 @@ public final class MonkCodexUpgradeHelper {
         int oldCapacity =
                 oldContainer.getMaxSpellCount();
 
-        int currentBaseCapacity =
-                currentTier.getTotalSpellSlots();
-
         /*
-         * Any capacity above the current tier's normal amount came from
-         * an external spell-slot improvement.
+         * Preserve the Codex's existing total capacity.
+         *
+         * Tier progression may raise the capacity to the target tier's
+         * normal amount, but it must never reduce externally upgraded
+         * capacity or exceed the absolute supported limit.
          */
-        int preservedBonusSlots =
-                Math.max(
-                        0,
-                        oldCapacity
-                                - currentBaseCapacity
-                );
-
         int targetCapacity =
                 Math.min(
                         MonkCodexItem.ABSOLUTE_SLOT_LIMIT,
-                        targetTier.getTotalSpellSlots()
-                                + preservedBonusSlots
+                        Math.max(
+                                oldCapacity,
+                                targetTier.getTotalSpellSlots()
+                        )
                 );
 
         /*
