@@ -4,7 +4,7 @@ import com.w0of26.martialspells.MartialSpells;
 import com.w0of26.martialspells.ki.KiHelper;
 import io.redspace.ironsspellbooks.api.config.DefaultConfig;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
-import io.redspace.ironsspellbooks.api.registry.SchoolRegistry;
+import com.w0of26.martialspells.registry.MartialSchoolRegistry;
 import io.redspace.ironsspellbooks.api.spells.CastResult;
 import io.redspace.ironsspellbooks.api.spells.CastSource;
 import io.redspace.ironsspellbooks.api.spells.CastType;
@@ -126,16 +126,14 @@ public final class StillwaterMeditationSpell
 
     private final DefaultConfig defaultConfig =
             new DefaultConfig()
-                    /*
-                     * Holy is temporary until the dedicated Monk
-                     * spell school is introduced.
-                     */
                     .setSchoolResource(
-                            SchoolRegistry.HOLY_RESOURCE
+                            MartialSchoolRegistry.MARTIAL_RESOURCE
                     )
                     .setMinRarity(SpellRarity.COMMON)
                     .setMaxLevel(MAX_LEVEL)
-                    .setCooldownSeconds(COOLDOWN_SECONDS)
+                    .setCooldownSeconds(
+                            COOLDOWN_SECONDS
+                    )
                     .build();
 
     public StillwaterMeditationSpell() {

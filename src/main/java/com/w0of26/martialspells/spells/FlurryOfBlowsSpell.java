@@ -1,6 +1,7 @@
 package com.w0of26.martialspells.spells;
 
 import com.w0of26.martialspells.MartialSpells;
+import com.w0of26.martialspells.registry.MartialSchoolRegistry;
 import io.redspace.ironsspellbooks.api.spells.*;
 import io.redspace.ironsspellbooks.api.util.AnimationHolder;
 import com.w0of26.martialspells.combat.FlurrySequenceManager;
@@ -8,13 +9,11 @@ import net.minecraft.resources.ResourceLocation;
 import com.w0of26.martialspells.combat.MonkWeaponHelper;
 import io.redspace.ironsspellbooks.api.config.DefaultConfig;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
-import io.redspace.ironsspellbooks.api.registry.SchoolRegistry;
 import io.redspace.ironsspellbooks.api.util.RaycastBuilder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
@@ -24,8 +23,8 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 import javax.annotation.Nullable;
 import java.util.List;
-import com.w0of26.martialspells.combat.MonkEncumbranceHelper;
 import net.minecraft.world.InteractionHand;
+import com.w0of26.martialspells.combat.MartialPowerHelper;
 
 public final class FlurryOfBlowsSpell
         extends AbstractMonkTechniqueSpell {
@@ -68,12 +67,8 @@ public final class FlurryOfBlowsSpell
 
     private final DefaultConfig defaultConfig =
             new DefaultConfig()
-                    /*
-                     * Temporary until the dedicated Monk school
-                     * is implemented.
-                     */
                     .setSchoolResource(
-                            SchoolRegistry.HOLY_RESOURCE
+                            MartialSchoolRegistry.MARTIAL_RESOURCE
                     )
                     .setMinRarity(SpellRarity.COMMON)
                     .setMaxLevel(MAX_LEVEL)
@@ -238,6 +233,10 @@ public final class FlurryOfBlowsSpell
                 ),
                 Component.translatable(
                         "ui.martial_spells."
+                                + "scales_with_martial_power"
+                ),
+                Component.translatable(
+                        "ui.martial_spells."
                                 + "flurry_range",
                         TARGET_RANGE
                 ),
@@ -249,6 +248,7 @@ public final class FlurryOfBlowsSpell
                         "ui.martial_spells."
                                 + "heavy_armor_penalty"
                 )
+
         );
     }
 
@@ -292,35 +292,17 @@ public final class FlurryOfBlowsSpell
                 KI_COST
         )) {
             return;
-        }                MonkEncumbranceHelper
-                        .getEffectiveKiCost(
-                                KI_COST,
-                                player
-                        );
-
-        if (!consumeTechniqueKi(
-                player,
-                KI_COST
-        )) {
-            return;
         }
 
-        float attackDamage =
-                (float) player.getAttributeValue(
-                        Attributes.ATTACK_DAMAGE
-                );
-
-        float effectiveAttackDamage =
-                Math.max(
-                        MINIMUM_EFFECTIVE_ATTACK_DAMAGE,
-                        attackDamage
-                );
-
         float baseDamagePerStrike =
-                effectiveAttackDamage
-                        * getDamagePerStrikeMultiplier(
-                        spellLevel
-                );
+                MartialPowerHelper
+                        .calculateTechniqueDamage(
+                                player,
+                                MINIMUM_EFFECTIVE_ATTACK_DAMAGE,
+                                getDamagePerStrikeMultiplier(
+                                        spellLevel
+                                )
+                        );
 
         float damagePerStrike =
                 applyTechniqueDamagePenalty(
