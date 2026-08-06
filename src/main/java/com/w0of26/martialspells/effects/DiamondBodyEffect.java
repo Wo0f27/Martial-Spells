@@ -1,4 +1,4 @@
-package com.w0of26.martialspells.effect;
+package com.w0of26.martialspells.effects;
 
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
@@ -48,6 +48,14 @@ public final class DiamondBodyEffect
             0.24D,
             0.32D,
             0.40D
+    };
+
+    private static final float[] DAMAGE_REDUCTION_VALUES = {
+            0.20F,
+            0.25F,
+            0.30F,
+            0.35F,
+            0.40F
     };
 
     public DiamondBodyEffect() {
@@ -164,5 +172,20 @@ public final class DiamondBodyEffect
         if (instance != null) {
             instance.removeModifier(uuid);
         }
+    }
+
+    public static float getDamageReduction(
+            int amplifier
+    ) {
+        int index = clampAmplifier(amplifier);
+
+        return DAMAGE_REDUCTION_VALUES[index];
+    }
+
+    public static float getDamageMultiplier(
+            int amplifier
+    ) {
+        return 1.0F
+                - getDamageReduction(amplifier);
     }
 }
