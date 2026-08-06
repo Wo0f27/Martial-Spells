@@ -61,7 +61,7 @@ public final class MartialSchoolRegistry {
                                     "school.martial_spells.martial"
                             ).withStyle(
                                     Style.EMPTY.withColor(
-                                            0x8C3FD1
+                                            0x8e6b00
                                     )
                             ),
                             LazyOptional.of(
