@@ -64,5 +64,18 @@
   "ui.martial_spells.not_enough_ki": "You do not have enough Ki.",
   "ui.martial_spells.no_flurry_target": "No valid target is within striking range.",
   "ui.martial_spells.server_player_required": "This technique requires a server-side player.",
-  "ui.martial_spells.heavy_armor_penalty": "Heavy Armor: +50% Ki cost and -25% technique damage."
+  "ui.martial_spells.heavy_armor_penalty": "Heavy Armor: +50% Ki cost and -25% technique damage.",
+
+  "effect.martial_spells.diamond_body": "Diamond Body",
+  "spell.martial_spells.diamond_body": "Diamond Body",
+  "spell.martial_spells.diamond_body.description": "Hardens the body into an unyielding martial form, granting armor, toughness, knockback resistance, and final damage reduction.",
+  "ui.martial_spells.diamond_body_reduction": "Damage Reduction: %s%%",
+  "ui.martial_spells.diamond_body_armor": "Armor: +%s",
+  "ui.martial_spells.diamond_body_toughness": "Armor Toughness: +%s",
+  "ui.martial_spells.diamond_body_knockback": "Knockback Resistance: +%s%%",
+  "ui.martial_spells.diamond_body_duration": "Duration: %s seconds",
+  "ui.martial_spells.diamond_body_heavy_armor": "Diamond Body cannot be used while wearing heavy armor.",
+  "ui.martial_spells.diamond_body_heavy_restriction": "Cannot be cast while wearing heavy armor.",
+  "ui.martial_spells.diamond_body_oakskin_stacking": "Stacks multiplicatively with Oakskin.",
+  "ui.martial_spells.diamond_heart_description": "Diamond Heart prevents one lethal hit during each activation."
 }
