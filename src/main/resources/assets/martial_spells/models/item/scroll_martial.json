@@ -1,0 +1,6 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "martial_spells:item/scroll_martial"
+  }
+}

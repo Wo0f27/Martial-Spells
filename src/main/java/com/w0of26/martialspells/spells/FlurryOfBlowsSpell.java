@@ -1,6 +1,7 @@
 package com.w0of26.martialspells.spells;
 
 import com.w0of26.martialspells.MartialSpells;
+import com.w0of26.martialspells.registry.MartialSchoolRegistry;
 import io.redspace.ironsspellbooks.api.spells.*;
 import io.redspace.ironsspellbooks.api.util.AnimationHolder;
 import com.w0of26.martialspells.combat.FlurrySequenceManager;
@@ -8,7 +9,6 @@ import net.minecraft.resources.ResourceLocation;
 import com.w0of26.martialspells.combat.MonkWeaponHelper;
 import io.redspace.ironsspellbooks.api.config.DefaultConfig;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
-import io.redspace.ironsspellbooks.api.registry.SchoolRegistry;
 import io.redspace.ironsspellbooks.api.util.RaycastBuilder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -67,12 +67,8 @@ public final class FlurryOfBlowsSpell
 
     private final DefaultConfig defaultConfig =
             new DefaultConfig()
-                    /*
-                     * Temporary until the dedicated Monk school
-                     * is implemented.
-                     */
                     .setSchoolResource(
-                            SchoolRegistry.HOLY_RESOURCE
+                            MartialSchoolRegistry.MARTIAL_RESOURCE
                     )
                     .setMinRarity(SpellRarity.COMMON)
                     .setMaxLevel(MAX_LEVEL)
