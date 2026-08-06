@@ -24,7 +24,6 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 import javax.annotation.Nullable;
 import java.util.List;
-import com.w0of26.martialspells.combat.MonkEncumbranceHelper;
 import net.minecraft.world.InteractionHand;
 
 public final class FlurryOfBlowsSpell
@@ -287,17 +286,6 @@ public final class FlurryOfBlowsSpell
          * Ki is consumed immediately when the technique executes,
          * even when every subsequent punch misses.
          */
-        if (!consumeTechniqueKi(
-                player,
-                KI_COST
-        )) {
-            return;
-        }                MonkEncumbranceHelper
-                        .getEffectiveKiCost(
-                                KI_COST,
-                                player
-                        );
-
         if (!consumeTechniqueKi(
                 player,
                 KI_COST
