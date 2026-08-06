@@ -5,6 +5,7 @@
 
   "death.attack.martial": "%1$s was defeated by a martial technique",
   "death.attack.martial.player": "%1$s was defeated by %2$s's martial technique",
+  "ui.martial_spells.scales_with_martial_power": "Scales with Martial Spell Power.",
 
   "spell.martial_spells.guardians_cry": "Guardian's Cry",
   "spell.martial_spells.guardians_cry.guide": "Forces nearby hostile creatures to target the caster for a short duration.",
