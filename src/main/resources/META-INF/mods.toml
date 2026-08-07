@@ -77,3 +77,24 @@ side="BOTH"
 # stop your mod loading on the server for example.
 #[features.${mod_id}]
 #openGLVersion="[3.2,)"
+
+[[dependencies."${mod_id}"]]
+modId="attributeslib"
+mandatory=true
+versionRange="[${apothic_attributes_version},)"
+ordering="AFTER"
+side="BOTH"
+
+[[dependencies."${mod_id}"]]
+modId="turtlecore"
+mandatory=true
+versionRange="[${turtlecore_version},)"
+ordering="AFTER"
+side="BOTH"
+
+[[dependencies."${mod_id}"]]
+modId="runiclib"
+mandatory=true
+versionRange="[${runiclib_version},)"
+ordering="AFTER"
+side="BOTH"

@@ -30,6 +30,15 @@ public final class MartialDamageTypes {
                             "flurry_of_blows"
                     )
             );
+    public static final ResourceKey<DamageType>
+            STUNNING_STRIKE =
+            ResourceKey.create(
+                    Registries.DAMAGE_TYPE,
+                    new ResourceLocation(
+                            MartialSpells.MOD_ID,
+                            "stunning_strike"
+                    )
+            );
 
 
     private MartialDamageTypes() {
@@ -86,6 +95,26 @@ public final class MartialDamageTypes {
     ) {
         return source.is(
                 GUARDIANS_COVENANT_REDIRECT
+        );
+    }
+
+    public static DamageSource stunningStrike(
+            ServerPlayer player
+    ) {
+        Holder<DamageType> damageType =
+                player.level()
+                        .registryAccess()
+                        .registryOrThrow(
+                                Registries.DAMAGE_TYPE
+                        )
+                        .getHolderOrThrow(
+                                STUNNING_STRIKE
+                        );
+
+        return new DamageSource(
+                damageType,
+                player,
+                player
         );
     }
 

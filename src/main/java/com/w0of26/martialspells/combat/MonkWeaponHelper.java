@@ -3,6 +3,7 @@ package com.w0of26.martialspells.combat;
 import com.w0of26.martialspells.registry.MartialTags;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import javax.annotation.Nullable;
 
 public final class MonkWeaponHelper {
     private MonkWeaponHelper() {
@@ -18,5 +19,49 @@ public final class MonkWeaponHelper {
                 || mainHand.is(
                 MartialTags.Items.MONK_WEAPONS
         );
+    }
+
+    @Nullable
+    public static StunningStrikeWeaponStyle
+    getStunningStrikeWeaponStyle(
+            Player player
+    ) {
+        if (player == null) {
+            return null;
+        }
+
+        ItemStack mainHand =
+                player.getMainHandItem();
+
+        /*
+         * Empty-handed and gauntlet Stunning Strikes
+         * use the punch animation.
+         */
+        if (mainHand.isEmpty()
+                || mainHand.is(
+                MartialTags.Items.GAUNTLETS
+        )) {
+            return StunningStrikeWeaponStyle.PUNCH;
+        }
+
+        /*
+         * Quarterstaff Stunning Strikes use Better Combat's
+         * battlestaff spin animation.
+         */
+        if (mainHand.is(
+                MartialTags.Items.QUARTERSTAFFS
+        )) {
+            return StunningStrikeWeaponStyle.QUARTERSTAFF;
+        }
+
+        return null;
+    }
+
+    public static boolean
+    hasValidStunningStrikeMainHand(
+            Player player
+    ) {
+        return getStunningStrikeWeaponStyle(player)
+                != null;
     }
 }
