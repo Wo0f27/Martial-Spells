@@ -1,15 +1,12 @@
 package com.w0of26.martialspells.registry;
 
 import com.w0of26.martialspells.MartialSpells;
-import com.w0of26.martialspells.spells.GuardiansCrySpell;
-import com.w0of26.martialspells.spells.GuardiansCovenantSpell;
-import com.w0of26.martialspells.spells.StillwaterMeditationSpell;
+import com.w0of26.martialspells.spells.*;
 import io.redspace.ironsspellbooks.api.registry.SpellRegistry;
 import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.RegistryObject;
-import com.w0of26.martialspells.spells.FlurryOfBlowsSpell;
 
 public final class MartialSpellRegistry {
     public static final DeferredRegister<AbstractSpell> SPELLS =
@@ -42,6 +39,13 @@ public final class MartialSpellRegistry {
             SPELLS.register(
                     "flurry_of_blows",
                     FlurryOfBlowsSpell::new
+            );
+
+    public static final RegistryObject<AbstractSpell>
+            DIAMOND_BODY =
+            SPELLS.register(
+                    "diamond_body",
+                    DiamondBodySpell::new
             );
 
     private MartialSpellRegistry() {

@@ -5,6 +5,8 @@ import com.w0of26.martialspells.effects.GuardiansCovenantTankEffect;
 import com.w0of26.martialspells.MartialSpells;
 import com.w0of26.martialspells.effects.GuardiansCryActiveEffect;
 import com.w0of26.martialspells.effects.GuardiansCryEffect;
+import com.w0of26.martialspells.effects.DiamondBodyEffect;
+import com.w0of26.martialspells.effects.DiamondHeartEffect;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
@@ -40,6 +42,20 @@ public final class MartialEffectRegistry {
             MOB_EFFECTS.register(
                     "guardians_covenant_linked",
                     GuardiansCovenantLinkedEffect::new
+            );
+
+    public static final RegistryObject<MobEffect>
+            DIAMOND_BODY =
+            MOB_EFFECTS.register(
+                    "diamond_body",
+                    DiamondBodyEffect::new
+            );
+
+    public static final RegistryObject<MobEffect>
+            DIAMOND_HEART =
+            MOB_EFFECTS.register(
+                    "diamond_heart",
+                    DiamondHeartEffect::new
             );
 
     private MartialEffectRegistry() {
