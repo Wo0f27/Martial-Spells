@@ -77,5 +77,6 @@
   "ui.martial_spells.diamond_body_heavy_armor": "Diamond Body cannot be used while wearing heavy armor.",
   "ui.martial_spells.diamond_body_heavy_restriction": "Cannot be cast while wearing heavy armor.",
   "ui.martial_spells.diamond_body_oakskin_stacking": "Stacks multiplicatively with Oakskin.",
-  "ui.martial_spells.diamond_heart_description": "Diamond Heart prevents one lethal hit during each activation."
+  "ui.martial_spells.diamond_heart_description": "Diamond Heart prevents one lethal hit during each activation.",
+  "effect.martial_spells.diamond_heart": "Diamond Heart"
 }
