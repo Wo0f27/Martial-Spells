@@ -11,6 +11,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import com.w0of26.martialspells.technique.MartialTechnique;
+import com.w0of26.martialspells.technique.MartialTechniqueClass;
 
 /**
  * Shared foundation for Monk techniques.
@@ -27,7 +29,8 @@ import net.minecraft.world.entity.player.Player;
  * - technique-specific execution.
  */
 public abstract class AbstractMonkTechniqueSpell
-        extends AbstractSpell {
+        extends AbstractSpell
+        implements MartialTechnique {
 
     private final int maximumTechniqueLevel;
 
@@ -55,6 +58,11 @@ public abstract class AbstractMonkTechniqueSpell
          */
         this.baseSpellPower = 0;
         this.spellPowerPerLevel = 0;
+    }
+
+    @Override
+    public final MartialTechniqueClass getTechniqueClass() {
+        return MartialTechniqueClass.MONK;
     }
 
     protected final int clampTechniqueLevel(

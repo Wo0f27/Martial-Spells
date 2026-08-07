@@ -1,0 +1,8 @@
+{
+  "replace": false,
+  "values": [
+    "martial_spells:stillwater_meditation",
+    "martial_spells:flurry_of_blows",
+    "martial_spells:diamond_body"
+  ]
+}
