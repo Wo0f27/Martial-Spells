@@ -2,7 +2,8 @@ package com.w0of26.martialspells.events;
 
 import com.w0of26.martialspells.MartialSpells;
 import com.w0of26.martialspells.item.MonkCodexItem;
-import com.w0of26.martialspells.registry.MartialSpellRegistry;
+//import com.w0of26.martialspells.registry.MartialSpellRegistry;
+import com.w0of26.martialspells.spells.AbstractMonkTechniqueSpell;
 import io.redspace.ironsspellbooks.api.events.InscribeSpellEvent;
 import io.redspace.ironsspellbooks.gui.inscription_table.InscriptionTableMenu;
 import net.minecraft.ChatFormatting;
@@ -12,6 +13,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
+import com.w0of26.martialspells.technique.MartialTechnique;
+import com.w0of26.martialspells.technique.MartialTechniqueClass;
 
 /**
  * Prevents Monk techniques from being inscribed into ordinary
@@ -33,16 +36,9 @@ public final class MonkTechniqueRestrictionEvents {
                 event.getSpellData().getSpell();
 
         boolean isMonkTechnique =
-                spell.equals(
-                        MartialSpellRegistry
-                                .STILLWATER_MEDITATION
-                                .get()
-                )
-                        || spell.equals(
-                        MartialSpellRegistry
-                                .FLURRY_OF_BLOWS
-                                .get()
-                );
+                spell instanceof MartialTechnique technique
+                        && technique.getTechniqueClass()
+                        == MartialTechniqueClass.MONK;
 
         if (!isMonkTechnique) {
             return;
