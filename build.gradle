@@ -318,6 +318,11 @@ dependencies {
             "maven.modrinth:mk0Htq87:${runiclib_version}-forge,${minecraft_version}"
     )
 
+    // Development/testing only — target health, effects, entity info.
+    runtimeOnly fg.deobf(
+            "curse.maven:jade-324717:6271651"
+    )
+
 
 }
 

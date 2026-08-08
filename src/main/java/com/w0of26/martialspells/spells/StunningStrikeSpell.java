@@ -86,6 +86,15 @@ public final class StunningStrikeSpell
                 ];
     }
 
+    public static float getStunDurationSeconds(
+            int spellLevel
+    ) {
+        int level = clampLevel(spellLevel);
+
+        return 5.0F
+                + ((level - 1) * 0.75F);
+    }
+
     private final DefaultConfig defaultConfig =
             new DefaultConfig()
                     .setSchoolResource(
@@ -273,15 +282,9 @@ public final class StunningStrikeSpell
 
         StunningStrikeImpactManager.begin(
                 player,
-                finalDamage
+                finalDamage,
+                spellLevel
         );
-        /*
-         * target is intentionally unused after validation
-         * during this checkpoint.
-         *
-         * The next checkpoint will store it for the
-         * server-authoritative impact event.
-         */
     }
 
     @Nullable
@@ -354,20 +357,15 @@ public final class StunningStrikeSpell
                         "ui.martial_spells."
                                 + "heavy_armor_penalty"
                 ),
+
                 Component.translatable(
-                        "ui.martial_spells.stunning_strike_damage",
-                        Math.round(
-                                getDamageMultiplier(
-                                        spellLevel
-                                ) * 100.0F
+                        "ui.martial_spells.stunning_strike_stun_duration",
+                        getStunDurationSeconds(
+                                spellLevel
                         )
                 ),
                 Component.translatable(
-                        "ui.martial_spells.stunning_strike_armor_shred",
-                        5
-                ),
-                Component.translatable(
-                        "ui.martial_spells.scales_with_martial_power"
+                        "ui.martial_spells.stunning_strike_rend"
                 )
         );
     }
