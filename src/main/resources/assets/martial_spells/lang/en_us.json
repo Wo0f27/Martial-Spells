@@ -87,5 +87,8 @@
   "ui.martial_spells.no_stunning_strike_target": "No valid target is within striking range.",
   "ui.martial_spells.stunning_strike_damage": "Damage: %s%% Attack Damage",
   "ui.martial_spells.stunning_strike_stun_duration": "Stun Duration: %s seconds",
-  "ui.martial_spells.stunning_strike_rend": "Rend II: -10% Armor for 5 seconds"
+  "ui.martial_spells.stunning_strike_rend": "Rend II: -10% Armor for 5 seconds",
+
+  "spell.martial_spells.deflect_missiles": "Deflect Missiles",
+  "spell.martial_spells.deflect_missiles.description": "Enter a focused defensive stance, deflecting incoming missiles while the technique is maintained."
 }
