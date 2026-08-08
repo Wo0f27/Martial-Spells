@@ -48,6 +48,13 @@ public final class MartialSpellRegistry {
                     DiamondBodySpell::new
             );
 
+    public static final RegistryObject<AbstractSpell>
+            STUNNING_STRIKE =
+            SPELLS.register(
+                    "stunning_strike",
+                    StunningStrikeSpell::new
+            );
+
     private MartialSpellRegistry() {
     }
 

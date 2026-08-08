@@ -58,6 +58,7 @@ public final class MartialEffectRegistry {
                     DiamondHeartEffect::new
             );
 
+
     private MartialEffectRegistry() {
     }
 

@@ -78,5 +78,14 @@
   "ui.martial_spells.diamond_body_heavy_restriction": "Cannot be cast while wearing heavy armor.",
   "ui.martial_spells.diamond_body_oakskin_stacking": "Stacks multiplicatively with Oakskin.",
   "ui.martial_spells.diamond_heart_description": "Diamond Heart prevents one lethal hit during each activation.",
-  "effect.martial_spells.diamond_heart": "Diamond Heart"
+  "effect.martial_spells.diamond_heart": "Diamond Heart",
+
+  "spell.martial_spells.stunning_strike": "Stunning Strike",
+  "spell.martial_spells.stunning_strike.description": "Deliver a focused martial blow that stuns the target and rends its defenses, leaving it vulnerable to follow-up attacks.",
+  "ui.martial_spells.stunning_strike_range": "Range: %s blocks",
+  "ui.martial_spells.requires_stunning_strike_weapon": "Requires empty hands, gauntlets, or a quarterstaff.",
+  "ui.martial_spells.no_stunning_strike_target": "No valid target is within striking range.",
+  "ui.martial_spells.stunning_strike_damage": "Damage: %s%% Attack Damage",
+  "ui.martial_spells.stunning_strike_stun_duration": "Stun Duration: %s seconds",
+  "ui.martial_spells.stunning_strike_rend": "Rend II: -10% Armor for 5 seconds"
 }
