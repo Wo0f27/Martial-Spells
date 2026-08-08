@@ -12,7 +12,14 @@ import net.minecraftforge.network.simple.SimpleChannel;
  * Registers and sends Martial Spells network packets.
  */
 public final class MartialNetwork {
-    private static final String PROTOCOL_VERSION = "3";
+
+    /*
+     * Increment whenever the packet protocol changes.
+     *
+     * Deflect Missiles adds a new S2C animation packet,
+     * so protocol version 4 represents the new layout.
+     */
+    private static final String PROTOCOL_VERSION = "4";
 
     private static SimpleChannel instance;
     private static int packetId;
@@ -21,34 +28,48 @@ public final class MartialNetwork {
     }
 
     public static void register() {
-        instance = NetworkRegistry.ChannelBuilder
-                .named(
-                        ResourceLocation.fromNamespaceAndPath(
-                                MartialSpells.MOD_ID,
-                                "messages"
+        instance =
+                NetworkRegistry.ChannelBuilder
+                        .named(
+                                ResourceLocation
+                                        .fromNamespaceAndPath(
+                                                MartialSpells.MOD_ID,
+                                                "messages"
+                                        )
                         )
-                )
-                .networkProtocolVersion(
-                        () -> PROTOCOL_VERSION
-                )
-                .clientAcceptedVersions(
-                        PROTOCOL_VERSION::equals
-                )
-                .serverAcceptedVersions(
-                        PROTOCOL_VERSION::equals
-                )
-                .simpleChannel();
+                        .networkProtocolVersion(
+                                () -> PROTOCOL_VERSION
+                        )
+                        .clientAcceptedVersions(
+                                PROTOCOL_VERSION::equals
+                        )
+                        .serverAcceptedVersions(
+                                PROTOCOL_VERSION::equals
+                        )
+                        .simpleChannel();
 
+        /*
+         * Ki synchronization.
+         */
         instance.messageBuilder(
                         SyncKiPacket.class,
                         nextPacketId(),
                         NetworkDirection.PLAY_TO_CLIENT
                 )
-                .decoder(SyncKiPacket::new)
-                .encoder(SyncKiPacket::toBytes)
-                .consumerMainThread(SyncKiPacket::handle)
+                .decoder(
+                        SyncKiPacket::new
+                )
+                .encoder(
+                        SyncKiPacket::toBytes
+                )
+                .consumerMainThread(
+                        SyncKiPacket::handle
+                )
                 .add();
 
+        /*
+         * Flurry of Blows visuals.
+         */
         instance.messageBuilder(
                         SyncFlurryVisualPacket.class,
                         nextPacketId(),
@@ -65,6 +86,9 @@ public final class MartialNetwork {
                 )
                 .add();
 
+        /*
+         * Stunning Strike animation.
+         */
         instance.messageBuilder(
                         SyncStunningStrikeAnimationPacket.class,
                         nextPacketId(),
@@ -80,12 +104,42 @@ public final class MartialNetwork {
                         SyncStunningStrikeAnimationPacket::handle
                 )
                 .add();
+
+        /*
+         * Deflect Missiles impact animation.
+         *
+         * The server sends:
+         *
+         * - the defending player's UUID
+         * - whether the base or mirrored swipe was chosen
+         *
+         * Only empty-hand and gauntlet Deflect Missiles
+         * interceptions send this packet.
+         */
+        instance.messageBuilder(
+                        SyncDeflectMissilesAnimationPacket.class,
+                        nextPacketId(),
+                        NetworkDirection.PLAY_TO_CLIENT
+                )
+                .decoder(
+                        SyncDeflectMissilesAnimationPacket::new
+                )
+                .encoder(
+                        SyncDeflectMissilesAnimationPacket::toBytes
+                )
+                .consumerMainThread(
+                        SyncDeflectMissilesAnimationPacket::handle
+                )
+                .add();
     }
 
     private static int nextPacketId() {
         return packetId++;
     }
 
+    /**
+     * Sends a packet only to one specific player.
+     */
     public static <MSG> void sendToPlayer(
             MSG message,
             ServerPlayer player
@@ -103,6 +157,14 @@ public final class MartialNetwork {
                 message
         );
     }
+
+    /**
+     * Sends a packet to the target player and every client
+     * currently tracking that player.
+     *
+     * This is used for player animations that must appear
+     * consistently in multiplayer.
+     */
     public static <MSG> void sendToTrackingAndSelf(
             MSG message,
             ServerPlayer player
@@ -117,7 +179,9 @@ public final class MartialNetwork {
         instance.send(
                 PacketDistributor
                         .TRACKING_ENTITY_AND_SELF
-                        .with(() -> player),
+                        .with(
+                                () -> player
+                        ),
                 message
         );
     }

@@ -55,6 +55,13 @@ public final class MartialSpellRegistry {
                     StunningStrikeSpell::new
             );
 
+    public static final RegistryObject<AbstractSpell>
+            DEFLECT_MISSILES =
+            SPELLS.register(
+                    "deflect_missiles",
+                    DeflectMissilesSpell::new
+            );
+
     private MartialSpellRegistry() {
     }
 
