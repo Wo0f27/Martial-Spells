@@ -1,6 +1,6 @@
 {
   "replace": false,
   "values": [
-    "martial_spells:martial_focus"
+    "#martial_spells:martial_focus"
   ]
 }

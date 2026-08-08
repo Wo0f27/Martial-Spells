@@ -3,20 +3,38 @@ package com.w0of26.martialspells.registry;
 import com.w0of26.martialspells.MartialSpells;
 import com.w0of26.martialspells.item.MonkCodexItem;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Rarity;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
-import net.minecraft.world.item.Rarity;
 
 /**
  * Registers items belonging to Martial Spells.
  */
 public final class MartialItemRegistry {
+
     private static final DeferredRegister<Item> ITEMS =
             DeferredRegister.create(
                     ForgeRegistries.ITEMS,
                     MartialSpells.MOD_ID
+            );
+
+    /*
+     * Generic consumable focus used by Iron's Scroll Forge
+     * to select the Martial school.
+     *
+     * This is deliberately not Monk-specific because the
+     * Martial school is shared by multiple martial classes.
+     */
+    public static final RegistryObject<Item> MARTIAL_FOCUS =
+            ITEMS.register(
+                    "martial_focus",
+                    () -> new Item(
+                            new Item.Properties()
+                                    .stacksTo(64)
+                                    .rarity(Rarity.UNCOMMON)
+                    )
             );
 
     public static final RegistryObject<MonkCodexItem> MONK_CODEX =
@@ -72,7 +90,9 @@ public final class MartialItemRegistry {
     private MartialItemRegistry() {
     }
 
-    public static void register(IEventBus eventBus) {
+    public static void register(
+            IEventBus eventBus
+    ) {
         ITEMS.register(eventBus);
     }
 }

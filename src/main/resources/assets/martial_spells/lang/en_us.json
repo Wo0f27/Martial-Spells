@@ -2,6 +2,7 @@
   "school.martial_spells.martial": "Martial",
   "attribute.martial_spells.martial_spell_power": "Martial Spell Power",
   "attribute.martial_spells.martial_magic_resist": "Martial Resistance",
+  "item.martial_spells.martial_focus": "Martial Focus",
 
   "death.attack.martial": "%1$s was defeated by a martial technique",
   "death.attack.martial.player": "%1$s was defeated by %2$s's martial technique",
@@ -39,6 +40,16 @@
   "item.martial_spells.monk_codex_advancement_iii": "Monk Codex Advancement: Tier III",
   "item.martial_spells.monk_codex_advancement_iv": "Monk Codex Advancement: Tier IV",
   "item.martial_spells.monk_codex_advancement_v": "Monk Codex Advancement: Tier V",
+
+  "spell.martial_spells.stillwater_meditation.guide": "Enter a state of deliberate stillness to restore Ki. Moving or attacking interrupts the meditation, while higher technique levels improve its resilience and restorative effects.",
+
+  "spell.martial_spells.flurry_of_blows.guide": "Unleash two rapid strikes against an enemy directly in front of you. Damage scales from Attack Damage and Martial Spell Power, and the technique requires a valid Monk weapon.",
+
+  "spell.martial_spells.diamond_body.guide": "Harden your body into an unyielding martial form, gaining armor, toughness, knockback resistance, and damage reduction. At higher mastery, Diamond Heart can prevent one lethal blow during the effect.",
+
+  "spell.martial_spells.stunning_strike.guide": "Deliver a focused martial strike that damages and stuns the target while applying Rend II to weaken its armor. Some powerful enemies resist or are immune to the stun.",
+
+  "spell.martial_spells.deflect_missiles.guide": "Assume a defensive stance that intercepts arrows, tridents, and fireballs while maintained. Incoming missiles are scattered away, with a level-scaled chance for eligible projectiles to be redirected toward their attacker.",
 
   "spell.martial_spells.stillwater_meditation": "Stillwater Meditation",
   "spell.martial_spells.stillwater_meditation.description": "Enter a state of deliberate stillness, gathering inner energy and restoring Ki upon completing the meditation.",
