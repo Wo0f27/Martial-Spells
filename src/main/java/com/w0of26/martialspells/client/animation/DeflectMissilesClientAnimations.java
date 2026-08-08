@@ -1,7 +1,6 @@
 package com.w0of26.martialspells.client.animation;
 
 import com.w0of26.martialspells.MartialSpells;
-import com.w0of26.martialspells.client.visual.ClientDeflectMissilesVisuals;
 import dev.kosmx.playerAnim.api.layered.IAnimation;
 import dev.kosmx.playerAnim.api.layered.KeyframeAnimationPlayer;
 import dev.kosmx.playerAnim.api.layered.ModifierLayer;
@@ -17,22 +16,11 @@ import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
-@Mod.EventBusSubscriber(
-        modid = MartialSpells.MOD_ID,
-        value = Dist.CLIENT,
-        bus = Mod.EventBusSubscriber.Bus.FORGE
-)
 public final class DeflectMissilesClientAnimations {
 
     /*
@@ -54,72 +42,109 @@ public final class DeflectMissilesClientAnimations {
      * Better Combat's source animation has its important
      * motion ending around tick 20.
      *
-     * Compress it into 8 ticks so that Deflect Missiles
-     * looks like rapid defensive hand movements.
+     * Compress it into 8 ticks so that an individual
+     * projectile deflection looks quick and reactive.
      */
     private static final float SWIPE_DURATION_TICKS =
             8.0F;
 
     /*
-     * Start the next swipe every 8 ticks.
+     * Prevent extremely rapid projectile impacts from
+     * restarting the animation every single game tick.
      *
-     * This produces:
-     *
-     * right -> left -> right -> left
-     *
-     * without a large pause between swipes.
+     * This is intentionally very short. Deflect Missiles
+     * should still visibly react to rapid barrages.
      */
-    private static final int SWIPE_REPEAT_TICKS =
-            8;
+    private static final int MIN_SWIPE_INTERVAL_TICKS =
+            2;
 
     /*
-     * Next game tick on which each player should
-     * perform another swipe.
+     * Last game tick on which a Deflect Missiles swipe
+     * was started for each visible player.
      */
     private static final Map<UUID, Integer>
-            NEXT_SWIPE_TICK =
-            new HashMap<>();
-
-    /*
-     * false = main-hand version
-     * true  = mirrored/offhand version
-     */
-    private static final Map<UUID, Boolean>
-            NEXT_SWIPE_OFFHAND =
+            LAST_SWIPE_TICK =
             new HashMap<>();
 
     private DeflectMissilesClientAnimations() {
     }
 
-    @SubscribeEvent
-    public static void onClientTick(
-            TickEvent.ClientTickEvent event
+    /*
+     * Called by the clientbound Deflect Missiles animation
+     * packet after the server confirms that a projectile
+     * was actually deflected.
+     *
+     * mirroredChoice is selected by the server so every
+     * tracking client sees the same left/right deflection.
+     *
+     * false = base/original animation
+     * true  = mirrored animation
+     */
+    public static void play(
+            UUID playerId,
+            boolean mirroredChoice
     ) {
-        if (event.phase != TickEvent.Phase.END) {
-            return;
-        }
-
         Minecraft minecraft =
                 Minecraft.getInstance();
 
-        /*
-         * Clear client visual state when leaving a world.
-         */
         if (minecraft.level == null) {
-            NEXT_SWIPE_TICK.clear();
-            NEXT_SWIPE_OFFHAND.clear();
+            LAST_SWIPE_TICK.clear();
             return;
         }
 
-        Set<UUID> activePlayers =
-                new HashSet<>();
+        AbstractClientPlayer player =
+                findPlayer(
+                        minecraft,
+                        playerId
+                );
+
+        if (player == null) {
+            return;
+        }
 
         /*
-         * Check every visible client player.
-         *
-         * This lets the animation work for both the local
-         * player and other players in multiplayer.
+         * Avoid constantly resetting the animation when
+         * multiple projectiles impact almost simultaneously.
          */
+        int currentTick =
+                player.tickCount;
+
+        Integer lastSwipeTick =
+                LAST_SWIPE_TICK.get(
+                        playerId
+                );
+
+        if (lastSwipeTick != null
+                && currentTick >= lastSwipeTick
+                && currentTick - lastSwipeTick
+                < MIN_SWIPE_INTERVAL_TICKS) {
+            return;
+        }
+
+        LAST_SWIPE_TICK.put(
+                playerId,
+                currentTick
+        );
+
+        playSwipe(
+                player,
+                mirroredChoice
+        );
+    }
+
+    /*
+     * Find the player represented by the UUID supplied by
+     * the server packet.
+     *
+     * This supports both:
+     *
+     * - the local player
+     * - other players currently visible to this client
+     */
+    private static AbstractClientPlayer findPlayer(
+            Minecraft minecraft,
+            UUID playerId
+    ) {
         for (Player rawPlayer
                 : minecraft.level.players()) {
 
@@ -128,111 +153,19 @@ public final class DeflectMissilesClientAnimations {
                 continue;
             }
 
-            /*
-             * Only empty-hand / gauntlet Deflect Missiles
-             * uses this animation.
-             *
-             * Quarterstaff Deflect continues using the
-             * spinning-item renderer instead.
-             */
-            if (!ClientDeflectMissilesVisuals
-                    .shouldPlayHandDeflectAnimation(
-                            player
-                    )) {
-                continue;
+            if (player.getUUID()
+                    .equals(playerId)) {
+
+                return player;
             }
-
-            UUID playerId =
-                    player.getUUID();
-
-            activePlayers.add(
-                    playerId
-            );
-
-            /*
-             * New Deflect channel:
-             *
-             * make the first swipe happen immediately.
-             */
-            int nextSwipeTick =
-                    NEXT_SWIPE_TICK
-                            .getOrDefault(
-                                    playerId,
-                                    player.tickCount
-                            );
-
-            if (player.tickCount
-                    < nextSwipeTick) {
-                continue;
-            }
-
-            /*
-             * false:
-             *     normal/main-hand animation
-             *
-             * true:
-             *     mirrored/offhand animation
-             */
-            boolean offhandSwipe =
-                    NEXT_SWIPE_OFFHAND
-                            .getOrDefault(
-                                    playerId,
-                                    false
-                            );
-
-            playSwipe(
-                    player,
-                    offhandSwipe
-            );
-
-            /*
-             * Alternate the next swipe.
-             */
-            NEXT_SWIPE_OFFHAND.put(
-                    playerId,
-                    !offhandSwipe
-            );
-
-            /*
-             * Schedule the next defensive swipe.
-             */
-            NEXT_SWIPE_TICK.put(
-                    playerId,
-                    player.tickCount
-                            + SWIPE_REPEAT_TICKS
-            );
         }
 
-        /*
-         * Remove state for players who:
-         *
-         * - released Deflect Missiles
-         * - changed to a quarterstaff
-         * - changed to an unsupported weapon
-         * - disappeared from the world
-         */
-        NEXT_SWIPE_TICK
-                .keySet()
-                .removeIf(
-                        playerId ->
-                                !activePlayers.contains(
-                                        playerId
-                                )
-                );
-
-        NEXT_SWIPE_OFFHAND
-                .keySet()
-                .removeIf(
-                        playerId ->
-                                !activePlayers.contains(
-                                        playerId
-                                )
-                );
+        return null;
     }
 
     private static void playSwipe(
             AbstractClientPlayer player,
-            boolean offhandSwipe
+            boolean mirroredChoice
     ) {
         var keyframeAnimation =
                 PlayerAnimationRegistry
@@ -252,7 +185,9 @@ public final class DeflectMissilesClientAnimations {
         /*
          * Get Iron's existing spell-casting animation layer.
          *
-         * This is the same layer used by Flurry of Blows.
+         * Deflect Missiles temporarily replaces Iron's
+         * normal continuous casting pose only when a
+         * projectile is actually intercepted.
          */
         @SuppressWarnings("unchecked")
         ModifierLayer<IAnimation> castingLayer =
@@ -277,31 +212,30 @@ public final class DeflectMissilesClientAnimations {
         }
 
         /*
-         * The source Better Combat animation is authored
-         * for one side.
-         *
-         * Every second Deflect movement mirrors it to
-         * create the opposite-hand swipe.
+         * The server randomly chooses whether the base
+         * or mirrored animation should play.
          */
         boolean mirrored =
-                offhandSwipe;
+                mirroredChoice;
 
         /*
-         * Respect Minecraft's configured dominant hand.
+         * Respect the player's configured dominant arm.
          *
          * Right-handed:
          *
-         * false -> right/main
-         * true  -> left/offhand
+         * false -> right-side deflection
+         * true  -> left-side deflection
          *
          * Left-handed:
          *
-         * false -> left/main
-         * true  -> right/offhand
+         * false -> left-side deflection
+         * true  -> right-side deflection
          */
         if (player.getMainArm()
                 == HumanoidArm.LEFT) {
-            mirrored = !mirrored;
+
+            mirrored =
+                    !mirrored;
         }
 
         KeyframeAnimationPlayer animationPlayer =
@@ -310,8 +244,8 @@ public final class DeflectMissilesClientAnimations {
                 );
 
         /*
-         * Compress the Better Combat animation into our
-         * shorter Deflect interval.
+         * Compress the source animation into the shorter
+         * Deflect Missiles impact reaction.
          */
         float animationSpeed =
                 Math.max(
@@ -332,10 +266,10 @@ public final class DeflectMissilesClientAnimations {
         );
 
         /*
-         * Same JSON:
+         * The same animation JSON provides both sides.
          *
-         * mirrored false = original side
-         * mirrored true  = opposite side
+         * false = original
+         * true  = mirrored
          */
         swipeLayer.addModifierBefore(
                 new MirrorModifier(
@@ -345,7 +279,7 @@ public final class DeflectMissilesClientAnimations {
 
         /*
          * Temporarily replace Iron's normal casting pose
-         * with this defensive swipe.
+         * with the projectile-deflection movement.
          */
         castingLayer.replaceAnimationWithFade(
                 AbstractFadeModifier.standardFadeIn(

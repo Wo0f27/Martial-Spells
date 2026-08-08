@@ -6,7 +6,6 @@ import io.redspace.ironsspellbooks.capabilities.magic.SyncedSpellData;
 import io.redspace.ironsspellbooks.player.ClientMagicData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 
 public final class ClientDeflectMissilesVisuals {
 
@@ -25,7 +24,8 @@ public final class ClientDeflectMissilesVisuals {
                 Minecraft.getInstance();
 
         /*
-         * Local player.
+         * Local player uses Iron's local client casting
+         * state.
          */
         if (minecraft.player != null
                 && minecraft.player
@@ -42,8 +42,9 @@ public final class ClientDeflectMissilesVisuals {
         }
 
         /*
-         * Other players use Iron's synchronized
-         * spell-casting state.
+         * Other players use Iron's synchronized casting
+         * state so their Deflect Missiles visuals can be
+         * rendered correctly in multiplayer.
          */
         SyncedSpellData syncedData =
                 ClientMagicData
@@ -61,6 +62,16 @@ public final class ClientDeflectMissilesVisuals {
     public static boolean shouldSpinQuarterstaff(
             Player player
     ) {
+        /*
+         * Quarterstaff Deflect Missiles keeps its
+         * continuous spinning-item visual for the entire
+         * duration of the channel.
+         *
+         * Empty-hand and gauntlet animations are no longer
+         * controlled here. Those are now triggered only by
+         * confirmed projectile impacts through the
+         * animation packet.
+         */
         return isChannelingDeflectMissiles(
                 player
         )
@@ -70,30 +81,5 @@ public final class ClientDeflectMissilesVisuals {
                         MartialTags.Items
                                 .QUARTERSTAFFS
                 );
-    }
-
-    public static boolean
-    shouldPlayHandDeflectAnimation(
-            Player player
-    ) {
-        if (!isChannelingDeflectMissiles(
-                player
-        )) {
-            return false;
-        }
-
-        ItemStack heldItem =
-                player.getMainHandItem();
-
-        /*
-         * Empty hand and gauntlets use the swipe.
-         *
-         * Quarterstaffs stay on the existing casting
-         * animation because their item render itself spins.
-         */
-        return heldItem.isEmpty()
-                || heldItem.is(
-                MartialTags.Items.GAUNTLETS
-        );
     }
 }

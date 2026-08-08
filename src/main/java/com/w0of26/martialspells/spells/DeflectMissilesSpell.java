@@ -15,6 +15,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import com.w0of26.martialspells.combat.MonkWeaponHelper;
 
 import java.util.List;
 
@@ -113,10 +114,16 @@ public final class DeflectMissilesSpell
                 );
 
         /*
-         * Explicitly enforce the technique cooldown.
-         *
-         * Command casting remains exempt for development and
-         * administration, matching the rest of the Monk framework.
+         * Preserve Iron's normal casting restrictions.
+         */
+        if (!normalResult.isSuccess()) {
+            return normalResult;
+        }
+
+        /*
+         * Explicit cooldown enforcement is required for
+         * Deflect Missiles because of its continuous-cast
+         * lifecycle.
          */
         if (castSource != CastSource.COMMAND
                 && magicData
@@ -124,13 +131,15 @@ public final class DeflectMissilesSpell
                 .isOnCooldown(this)) {
 
             return failure(
-                    "ui.martial_spells.deflect_missiles_on_cooldown"
+                    "ui.martial_spells."
+                            + "deflect_missiles_on_cooldown"
             );
         }
 
         if (!(player instanceof ServerPlayer serverPlayer)) {
             return failure(
-                    "ui.martial_spells.server_player_required"
+                    "ui.martial_spells."
+                            + "server_player_required"
             );
         }
 
@@ -142,6 +151,25 @@ public final class DeflectMissilesSpell
 
         if (!sourceResult.isSuccess()) {
             return sourceResult;
+        }
+
+        /*
+         * Deflect Missiles only supports the weapon states
+         * represented by its defensive animations:
+         *
+         * - empty hand
+         * - gauntlets
+         * - quarterstaff
+         */
+        if (!MonkWeaponHelper
+                .hasValidDeflectMissilesMainHand(
+                        player
+                )) {
+
+            return failure(
+                    "ui.martial_spells."
+                            + "requires_deflect_missiles_weapon"
+            );
         }
 
         if (!hasTechniqueKi(
@@ -215,6 +243,10 @@ public final class DeflectMissilesSpell
                 ),
                 Component.translatable(
                         "ui.martial_spells.deflect_missiles_deflection"
+                ),
+                Component.translatable(
+                        "ui.martial_spells."
+                                + "requires_deflect_missiles_weapon"
                 )
         );
     }

@@ -64,4 +64,34 @@ public final class MonkWeaponHelper {
         return getStunningStrikeWeaponStyle(player)
                 != null;
     }
+
+    public static boolean
+    hasValidDeflectMissilesMainHand(
+            Player player
+    ) {
+        if (player == null) {
+            return false;
+        }
+
+        ItemStack mainHand =
+                player.getMainHandItem();
+
+        /*
+         * Deflect Missiles supports:
+         *
+         * - empty hand
+         * - gauntlets
+         * - quarterstaffs
+         *
+         * Other Monk weapons do not qualify because the
+         * technique has dedicated hand and staff animations.
+         */
+        return mainHand.isEmpty()
+                || mainHand.is(
+                MartialTags.Items.GAUNTLETS
+        )
+                || mainHand.is(
+                MartialTags.Items.QUARTERSTAFFS
+        );
+    }
 }
