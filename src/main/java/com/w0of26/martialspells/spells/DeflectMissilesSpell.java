@@ -9,7 +9,14 @@ import io.redspace.ironsspellbooks.api.spells.CastSource;
 import io.redspace.ironsspellbooks.api.spells.CastType;
 import io.redspace.ironsspellbooks.api.spells.SpellRarity;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.Level;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+
+import java.util.List;
 
 public final class DeflectMissilesSpell
         extends AbstractMonkTechniqueSpell {
@@ -28,7 +35,17 @@ public final class DeflectMissilesSpell
      * 100 ticks = 5 seconds maximum channel.
      * Final duration is still undecided.
      */
-    private static final int TEST_CHANNEL_TICKS = 100;
+    private static final int KI_COST = 1;
+
+    private static final int[] CHANNEL_TICKS = {
+            50,   // 2.5 seconds
+            60,   // 3.0 seconds
+            70,   // 3.5 seconds
+            80,   // 4.0 seconds
+            100   // 5.0 seconds
+    };
+
+    private static final int COOLDOWN_SECONDS = 10;
 
     private final DefaultConfig defaultConfig =
             new DefaultConfig()
@@ -46,22 +63,23 @@ public final class DeflectMissilesSpell
                     .setMaxLevel(
                             MAX_LEVEL
                     )
-                    /*
-                     * No meaningful cooldown during lifecycle testing.
-                     */
                     .setCooldownSeconds(
-                            0
+                            COOLDOWN_SECONDS
                     )
                     .build();
 
     public DeflectMissilesSpell() {
         super(MAX_LEVEL);
-
-        /*
-         * Continuous spells remain in their casting state
-         * while the player holds the cast.
-         */
-        this.castTime = TEST_CHANNEL_TICKS;
+    }
+    @Override
+    public int getCastTime(
+            int spellLevel
+    ) {
+        return CHANNEL_TICKS[
+                getTechniqueLevelIndex(
+                        spellLevel
+                )
+                ];
     }
 
     @Override
@@ -94,8 +112,26 @@ public final class DeflectMissilesSpell
                         player
                 );
 
-        if (!normalResult.isSuccess()) {
-            return normalResult;
+        /*
+         * Explicitly enforce the technique cooldown.
+         *
+         * Command casting remains exempt for development and
+         * administration, matching the rest of the Monk framework.
+         */
+        if (castSource != CastSource.COMMAND
+                && magicData
+                .getPlayerCooldowns()
+                .isOnCooldown(this)) {
+
+            return failure(
+                    "ui.martial_spells.deflect_missiles_on_cooldown"
+            );
+        }
+
+        if (!(player instanceof ServerPlayer serverPlayer)) {
+            return failure(
+                    "ui.martial_spells.server_player_required"
+            );
         }
 
         CastResult sourceResult =
@@ -108,12 +144,78 @@ public final class DeflectMissilesSpell
             return sourceResult;
         }
 
-        /*
-         * No Ki validation yet.
-         *
-         * Ki behavior is intentionally deferred until the
-         * continuous-cast lifecycle is proven.
-         */
+        if (!hasTechniqueKi(
+                serverPlayer,
+                KI_COST
+        )) {
+            return failure(
+                    "ui.martial_spells.not_enough_ki"
+            );
+        }
+
         return success();
+    }
+
+    @Override
+    public void onServerPreCast(
+            Level level,
+            int spellLevel,
+            LivingEntity caster,
+            MagicData magicData
+    ) {
+        if (!(caster instanceof ServerPlayer player)) {
+            return;
+        }
+
+        consumeTechniqueKi(
+                player,
+                KI_COST
+        );
+    }
+
+    public static float getChannelSeconds(
+            int spellLevel
+    ) {
+        int level =
+                Math.max(
+                        1,
+                        Math.min(
+                                spellLevel,
+                                MAX_LEVEL
+                        )
+                );
+
+        return CHANNEL_TICKS[level - 1]
+                / 20.0F;
+    }
+
+    @Override
+    public List<MutableComponent> getUniqueInfo(
+            int spellLevel,
+            LivingEntity caster
+    ) {
+        int displayedKiCost =
+                caster == null
+                        ? KI_COST
+                        : getEffectiveTechniqueKiCost(
+                        KI_COST,
+                        caster
+                );
+
+        return List.of(
+                Component.translatable(
+                        "ui.martial_spells.ki_cost",
+                        displayedKiCost
+                ),
+                Component.translatable(
+                        "ui.martial_spells.deflect_missiles_channel",
+                        getChannelSeconds(
+                                spellLevel
+                        )
+                ),
+                Component.translatable(
+                        "ui.martial_spells.deflect_missiles_deflection"
+                )
+        );
     }
 }

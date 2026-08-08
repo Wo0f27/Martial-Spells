@@ -90,5 +90,9 @@
   "ui.martial_spells.stunning_strike_rend": "Rend II: -10% Armor for 5 seconds",
 
   "spell.martial_spells.deflect_missiles": "Deflect Missiles",
-  "spell.martial_spells.deflect_missiles.description": "Enter a focused defensive stance, deflecting incoming missiles while the technique is maintained."
+  "spell.martial_spells.deflect_missiles.description": "Enter a focused defensive stance, deflecting incoming missiles while the technique is maintained.",
+  "ui.martial_spells.deflect_missiles_deflection": "Deflects arrows, tridents, and fireballs while channeling",
+  "ui.martial_spells.deflect_missiles_channel": "Maximum Channel: %s seconds",
+  "ui.martial_spells.deflect_missiles_on_cooldown": "Deflect Missiles is still on cooldown."
+
 }

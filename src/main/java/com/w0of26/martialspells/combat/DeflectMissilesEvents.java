@@ -1,20 +1,23 @@
 package com.w0of26.martialspells.combat;
 
 import com.w0of26.martialspells.MartialSpells;
+import com.w0of26.martialspells.spells.DeflectMissilesSpell;
+import io.redspace.ironsspellbooks.api.magic.MagicData;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.AbstractArrow;
+import net.minecraft.world.entity.projectile.AbstractHurtingProjectile;
+import net.minecraft.world.entity.projectile.Arrow;
+import net.minecraft.world.entity.projectile.Fireball;
 import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.entity.projectile.SpectralArrow;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.entity.ProjectileImpactEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraft.world.entity.projectile.AbstractHurtingProjectile;
-import net.minecraft.world.entity.projectile.Fireball;
-import com.w0of26.martialspells.spells.DeflectMissilesSpell;
-import io.redspace.ironsspellbooks.api.magic.MagicData;
 
 @Mod.EventBusSubscriber(
         modid = MartialSpells.MOD_ID,
@@ -23,19 +26,32 @@ import io.redspace.ironsspellbooks.api.magic.MagicData;
 public final class DeflectMissilesEvents {
 
     /*
-     * Temporary Phase-I behavior:
+     * Current Phase-I behavior:
      *
-     * While Deflect Missiles is active, every vanilla
-     * AbstractArrow impact against the player is deflected.
+     * While Deflect Missiles is actively being channeled,
+     * supported vanilla missiles are intercepted.
      *
-     * Level-based deflection chance comes later after the
-     * underlying projectile behavior is proven reliable.
+     * Normal and spectral arrows are temporarily returned
+     * to their attacker 100% of the time so that return
+     * trajectory and ownership can be tested reliably.
+     *
+     * Tridents and fireballs continue to scatter sideways.
+     *
+     * Final level-based return chance comes later.
      */
     private static final double DEFLECTED_SPEED_MULTIPLIER =
             0.80D;
 
     private static final double COLLISION_PUSH_DISTANCE =
             0.75D;
+
+    private static final float[] RETURN_CHANCES = {
+            0.20F,
+            0.30F,
+            0.40F,
+            0.50F,
+            0.75F
+    };
 
     private DeflectMissilesEvents() {
     }
@@ -51,14 +67,9 @@ public final class DeflectMissilesEvents {
             return;
         }
 
-        /*
-         * Phase I-A deliberately handles only vanilla-style
-         * arrows first.
-         *
-         * AbstractArrow includes normal arrows, spectral
-         * arrows, and thrown tridents.
-         */
-        if (!isDeflectableVanillaMissile(projectile)) {
+        if (!isDeflectableVanillaMissile(
+                projectile
+        )) {
             return;
         }
 
@@ -79,7 +90,8 @@ public final class DeflectMissilesEvents {
         }
 
         /*
-         * Never deflect the player's own projectile.
+         * Never deflect a projectile already owned
+         * by the defending player.
          */
         if (projectile.getOwner() == player) {
             return;
@@ -89,15 +101,19 @@ public final class DeflectMissilesEvents {
             return;
         }
 
-        scatterProjectile(
-                projectile
+        redirectProjectile(
+                projectile,
+                player
         );
 
         /*
-         * Cancel the original hit after moving the projectile.
+         * Cancel the original impact only after the
+         * projectile has been moved away from the
+         * defender.
          *
-         * This prevents the arrow from dealing its normal
-         * collision damage to the player.
+         * This prevents normal collision damage and
+         * reduces the risk of an immediate repeat
+         * collision.
          */
         event.setCanceled(true);
 
@@ -138,17 +154,217 @@ public final class DeflectMissilesEvents {
     ) {
         /*
          * AbstractArrow covers:
-         * - Arrow
-         * - Spectral Arrow
-         * - Trident
+         * - normal arrows
+         * - spectral arrows
+         * - thrown tridents
          *
-         * Fireball covers the vanilla small and large
-         * fireballs used by Blazes and Ghasts.
+         * Fireball covers the vanilla fireballs already
+         * proven by runtime testing.
          */
         return projectile instanceof AbstractArrow
                 || projectile instanceof Fireball;
     }
 
+    /*
+     * Only actual arrows are returned during this
+     * checkpoint.
+     *
+     * Thrown tridents remain on the existing scatter
+     * behavior until arrow returning is proven reliable.
+     */
+    private static boolean isReturnableArrow(
+            Projectile projectile
+    ) {
+        /*
+         * Eligible for return-to-attacker:
+         * - normal arrows
+         * - spectral arrows
+         * - vanilla small fireballs
+         * - vanilla large fireballs
+         *
+         * Tridents deliberately do NOT qualify even though
+         * they are AbstractArrow instances.
+         */
+        return projectile instanceof Arrow
+                || projectile instanceof SpectralArrow
+                || projectile instanceof Fireball;
+    }
+
+    private static void redirectProjectile(
+            Projectile projectile,
+            ServerPlayer defender
+    ) {
+        MagicData magicData =
+                MagicData.getPlayerMagicData(
+                        defender
+                );
+
+        int spellLevel =
+                Math.max(
+                        1,
+                        Math.min(
+                                magicData.getCastingSpellLevel(),
+                                RETURN_CHANCES.length
+                        )
+                );
+
+        float returnChance =
+                RETURN_CHANCES[
+                        spellLevel - 1
+                        ];
+
+        /*
+         * Only normal and spectral arrows participate in
+         * return-to-attacker behavior for this checkpoint.
+         *
+         * Deflection itself remains guaranteed.
+         */
+        if (isReturnableArrow(projectile)
+                && projectile.getOwner()
+                instanceof LivingEntity attacker
+                && attacker.isAlive()
+                && attacker != defender
+                && defender.getRandom().nextFloat()
+                < returnChance) {
+
+            returnProjectileToAttacker(
+                    projectile,
+                    defender,
+                    attacker
+            );
+
+            return;
+        }
+
+        /*
+         * Failed return roll does NOT mean failed defense.
+         *
+         * The projectile is still safely scattered away.
+         */
+        scatterProjectile(
+                projectile
+        );
+    }
+
+    private static void returnProjectileToAttacker(
+            Projectile projectile,
+            ServerPlayer defender,
+            LivingEntity attacker
+    ) {
+        Vec3 incoming =
+                projectile.getDeltaMovement();
+
+        double originalSpeed =
+                incoming.length();
+
+        if (originalSpeed < 0.05D) {
+            originalSpeed = 0.75D;
+        }
+
+        /*
+         * Aim near the center of the attacker's hitbox.
+         */
+        Vec3 target =
+                attacker
+                        .getBoundingBox()
+                        .getCenter();
+
+        Vec3 direction =
+                target.subtract(
+                        projectile.position()
+                );
+
+        if (direction.lengthSqr() < 1.0E-6D) {
+            scatterProjectile(
+                    projectile
+            );
+
+            return;
+        }
+
+        direction =
+                direction.normalize();
+
+        Vec3 returnedVelocity =
+                direction.scale(
+                        originalSpeed
+                );
+
+        /*
+         * Transfer ownership to the Monk.
+         *
+         * This allows the returned projectile to collide with
+         * its original shooter and attributes the returned
+         * projectile to the defender.
+         */
+        projectile.setOwner(
+                defender
+        );
+
+        projectile.setDeltaMovement(
+                returnedVelocity
+        );
+
+        /*
+         * Fireballs have persistent acceleration in addition
+         * to their current velocity.
+         *
+         * If we only reverse their velocity, their original
+         * xPower/yPower/zPower can cause them to curve back
+         * toward their old trajectory.
+         */
+        if (projectile
+                instanceof AbstractHurtingProjectile
+                hurtingProjectile) {
+
+            double originalPower =
+                    Math.sqrt(
+                            hurtingProjectile.xPower
+                                    * hurtingProjectile.xPower
+                                    + hurtingProjectile.yPower
+                                    * hurtingProjectile.yPower
+                                    + hurtingProjectile.zPower
+                                    * hurtingProjectile.zPower
+                    );
+
+            if (originalPower < 1.0E-6D) {
+                originalPower = 0.1D;
+            }
+
+            Vec3 redirectedPower =
+                    direction.scale(
+                            originalPower
+                    );
+
+            hurtingProjectile.xPower =
+                    redirectedPower.x;
+
+            hurtingProjectile.yPower =
+                    redirectedPower.y;
+
+            hurtingProjectile.zPower =
+                    redirectedPower.z;
+        }
+
+        /*
+         * Move the projectile outside the defender's immediate
+         * collision area before the original impact is
+         * canceled.
+         */
+        Vec3 displacement =
+                direction.scale(
+                        COLLISION_PUSH_DISTANCE
+                );
+
+        projectile.setPos(
+                projectile.getX()
+                        + displacement.x,
+                projectile.getY()
+                        + displacement.y,
+                projectile.getZ()
+                        + displacement.z
+        );
+    }
 
     private static void scatterProjectile(
             Projectile projectile
@@ -166,10 +382,6 @@ public final class DeflectMissilesEvents {
         /*
          * Create a vector perpendicular to the projectile's
          * incoming horizontal direction.
-         *
-         * This makes the first implementation scatter the
-         * projectile sideways instead of sending it straight
-         * back to the shooter.
          */
         Vec3 sideways =
                 new Vec3(
@@ -222,14 +434,16 @@ public final class DeflectMissilesEvents {
         );
 
         /*
-         * Fireballs continuously accelerate using xPower/yPower/zPower.
+         * Fireballs continuously accelerate using
+         * xPower/yPower/zPower.
          *
-         * Redirect that acceleration along with the velocity or the
-         * projectile can curve back toward its original trajectory
-         * after being deflected.
+         * Their acceleration therefore has to be redirected
+         * along with their current velocity, otherwise they
+         * can curve back toward their original trajectory.
          */
         if (projectile
-                instanceof AbstractHurtingProjectile hurtingProjectile) {
+                instanceof AbstractHurtingProjectile
+                hurtingProjectile) {
 
             double originalPower =
                     Math.sqrt(
@@ -241,11 +455,6 @@ public final class DeflectMissilesEvents {
                                     * hurtingProjectile.zPower
                     );
 
-            /*
-             * Vanilla fireballs normally have a small non-zero
-             * acceleration. Keep a sensible fallback in case a
-             * projectile reaches us with effectively zero power.
-             */
             if (originalPower < 1.0E-6D) {
                 originalPower = 0.1D;
             }
@@ -268,11 +477,8 @@ public final class DeflectMissilesEvents {
         }
 
         /*
-         * Physically move it outside the player's immediate
-         * collision area.
-         *
-         * Canceling the impact without displacement can allow
-         * the same projectile to collide again immediately.
+         * Physically move the projectile outside the
+         * player's immediate collision area.
          */
         Vec3 displacement =
                 scattered
