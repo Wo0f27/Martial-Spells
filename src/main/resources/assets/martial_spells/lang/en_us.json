@@ -110,6 +110,10 @@
   "spell.martial_spells.step_of_the_wind": "Step of the Wind",
   "spell.martial_spells.step_of_the_wind.description": "Move with supernatural speed, surging rapidly in the direction of your movement.",
   "spell.martial_spells.step_of_the_wind.guide": "Spend Ki to surge rapidly forward. Your aim provides limited vertical control, but the technique cannot be used while swimming, climbing, mounted, or flying.",
-  "ui.martial_spells.step_of_the_wind_invalid_movement": "Step of the Wind cannot be used while mounted, swimming, climbing, or flying."
+  "ui.martial_spells.step_of_the_wind_invalid_movement": "Step of the Wind cannot be used while mounted, swimming, climbing, or flying.",
+  "ui.martial_spells.step_of_the_wind_dash_speed": "Dash Speed: %s",
+  "ui.martial_spells.step_of_the_wind_wall_run": "Run and climb along walls while Step remains active",
+  "ui.martial_spells.step_of_the_wind_wall_jump": "Press Jump while wall-running to rebound away",
+  "ui.martial_spells.step_of_the_wind_fall_protection": "Prevents fall damage from the protected movement"
 
 }

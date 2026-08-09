@@ -18,6 +18,11 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import com.w0of26.martialspells.movement.StepOfTheWindMovementEvents;
 import com.w0of26.martialspells.movement.StepOfTheWindWallRunEvents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+
+import java.util.List;
+
 
 public final class StepOfTheWindSpell
         extends AbstractMonkTechniqueSpell {
@@ -149,6 +154,47 @@ public final class StepOfTheWindSpell
         }
 
         return success();
+    }
+
+    @Override
+    public List<MutableComponent> getUniqueInfo(
+            int spellLevel,
+            LivingEntity caster
+    ) {
+        int displayedKiCost =
+                caster == null
+                        ? KI_COST
+                        : getEffectiveTechniqueKiCost(
+                        KI_COST,
+                        caster
+                );
+
+        int level =
+                clampTechniqueLevel(
+                        spellLevel
+                );
+
+        return List.of(
+                Component.translatable(
+                        "ui.martial_spells.ki_cost",
+                        displayedKiCost
+                ),
+                Component.translatable(
+                        "ui.martial_spells.step_of_the_wind_dash_speed",
+                        HORIZONTAL_SPEED[
+                                level - 1
+                                ]
+                ),
+                Component.translatable(
+                        "ui.martial_spells.step_of_the_wind_wall_run"
+                ),
+                Component.translatable(
+                        "ui.martial_spells.step_of_the_wind_wall_jump"
+                ),
+                Component.translatable(
+                        "ui.martial_spells.step_of_the_wind_fall_protection"
+                )
+        );
     }
 
     @Override
