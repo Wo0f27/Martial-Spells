@@ -66,11 +66,11 @@ public final class StillwaterMeditationSpell
     };
 
     private static final float[] HEALING_PERCENT_PER_PULSE = {
-            0.020F,
-            0.025F,
             0.030F,
-            0.035F,
-            0.040F
+            0.040F,
+            0.050F,
+            0.075F,
+            0.100F
     };
 
     private static final float[] DAMAGE_REDUCTION = {

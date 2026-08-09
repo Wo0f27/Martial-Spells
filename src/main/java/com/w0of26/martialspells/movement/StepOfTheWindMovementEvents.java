@@ -61,6 +61,46 @@ public final class StepOfTheWindMovementEvents {
         );
     }
 
+    public static void maintainFallProtection(
+            ServerPlayer player
+    ) {
+        UUID playerId =
+                player.getUUID();
+
+        FallProtectionState state =
+                FALL_PROTECTION.get(
+                        playerId
+                );
+
+        /*
+         * Advanced Step movement is intrinsically airborne
+         * movement even if Minecraft briefly reports onGround
+         * because of wall/collision geometry.
+         */
+        if (state == null) {
+
+            FALL_PROTECTION.put(
+                    playerId,
+                    new FallProtectionState(
+                            true,
+                            AIRBORNE_GRACE_TICKS
+                    )
+            );
+
+            return;
+        }
+
+        /*
+         * From this point onward protection is landing-based.
+         *
+         * Wall-running refreshes the logical airborne state,
+         * but does NOT introduce a new duration timer.
+         */
+        state.airborne = true;
+
+        state.groundedAfterAirborneTicks = 0;
+    }
+
     @SubscribeEvent
     public static void onPlayerTick(
             TickEvent.PlayerTickEvent event

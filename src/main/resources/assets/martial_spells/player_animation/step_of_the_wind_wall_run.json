@@ -1,0 +1,59 @@
+{
+  "version": 1,
+  "name": "step_of_the_wind_wall_run",
+  "author": "W0of26",
+  "emote": {
+    "beginTick": 0,
+    "endTick": 12,
+    "stopTick": 13,
+    "isLoop": true,
+    "returnTick": 0,
+    "degrees": false,
+    "moves": [
+      {
+        "tick": 0,
+        "easing": "INOUTSINE",
+        "rightLeg": {
+          "pitch": 0.85
+        }
+      },
+      {
+        "tick": 0,
+        "easing": "INOUTSINE",
+        "leftLeg": {
+          "pitch": -0.85
+        }
+      },
+
+      {
+        "tick": 6,
+        "easing": "INOUTSINE",
+        "rightLeg": {
+          "pitch": -0.85
+        }
+      },
+      {
+        "tick": 6,
+        "easing": "INOUTSINE",
+        "leftLeg": {
+          "pitch": 0.85
+        }
+      },
+
+      {
+        "tick": 12,
+        "easing": "INOUTSINE",
+        "rightLeg": {
+          "pitch": 0.85
+        }
+      },
+      {
+        "tick": 12,
+        "easing": "INOUTSINE",
+        "leftLeg": {
+          "pitch": -0.85
+        }
+      }
+    ]
+  }
+}
