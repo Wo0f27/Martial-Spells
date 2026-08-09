@@ -105,6 +105,11 @@
   "ui.martial_spells.deflect_missiles_deflection": "Deflects arrows, tridents, and fireballs while channeling",
   "ui.martial_spells.deflect_missiles_channel": "Maximum Channel: %s seconds",
   "ui.martial_spells.deflect_missiles_on_cooldown": "Deflect Missiles is still on cooldown.",
-  "ui.martial_spells.requires_deflect_missiles_weapon": "Requires empty hands, gauntlets, or a quarterstaff."
+  "ui.martial_spells.requires_deflect_missiles_weapon": "Requires empty hands, gauntlets, or a quarterstaff.",
+
+  "spell.martial_spells.step_of_the_wind": "Step of the Wind",
+  "spell.martial_spells.step_of_the_wind.description": "Move with supernatural speed, surging rapidly in the direction of your movement.",
+  "spell.martial_spells.step_of_the_wind.guide": "Spend Ki to surge rapidly forward. Your aim provides limited vertical control, but the technique cannot be used while swimming, climbing, mounted, or flying.",
+  "ui.martial_spells.step_of_the_wind_invalid_movement": "Step of the Wind cannot be used while mounted, swimming, climbing, or flying."
 
 }

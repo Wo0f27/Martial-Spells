@@ -62,6 +62,13 @@ public final class MartialSpellRegistry {
                     DeflectMissilesSpell::new
             );
 
+    public static final RegistryObject<AbstractSpell>
+            STEP_OF_THE_WIND =
+            SPELLS.register(
+                    "step_of_the_wind",
+                    StepOfTheWindSpell::new
+            );
+
     private MartialSpellRegistry() {
     }
 
