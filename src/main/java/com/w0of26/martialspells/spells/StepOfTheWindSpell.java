@@ -17,6 +17,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import com.w0of26.martialspells.movement.StepOfTheWindMovementEvents;
+import com.w0of26.martialspells.movement.StepOfTheWindWallRunEvents;
 
 public final class StepOfTheWindSpell
         extends AbstractMonkTechniqueSpell {
@@ -186,16 +187,25 @@ public final class StepOfTheWindSpell
             return;
         }
 
+        int techniqueLevel =
+                clampTechniqueLevel(
+                        spellLevel
+                );
+
         StepOfTheWindMovementEvents
                 .armFallProtection(
                         player
                 );
 
+        StepOfTheWindWallRunEvents
+                .arm(
+                        player,
+                        techniqueLevel
+                );
+
         performDash(
                 player,
-                clampTechniqueLevel(
-                        spellLevel
-                )
+                techniqueLevel
         );
     }
 

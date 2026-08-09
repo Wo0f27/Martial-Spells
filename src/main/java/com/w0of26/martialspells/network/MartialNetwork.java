@@ -15,11 +15,8 @@ public final class MartialNetwork {
 
     /*
      * Increment whenever the packet protocol changes.
-     *
-     * Deflect Missiles adds a new S2C animation packet,
-     * so protocol version 4 represents the new layout.
      */
-    private static final String PROTOCOL_VERSION = "4";
+    private static final String PROTOCOL_VERSION = "6";
 
     private static SimpleChannel instance;
     private static int packetId;
@@ -131,7 +128,68 @@ public final class MartialNetwork {
                         SyncDeflectMissilesAnimationPacket::handle
                 )
                 .add();
+
+        /*
+         * Step of the Wind surface orientation.
+         */
+        instance.messageBuilder(
+                        SyncStepOfWindSurfacePacket.class,
+                        nextPacketId(),
+                        NetworkDirection.PLAY_TO_CLIENT
+                )
+                .decoder(
+                        SyncStepOfWindSurfacePacket::new
+                )
+                .encoder(
+                        SyncStepOfWindSurfacePacket::toBytes
+                )
+                .consumerMainThread(
+                        SyncStepOfWindSurfacePacket::handle
+                )
+                .add();
+
+        /*
+         * Step of the Wind wall-jump request.
+         *
+         * The client only reports the jump input.
+         * All movement validation remains server-side.
+         */
+        instance.messageBuilder(
+                        RequestStepOfWindWallJumpPacket.class,
+                        nextPacketId(),
+                        NetworkDirection.PLAY_TO_SERVER
+                )
+                .decoder(
+                        RequestStepOfWindWallJumpPacket::new
+                )
+                .encoder(
+                        RequestStepOfWindWallJumpPacket::toBytes
+                )
+                .consumerMainThread(
+                        RequestStepOfWindWallJumpPacket::handle
+                )
+                .add();
+
     }
+
+
+    /**
+     * Sends a client-originating packet to the server.
+     */
+    public static <MSG> void sendToServer(
+            MSG message
+    ) {
+        if (instance == null) {
+            throw new IllegalStateException(
+                    "Martial Spells network has not been registered."
+            );
+        }
+
+        instance.sendToServer(
+                message
+        );
+    }
+
 
     private static int nextPacketId() {
         return packetId++;
