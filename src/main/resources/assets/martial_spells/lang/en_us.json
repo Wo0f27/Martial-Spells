@@ -114,6 +114,14 @@
   "ui.martial_spells.step_of_the_wind_dash_speed": "Dash Speed: %s",
   "ui.martial_spells.step_of_the_wind_wall_run": "Run and climb along walls while Step remains active",
   "ui.martial_spells.step_of_the_wind_wall_jump": "Press Jump while wall-running to rebound away",
-  "ui.martial_spells.step_of_the_wind_fall_protection": "Prevents fall damage from the protected movement"
+  "ui.martial_spells.step_of_the_wind_fall_protection": "Prevents fall damage from the protected movement",
+
+  "spell.martial_spells.heavenfall_strike": "Heavenfall Strike",
+  "spell.martial_spells.heavenfall_strike.description": "Launch into the air, choose a hostile target, and descend upon them with overwhelming martial force.",
+  "spell.martial_spells.heavenfall_strike.guide": "Leap skyward and select a hostile target before committing to a devastating descending strike.",
+  "ui.martial_spells.heavenfall_invalid_movement": "Heavenfall Strike cannot be used while mounted, swimming, climbing, or flying.",
+  "ui.martial_spells.heavenfall_no_clearance": "There is not enough space above you to begin Heavenfall Strike.",
+  "ui.martial_spells.heavenfall_launch": "Launches the caster upward",
+  "ui.martial_spells.heavenfall_targeted_dive": "Select a hostile target and commit to a descending strike"
 
 }

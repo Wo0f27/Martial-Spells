@@ -16,7 +16,7 @@ public final class MartialNetwork {
     /*
      * Increment whenever the packet protocol changes.
      */
-    private static final String PROTOCOL_VERSION = "6";
+    private static final String PROTOCOL_VERSION = "8";
 
     private static SimpleChannel instance;
     private static int packetId;
@@ -167,6 +167,53 @@ public final class MartialNetwork {
                 )
                 .consumerMainThread(
                         RequestStepOfWindWallJumpPacket::handle
+                )
+                .add();
+
+        /*
+         * Heavenfall Strike target selection.
+         *
+         * Server chooses the currently valid target.
+         * Client receives only the selected entity ID
+         * for rendering.
+         */
+        instance.messageBuilder(
+                        SyncHeavenfallTargetPacket.class,
+                        nextPacketId(),
+                        NetworkDirection.PLAY_TO_CLIENT
+                )
+                .decoder(
+                        SyncHeavenfallTargetPacket::new
+                )
+                .encoder(
+                        SyncHeavenfallTargetPacket::toBytes
+                )
+                .consumerMainThread(
+                        SyncHeavenfallTargetPacket::handle
+                )
+                .add();
+
+        /*
+         * Heavenfall Strike dive confirmation.
+         *
+         * The client reports only that Attack was pressed while
+         * Heavenfall had a selectable target.
+         *
+         * Target identity and validity remain server-authoritative.
+         */
+        instance.messageBuilder(
+                        RequestHeavenfallDivePacket.class,
+                        nextPacketId(),
+                        NetworkDirection.PLAY_TO_SERVER
+                )
+                .decoder(
+                        RequestHeavenfallDivePacket::new
+                )
+                .encoder(
+                        RequestHeavenfallDivePacket::toBytes
+                )
+                .consumerMainThread(
+                        RequestHeavenfallDivePacket::handle
                 )
                 .add();
 
