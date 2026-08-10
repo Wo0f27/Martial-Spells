@@ -94,4 +94,46 @@ public final class MonkWeaponHelper {
                 MartialTags.Items.QUARTERSTAFFS
         );
     }
+
+    @Nullable
+    public static HeavenfallAnimationStyle
+    getHeavenfallAnimationStyle(
+            Player player
+    ) {
+        if (player == null) {
+            return null;
+        }
+
+        ItemStack mainHand =
+                player.getMainHandItem();
+
+        /*
+         * Empty-handed and gauntlet Heavenfall launches
+         * use the uppercut animation.
+         */
+        if (mainHand.isEmpty()
+                || mainHand.is(
+                MartialTags.Items.GAUNTLETS
+        )) {
+            return HeavenfallAnimationStyle.UNARMED;
+        }
+
+        /*
+         * Any otherwise valid Monk weapon uses the
+         * two-handed spinning launch placeholder.
+         */
+        if (mainHand.is(
+                MartialTags.Items.MONK_WEAPONS
+        )) {
+            return HeavenfallAnimationStyle.WEAPON;
+        }
+
+        /*
+         * Do not alter Heavenfall's gameplay eligibility yet.
+         *
+         * Invalid weapons simply receive no custom launch
+         * animation during this checkpoint.
+         */
+        return null;
+    }
 }

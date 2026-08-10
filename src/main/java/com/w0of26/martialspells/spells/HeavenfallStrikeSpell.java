@@ -19,6 +19,13 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import com.w0of26.martialspells.movement.HeavenfallStrikeEvents;
+import com.w0of26.martialspells.client.animation.HeavenfallAnimationPhase;
+import com.w0of26.martialspells.combat.HeavenfallAnimationStyle;
+import com.w0of26.martialspells.combat.MonkWeaponHelper;
+import com.w0of26.martialspells.network.MartialNetwork;
+import com.w0of26.martialspells.network.SyncHeavenfallAnimationPacket;
+import io.redspace.ironsspellbooks.api.util.AnimationHolder;
+
 
 import java.util.List;
 
@@ -214,6 +221,24 @@ public final class HeavenfallStrikeSpell
                         techniqueLevel
                 );
 
+
+        HeavenfallAnimationStyle animationStyle =
+                MonkWeaponHelper
+                        .getHeavenfallAnimationStyle(
+                                player
+                        );
+
+        if (animationStyle != null) {
+            MartialNetwork.sendToTrackingAndSelf(
+                    new SyncHeavenfallAnimationPacket(
+                            player.getUUID(),
+                            HeavenfallAnimationPhase.LAUNCH,
+                            animationStyle
+                    ),
+                    player
+            );
+        }
+
         launch(
                 player
         );
@@ -321,4 +346,16 @@ public final class HeavenfallStrikeSpell
                 )
         );
     }
+
+    @Override
+    public AnimationHolder getCastStartAnimation() {
+        return AnimationHolder.none();
+    }
+
+    @Override
+    public AnimationHolder getCastFinishAnimation() {
+        return AnimationHolder.pass();
+    }
+
+
 }

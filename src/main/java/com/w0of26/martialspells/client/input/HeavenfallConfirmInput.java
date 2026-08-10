@@ -1,5 +1,6 @@
 package com.w0of26.martialspells.client.input;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.w0of26.martialspells.MartialSpells;
 import com.w0of26.martialspells.client.visual.HeavenfallClientTargetState;
 import com.w0of26.martialspells.network.MartialNetwork;
@@ -7,6 +8,7 @@ import com.w0of26.martialspells.network.RequestHeavenfallDivePacket;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.InputEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -20,11 +22,32 @@ public final class HeavenfallConfirmInput {
     private HeavenfallConfirmInput() {
     }
 
-    @SubscribeEvent
-    public static void onInteraction(
-            InputEvent.InteractionKeyMappingTriggered event
+    /*
+     * Intercept the physical mouse event before Minecraft
+     * turns it into an Attack key-mapping action.
+     *
+     * This is intentionally lower-level than
+     * InteractionKeyMappingTriggered.
+     *
+     * Better Combat also owns normal weapon attack input,
+     * so allowing the click to proceed causes its regular
+     * attack animation to begin before Heavenfall's DIVE
+     * animation is received.
+     */
+    @SubscribeEvent(
+            priority = EventPriority.HIGHEST
+    )
+    public static void onMouseButton(
+            InputEvent.MouseButton.Pre event
     ) {
-        if (!event.isAttack()) {
+        /*
+         * Only react to a new button press.
+         *
+         * RELEASE must still pass through normally.
+         */
+        if (event.getAction()
+                != InputConstants.PRESS) {
+
             return;
         }
 
@@ -39,9 +62,21 @@ public final class HeavenfallConfirmInput {
         }
 
         /*
-         * The server-synchronized target ID doubles as the
-         * client's indication that Heavenfall is currently
-         * accepting a confirmation.
+         * Respect the player's configured Attack mouse
+         * binding instead of assuming mouse button 0.
+         */
+        if (!minecraft.options
+                .keyAttack
+                .matchesMouse(
+                        event.getButton()
+                )) {
+
+            return;
+        }
+
+        /*
+         * No Heavenfall target means this click belongs to
+         * ordinary Minecraft / Better Combat gameplay.
          */
         if (HeavenfallClientTargetState
                 .getTargetEntityId() < 0) {
@@ -50,14 +85,20 @@ public final class HeavenfallConfirmInput {
         }
 
         /*
-         * This click belongs to Heavenfall.
+         * Heavenfall owns this press.
          *
-         * Do not let vanilla also perform a normal attack or
-         * play its normal hand swing.
+         * Cancel BEFORE Minecraft and Better Combat can
+         * convert it into a normal weapon attack.
          */
-        event.setSwingHand(false);
-        event.setCanceled(true);
+        event.setCanceled(
+                true
+        );
 
+        /*
+         * The client sends only the confirmation action.
+         *
+         * Target identity remains entirely server-owned.
+         */
         MartialNetwork.sendToServer(
                 new RequestHeavenfallDivePacket()
         );

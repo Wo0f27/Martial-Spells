@@ -22,6 +22,12 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import com.w0of26.martialspells.client.animation.HeavenfallAnimationPhase;
+import com.w0of26.martialspells.combat.HeavenfallAnimationStyle;
+import com.w0of26.martialspells.combat.MonkWeaponHelper;
+import com.w0of26.martialspells.network.SyncHeavenfallAnimationPacket;
+import net.minecraft.core.particles.ParticleTypes;
+import com.w0of26.martialspells.combat.HeavenfallCombatHelper;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
@@ -86,12 +92,18 @@ public final class HeavenfallStrikeEvents {
             1.60D;
 
     /*
-     * Temporary Checkpoint-3 arrival threshold.
-     *
-     * Proper swept impact detection comes next.
+     * Small additional tolerance around the target for
+     * Heavenfall's swept contact test.
      */
-    private static final double ARRIVAL_DISTANCE =
-            1.35D;
+    private static final double IMPACT_PADDING =
+            0.15D;
+
+    /*
+     * Prevent the player from retaining full dive momentum
+     * after a successful impact.
+     */
+    private static final double POST_IMPACT_Y_SPEED =
+            -0.10D;
 
     /*
      * Maximum distance a committed target may move away
@@ -278,6 +290,36 @@ public final class HeavenfallStrikeEvents {
 
         state.phase =
                 Phase.DIVING;
+
+        /*
+         * Store the player's current body center before the first
+         * dive movement is applied.
+         *
+         * On the following server tick we can sweep from this
+         * position to the new one and detect targets crossed
+         * between ticks.
+         */
+        state.previousDiveCenter =
+                getPlayerCenter(
+                        player
+                );
+
+        HeavenfallAnimationStyle animationStyle =
+                MonkWeaponHelper
+                        .getHeavenfallAnimationStyle(
+                                player
+                        );
+
+        if (animationStyle != null) {
+            MartialNetwork.sendToTrackingAndSelf(
+                    new SyncHeavenfallAnimationPacket(
+                            player.getUUID(),
+                            HeavenfallAnimationPhase.DIVE,
+                            animationStyle
+                    ),
+                    player
+            );
+        }
 
         /*
          * Selection is finished.
@@ -575,6 +617,56 @@ public final class HeavenfallStrikeEvents {
             return;
         }
 
+        /*
+         * ====================================================
+         * SWEPT IMPACT DETECTION
+         * ====================================================
+         *
+         * Checking only the player's current position is not
+         * sufficient because Heavenfall moves quickly.
+         *
+         * Instead, test the entire segment travelled since
+         * the previous server tick.
+         */
+        Vec3 currentCenter =
+                getPlayerCenter(
+                        player
+                );
+
+        if (hasSweptImpact(
+                player,
+                target,
+                state.previousDiveCenter,
+                currentCenter
+        )) {
+            finishImpactCheckpoint(
+                    player,
+                    target
+            );
+            return;
+        }
+
+        /*
+         * Save this tick's position for the next sweep.
+         */
+        state.previousDiveCenter =
+                currentCenter;
+
+        /*
+         * Terrain intercepted the dive before the selected
+         * target was struck.
+         *
+         * Do not treat this as a successful Heavenfall hit.
+         */
+        if (player.onGround()
+                || player.horizontalCollision) {
+
+            cancel(
+                    player
+            );
+            return;
+        }
+
         Vec3 targetPoint =
                 getDiveTargetPoint(
                         target
@@ -586,23 +678,8 @@ public final class HeavenfallStrikeEvents {
                 );
 
         /*
-         * Temporary Checkpoint-3 arrival behavior.
-         */
-        double arrivalDistanceSqr =
-                ARRIVAL_DISTANCE
-                        * ARRIVAL_DISTANCE;
-
-        if (toTarget.lengthSqr()
-                <= arrivalDistanceSqr) {
-
-            finishDiveCheckpoint(
-                    player
-            );
-            return;
-        }
-
-        /*
-         * Do not chase targets upward.
+         * If the target has somehow moved above the caster,
+         * Heavenfall must not become upward homing flight.
          */
         if (toTarget.y >= 0.0D) {
             cancel(
@@ -621,6 +698,90 @@ public final class HeavenfallStrikeEvents {
                 player,
                 velocity
         );
+    }
+
+    private static Vec3 getPlayerCenter(
+            ServerPlayer player
+    ) {
+        return player.position()
+                .add(
+                        0.0D,
+                        player.getBbHeight()
+                                * 0.50D,
+                        0.0D
+                );
+    }
+
+    private static boolean hasSweptImpact(
+            ServerPlayer player,
+            LivingEntity target,
+            @Nullable Vec3 previousCenter,
+            Vec3 currentCenter
+    ) {
+        /*
+         * The first DIVING tick should normally have a
+         * previous position from tryCommitDive().
+         *
+         * Fall back safely if one is unavailable.
+         */
+        Vec3 start =
+                previousCenter == null
+                        ? currentCenter
+                        : previousCenter;
+
+        /*
+         * Treat the player's center as a swept point and
+         * expand the target's box by the player's dimensions.
+         *
+         * This approximates player-body versus target-body
+         * contact rather than requiring the exact center of
+         * the player to enter the target's original AABB.
+         */
+        double horizontalExpansion =
+                player.getBbWidth()
+                        * 0.50D
+                        + IMPACT_PADDING;
+
+        double verticalExpansion =
+                player.getBbHeight()
+                        * 0.50D
+                        + IMPACT_PADDING;
+
+        AABB impactBox =
+                target.getBoundingBox()
+                        .inflate(
+                                horizontalExpansion,
+                                verticalExpansion,
+                                horizontalExpansion
+                        );
+
+        /*
+         * Already inside the expanded target volume.
+         */
+        if (impactBox.contains(
+                currentCenter
+        )) {
+            return true;
+        }
+
+        /*
+         * Detect the important tunnelling case:
+         *
+         * previous position
+         *       |
+         *       | 1.60 block movement
+         *       V
+         * current position
+         *
+         * even when neither endpoint itself is inside the
+         * target.
+         */
+        return impactBox
+                .clip(
+                        start,
+                        currentCenter
+                )
+                .isPresent();
     }
 
     private static void applyDiveMovement(
@@ -644,14 +805,9 @@ public final class HeavenfallStrikeEvents {
         );
     }
 
-    /*
-     * Temporary successful Checkpoint-3 completion.
-     *
-     * Combat effects will be attached to the real impact
-     * handler later.
-     */
-    private static void finishDiveCheckpoint(
-            ServerPlayer player
+    private static void finishImpactCheckpoint(
+            ServerPlayer player,
+            LivingEntity target
     ) {
         HeavenfallState removed =
                 ACTIVE_STATES.remove(
@@ -662,20 +818,41 @@ public final class HeavenfallStrikeEvents {
             return;
         }
 
-        Vec3 currentVelocity =
-                player.getDeltaMovement();
+        /*
+         * Checkpoint 5A:
+         *
+         * Apply Heavenfall's combat package only to the
+         * selected primary target.
+         */
+        HeavenfallCombatHelper.applyPrimaryImpact(
+                player,
+                target,
+                removed.spellLevel
+        );
 
-        Vec3 releasedVelocity =
-                new Vec3(
-                        currentVelocity.x
-                                * 0.15D,
-                        -0.20D,
-                        currentVelocity.z
-                                * 0.15D
-                );
+        /*
+         * Surrounding enemies receive only reduced damage
+         * and outward knockback.
+         *
+         * No stun, Blight, or Rend.
+         */
+        HeavenfallCombatHelper.applyShockwave(
+                player,
+                target,
+                removed.spellLevel
+        );
 
+        /*
+         * Stop the high-speed homing movement.
+         *
+         * Keep a tiny downward velocity so the player settles
+         * naturally instead of appearing suspended beside the
+         * target.
+         */
         player.setDeltaMovement(
-                releasedVelocity
+                0.0D,
+                POST_IMPACT_Y_SPEED,
+                0.0D
         );
 
         player.fallDistance =
@@ -690,12 +867,39 @@ public final class HeavenfallStrikeEvents {
                 )
         );
 
+        /*
+         * Clear the client target state.
+         */
         MartialNetwork.sendToPlayer(
                 new SyncHeavenfallTargetPacket(
                         -1
                 ),
                 player
         );
+
+        /*
+         * TEMPORARY CHECKPOINT INDICATOR.
+         *
+         * No damage is performed yet.
+         *
+         * This particle burst exists solely so we can prove
+         * that the authoritative impact fired at the correct
+         * moment.
+         */
+        player.serverLevel()
+                .sendParticles(
+                        ParticleTypes.CRIT,
+                        target.getX(),
+                        target.getY()
+                                + target.getBbHeight()
+                                * 0.50D,
+                        target.getZ(),
+                        20,
+                        0.45D,
+                        0.45D,
+                        0.45D,
+                        0.10D
+                );
     }
 
     private static void clearSelectedTarget(
@@ -933,6 +1137,9 @@ public final class HeavenfallStrikeEvents {
         private UUID committedTargetId;
 
         private int diveTicksRemaining;
+
+        @Nullable
+        private Vec3 previousDiveCenter;
 
         private HeavenfallState(
                 int ticksRemaining,

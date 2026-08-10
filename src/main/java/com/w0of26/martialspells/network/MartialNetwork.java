@@ -16,7 +16,7 @@ public final class MartialNetwork {
     /*
      * Increment whenever the packet protocol changes.
      */
-    private static final String PROTOCOL_VERSION = "8";
+    private static final String PROTOCOL_VERSION = "9";
 
     private static SimpleChannel instance;
     private static int packetId;
@@ -214,6 +214,28 @@ public final class MartialNetwork {
                 )
                 .consumerMainThread(
                         RequestHeavenfallDivePacket::handle
+                )
+                .add();
+
+        /*
+         * Heavenfall Strike player animations.
+         *
+         * Server synchronizes animation phases to the caster
+         * and every client currently tracking them.
+         */
+        instance.messageBuilder(
+                        SyncHeavenfallAnimationPacket.class,
+                        nextPacketId(),
+                        NetworkDirection.PLAY_TO_CLIENT
+                )
+                .decoder(
+                        SyncHeavenfallAnimationPacket::new
+                )
+                .encoder(
+                        SyncHeavenfallAnimationPacket::toBytes
+                )
+                .consumerMainThread(
+                        SyncHeavenfallAnimationPacket::handle
                 )
                 .add();
 
