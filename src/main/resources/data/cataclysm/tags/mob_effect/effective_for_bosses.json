@@ -1,6 +1,9 @@
 {
   "replace": false,
   "values": [
-    "martial_spells:guardians_cry"
+    "martial_spells:guardians_cry",
+    "irons_spellbooks:rend",
+    "irons_spellbooks:blight",
+    "turtlecore:stunned"
   ]
 }

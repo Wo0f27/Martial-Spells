@@ -26,8 +26,8 @@ import com.w0of26.martialspells.client.animation.HeavenfallAnimationPhase;
 import com.w0of26.martialspells.combat.HeavenfallAnimationStyle;
 import com.w0of26.martialspells.combat.MonkWeaponHelper;
 import com.w0of26.martialspells.network.SyncHeavenfallAnimationPacket;
-import net.minecraft.core.particles.ParticleTypes;
 import com.w0of26.martialspells.combat.HeavenfallCombatHelper;
+import com.w0of26.martialspells.visual.HeavenfallImpactVfxManager;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
@@ -843,6 +843,18 @@ public final class HeavenfallStrikeEvents {
         );
 
         /*
+         * Final Heavenfall landing presentation.
+         *
+         * Combat has already been resolved above.
+         * This is purely sound/camera/terrain VFX.
+         */
+        HeavenfallImpactVfxManager.begin(
+                player.serverLevel(),
+                target.position(),
+                removed.spellLevel
+        );
+
+        /*
          * Stop the high-speed homing movement.
          *
          * Keep a tiny downward velocity so the player settles
@@ -876,30 +888,6 @@ public final class HeavenfallStrikeEvents {
                 ),
                 player
         );
-
-        /*
-         * TEMPORARY CHECKPOINT INDICATOR.
-         *
-         * No damage is performed yet.
-         *
-         * This particle burst exists solely so we can prove
-         * that the authoritative impact fired at the correct
-         * moment.
-         */
-        player.serverLevel()
-                .sendParticles(
-                        ParticleTypes.CRIT,
-                        target.getX(),
-                        target.getY()
-                                + target.getBbHeight()
-                                * 0.50D,
-                        target.getZ(),
-                        20,
-                        0.45D,
-                        0.45D,
-                        0.45D,
-                        0.10D
-                );
     }
 
     private static void clearSelectedTarget(
