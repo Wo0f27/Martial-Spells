@@ -1,4 +1,4 @@
-package com.w0of26.martialspells.visual;
+package com.w0of26.martialspells.client.visual;
 
 import com.w0of26.martialspells.MartialSpells;
 import io.redspace.ironsspellbooks.api.util.CameraShakeData;
@@ -15,6 +15,11 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import io.redspace.ironsspellbooks.api.registry.SchoolRegistry;
+import io.redspace.ironsspellbooks.capabilities.magic.MagicManager;
+import io.redspace.ironsspellbooks.particle.BlastwaveParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
+
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -96,6 +101,15 @@ public final class HeavenfallImpactVfxManager {
                         impactCenter,
                         CAMERA_SHAKE_RADIUS
                 )
+        );
+
+        /*
+         * Divine Smite's instantaneous magical impact.
+         */
+        createDivineSmiteBurst(
+                level,
+                impactCenter,
+                spellLevel
         );
 
         /*
@@ -379,5 +393,76 @@ public final class HeavenfallImpactVfxManager {
             this.center = center;
             this.maximumRadius = maximumRadius;
         }
+    }
+    private static void createDivineSmiteBurst(
+            ServerLevel level,
+            Vec3 impactCenter,
+            int spellLevel
+    ) {
+        /*
+         * Put Divine Smite's visual ring on the actual ground
+         * rather than at the target's body center.
+         */
+        Vec3 particleLocation =
+                Utils.moveToRelativeGroundLevel(
+                        level,
+                        impactCenter,
+                        4
+                ).add(
+                        0.0D,
+                        0.10D,
+                        0.0D
+                );
+
+        /*
+         * Match the visual blastwave to Heavenfall's
+         * level-scaled shockwave radius.
+         *
+         * Divine Smite itself passes radius * 2 into
+         * BlastwaveParticleOptions.
+         */
+        float visualSize =
+                getRadius(
+                        spellLevel
+                ) * 2.0F;
+
+        /*
+         * Divine Smite's Holy blastwave.
+         */
+        MagicManager.spawnParticles(
+                level,
+                new BlastwaveParticleOptions(
+                        SchoolRegistry.HOLY
+                                .get()
+                                .getTargetingColor(),
+                        visualSize
+                ),
+                particleLocation.x,
+                particleLocation.y,
+                particleLocation.z,
+                1,
+                0.0D,
+                0.0D,
+                0.0D,
+                0.0D,
+                true
+        );
+
+        /*
+         * Same electric-spark burst used by Divine Smite.
+         */
+        MagicManager.spawnParticles(
+                level,
+                ParticleTypes.ELECTRIC_SPARK,
+                particleLocation.x,
+                particleLocation.y,
+                particleLocation.z,
+                50,
+                0.0D,
+                0.0D,
+                0.0D,
+                1.0D,
+                false
+        );
     }
 }

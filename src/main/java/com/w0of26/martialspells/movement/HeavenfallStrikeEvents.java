@@ -27,7 +27,7 @@ import com.w0of26.martialspells.combat.HeavenfallAnimationStyle;
 import com.w0of26.martialspells.combat.MonkWeaponHelper;
 import com.w0of26.martialspells.network.SyncHeavenfallAnimationPacket;
 import com.w0of26.martialspells.combat.HeavenfallCombatHelper;
-import com.w0of26.martialspells.visual.HeavenfallImpactVfxManager;
+import com.w0of26.martialspells.client.visual.HeavenfallImpactVfxManager;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
