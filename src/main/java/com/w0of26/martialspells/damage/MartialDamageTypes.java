@@ -40,6 +40,16 @@ public final class MartialDamageTypes {
                     )
             );
 
+    public static final ResourceKey<DamageType>
+            HEAVENFALL_STRIKE =
+            ResourceKey.create(
+                    Registries.DAMAGE_TYPE,
+                    new ResourceLocation(
+                            MartialSpells.MOD_ID,
+                            "heavenfall_strike"
+                    )
+            );
+
 
     private MartialDamageTypes() {
     }
@@ -109,6 +119,26 @@ public final class MartialDamageTypes {
                         )
                         .getHolderOrThrow(
                                 STUNNING_STRIKE
+                        );
+
+        return new DamageSource(
+                damageType,
+                player,
+                player
+        );
+    }
+
+    public static DamageSource heavenfallStrike(
+            ServerPlayer player
+    ) {
+        Holder<DamageType> damageType =
+                player.level()
+                        .registryAccess()
+                        .registryOrThrow(
+                                Registries.DAMAGE_TYPE
+                        )
+                        .getHolderOrThrow(
+                                HEAVENFALL_STRIKE
                         );
 
         return new DamageSource(

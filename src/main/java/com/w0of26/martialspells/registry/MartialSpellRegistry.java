@@ -69,6 +69,13 @@ public final class MartialSpellRegistry {
                     StepOfTheWindSpell::new
             );
 
+    public static final RegistryObject<AbstractSpell>
+            HEAVENFALL_STRIKE =
+            SPELLS.register(
+                    "heavenfall_strike",
+                    HeavenfallStrikeSpell::new
+            );
+
     private MartialSpellRegistry() {
     }
 

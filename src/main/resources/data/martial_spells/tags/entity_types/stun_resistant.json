@@ -1,5 +1,15 @@
 {
   "replace": false,
   "values": [
+    "cataclysm:ignis",
+    "cataclsym:scylla",
+    "cataclysm:maledictus",
+    "cataclysm:netherite_monstrosity",
+    "cataclysm:amethyst_crab",
+    "cataclysm:ancient_remnant",
+    "cataclysm:ender_guardian",
+    "cataclysm:ender_golem",
+    "cataclysm:the_harbinger",
+    "cataclysm:the_leviathan"
   ]
 }

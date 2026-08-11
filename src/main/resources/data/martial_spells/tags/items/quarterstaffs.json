@@ -2,31 +2,31 @@
   "replace": false,
   "values": [
     {
-      "id": "spartanweaponry:wooden_quarterstaff",
+      "id": "simplymore:wooden_quarterstaff",
       "required": false
     },
     {
-      "id": "spartanweaponry:stone_quarterstaff",
+      "id": "simplymore:stone_quarterstaff",
       "required": false
     },
     {
-      "id": "spartanweaponry:copper_quarterstaff",
+      "id": "simplymore:copper_quarterstaff",
       "required": false
     },
     {
-      "id": "spartanweaponry:iron_quarterstaff",
+      "id": "simplymore:iron_quarterstaff",
       "required": false
     },
     {
-      "id": "spartanweaponry:golden_quarterstaff",
+      "id": "simplymore:golden_quarterstaff",
       "required": false
     },
     {
-      "id": "spartanweaponry:diamond_quarterstaff",
+      "id": "simplymore:diamond_quarterstaff",
       "required": false
     },
     {
-      "id": "spartanweaponry:netherite_quarterstaff",
+      "id": "simplymore:netherite_quarterstaff",
       "required": false
     }
 
