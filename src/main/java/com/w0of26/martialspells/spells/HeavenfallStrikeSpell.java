@@ -1,6 +1,7 @@
 package com.w0of26.martialspells.spells;
 
 import com.w0of26.martialspells.MartialSpells;
+import com.w0of26.martialspells.combat.HeavenfallCombatHelper;
 import com.w0of26.martialspells.movement.StepOfTheWindMovementEvents;
 import com.w0of26.martialspells.registry.MartialSchoolRegistry;
 import io.redspace.ironsspellbooks.api.config.DefaultConfig;
@@ -320,6 +321,21 @@ public final class HeavenfallStrikeSpell
         );
     }
 
+    private static String toRomanNumeral(
+            int value
+    ) {
+        return switch (value) {
+            case 1 -> "I";
+            case 2 -> "II";
+            case 3 -> "III";
+            case 4 -> "IV";
+            case 5 -> "V";
+            default -> Integer.toString(
+                    value
+            );
+        };
+    }
+
     @Override
     public List<MutableComponent> getUniqueInfo(
             int spellLevel,
@@ -333,16 +349,86 @@ public final class HeavenfallStrikeSpell
                         caster
                 );
 
+        int primaryDamagePercent =
+                Math.round(
+                        HeavenfallCombatHelper
+                                .getPrimaryDamageMultiplier(
+                                        spellLevel
+                                )
+                                * 100.0F
+                );
+
+        int shockwaveDamagePercent =
+                Math.round(
+                        HeavenfallCombatHelper
+                                .getShockwaveDamageMultiplier(
+                                        spellLevel
+                                )
+                                * 100.0F
+                );
+
+        String rendLevel =
+                toRomanNumeral(
+                        HeavenfallCombatHelper
+                                .getRendLevel(
+                                        spellLevel
+                                )
+                );
+
+        String blightLevel =
+                toRomanNumeral(
+                        HeavenfallCombatHelper
+                                .getBlightLevel(
+                                        spellLevel
+                                )
+                );
+
         return List.of(
                 Component.translatable(
                         "ui.martial_spells.ki_cost",
                         displayedKiCost
                 ),
+
                 Component.translatable(
-                        "ui.martial_spells.heavenfall_launch"
+                        "ui.martial_spells.heavenfall_impact_damage",
+                        primaryDamagePercent
                 ),
+
                 Component.translatable(
-                        "ui.martial_spells.heavenfall_targeted_dive"
+                        "ui.martial_spells.heavenfall_shockwave_damage",
+                        shockwaveDamagePercent
+                ),
+
+                Component.translatable(
+                        "ui.martial_spells.heavenfall_shockwave_radius",
+                        HeavenfallCombatHelper
+                                .getShockwaveRadius(
+                                        spellLevel
+                                )
+                ),
+
+                Component.translatable(
+                        "ui.martial_spells.heavenfall_stun_duration",
+                        HeavenfallCombatHelper
+                                .getStunDurationSeconds(
+                                        spellLevel
+                                )
+                ),
+
+                Component.translatable(
+                        "ui.martial_spells.heavenfall_debuffs",
+                        rendLevel,
+                        blightLevel,
+                        HeavenfallCombatHelper
+                                .getRendDurationSeconds()
+                ),
+
+                Component.translatable(
+                        "ui.martial_spells.scales_with_martial_power"
+                ),
+
+                Component.translatable(
+                        "ui.martial_spells.heavy_armor_penalty"
                 )
         );
     }

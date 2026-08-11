@@ -117,11 +117,16 @@
   "ui.martial_spells.step_of_the_wind_fall_protection": "Prevents fall damage from the protected movement",
 
   "spell.martial_spells.heavenfall_strike": "Heavenfall Strike",
-  "spell.martial_spells.heavenfall_strike.description": "Launch into the air, choose a hostile target, and descend upon them with overwhelming martial force.",
-  "spell.martial_spells.heavenfall_strike.guide": "Leap skyward and select a hostile target before committing to a devastating descending strike.",
+  "spell.martial_spells.heavenfall_strike.description": "Launch into the air, choose a hostile target, and descend upon them with overwhelming martial force, unleashing a shockwave on impact.",
+  "spell.martial_spells.heavenfall_strike.guide": "Launch skyward and aim at a hostile creature until it is marked in gold, then press Attack to commit to Heavenfall and dive toward it. A successful impact deals heavy martial damage, applies Rend and Blight, briefly stuns the primary target, and releases a damaging shockwave that knocks nearby enemies away. Stun-resistant enemies suffer a shorter stun. Landing without committing or losing a valid target safely ends the technique.",
+
   "ui.martial_spells.heavenfall_invalid_movement": "Heavenfall Strike cannot be used while mounted, swimming, climbing, or flying.",
   "ui.martial_spells.heavenfall_no_clearance": "There is not enough space above you to begin Heavenfall Strike.",
-  "ui.martial_spells.heavenfall_launch": "Launches the caster upward",
-  "ui.martial_spells.heavenfall_targeted_dive": "Select a hostile target and commit to a descending strike"
+
+  "ui.martial_spells.heavenfall_impact_damage": "Impact Damage: %s%% Attack Damage",
+  "ui.martial_spells.heavenfall_shockwave_damage": "Shockwave Damage: %s%% Attack Damage",
+  "ui.martial_spells.heavenfall_shockwave_radius": "Shockwave Radius: %s blocks",
+  "ui.martial_spells.heavenfall_stun_duration": "Stun Duration: %s seconds; halved against resistant enemies",
+  "ui.martial_spells.heavenfall_debuffs": "Rend %s / Blight %s: %s seconds"
 
 }

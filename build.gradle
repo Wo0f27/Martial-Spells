@@ -248,7 +248,7 @@ dependencies {
     )
 */
     runtimeOnly fg.deobf("curse.maven:simply-swords-659887:5639538")
-    runtimeOnly fg.deobf("dev.architectury:architectury-forge:9.0.8")
+    implementation fg.deobf("dev.architectury:architectury-forge:9.2.14")
     runtimeOnly fg.deobf("me.shedaniel.cloth:cloth-config-forge:11.1.106")
     runtimeOnly fg.deobf("curse.maven:spartan-weaponry-278141:6842571")
     // ============================================================

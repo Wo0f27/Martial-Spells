@@ -19,6 +19,7 @@ import io.redspace.ironsspellbooks.api.registry.SchoolRegistry;
 import io.redspace.ironsspellbooks.capabilities.magic.MagicManager;
 import io.redspace.ironsspellbooks.particle.BlastwaveParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
+import com.w0of26.martialspells.combat.HeavenfallCombatHelper;
 
 
 import java.util.ArrayList;
@@ -71,9 +72,10 @@ public final class HeavenfallImpactVfxManager {
             int spellLevel
     ) {
         float maximumRadius =
-                getRadius(
-                        spellLevel
-                );
+                (float) HeavenfallCombatHelper
+                        .getShockwaveRadius(
+                                spellLevel
+                        );
 
         /*
          * Use Iron's actual Earthquake impact sound.
@@ -352,30 +354,6 @@ public final class HeavenfallImpactVfxManager {
         );
     }
 
-    private static float getRadius(
-            int spellLevel
-    ) {
-        int level =
-                Mth.clamp(
-                        spellLevel,
-                        1,
-                        5
-                );
-
-        /*
-         * Match Heavenfall's actual damaging shockwave:
-         *
-         * I   2.5
-         * II  3.0
-         * III 3.5
-         * IV  4.0
-         * V   4.5
-         */
-        return 2.0F
-                + level
-                * 0.5F;
-    }
-
     private static final class ImpactWave {
 
         private final ResourceKey<Level> dimension;
@@ -422,9 +400,11 @@ public final class HeavenfallImpactVfxManager {
          * BlastwaveParticleOptions.
          */
         float visualSize =
-                getRadius(
-                        spellLevel
-                ) * 2.0F;
+                (float) HeavenfallCombatHelper
+                        .getShockwaveRadius(
+                                spellLevel
+                        )
+                        * 2.0F;
 
         /*
          * Divine Smite's Holy blastwave.

@@ -547,6 +547,76 @@ public final class HeavenfallCombatHelper {
         );
     }
 
+    public static float getPrimaryDamageMultiplier(
+            int spellLevel
+    ) {
+        return PRIMARY_DAMAGE_MULTIPLIERS[
+                getLevelIndex(
+                        spellLevel
+                )
+                ];
+    }
+
+    public static float getShockwaveDamageMultiplier(
+            int spellLevel
+    ) {
+        return SHOCKWAVE_DAMAGE_MULTIPLIERS[
+                getLevelIndex(
+                        spellLevel
+                )
+                ];
+    }
+
+    public static double getShockwaveRadius(
+            int spellLevel
+    ) {
+        return SHOCKWAVE_RADIUS[
+                getLevelIndex(
+                        spellLevel
+                )
+                ];
+    }
+
+    public static float getStunDurationSeconds(
+            int spellLevel
+    ) {
+        return STUN_TICKS[
+                getLevelIndex(
+                        spellLevel
+                )
+                ] / 20.0F;
+    }
+
+    public static int getRendLevel(
+            int spellLevel
+    ) {
+        return REND_AMPLIFIERS[
+                getLevelIndex(
+                        spellLevel
+                )
+                ] + 1;
+    }
+
+    public static int getBlightLevel(
+            int spellLevel
+    ) {
+        return BLIGHT_AMPLIFIERS[
+                getLevelIndex(
+                        spellLevel
+                )
+                ] + 1;
+    }
+
+    public static float getRendDurationSeconds() {
+        return REND_DURATION_TICKS
+                / 20.0F;
+    }
+
+    public static float getBlightDurationSeconds() {
+        return BLIGHT_DURATION_TICKS
+                / 20.0F;
+    }
+
     private static int getLevelIndex(
             int spellLevel
     ) {
