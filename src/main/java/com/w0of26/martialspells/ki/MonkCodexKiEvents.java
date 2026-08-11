@@ -10,6 +10,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotResult;
+import com.w0of26.martialspells.events.StillnessOfMindEvents;
 
 /**
  * Derives maximum Ki from the specific equipped Monk Codex stack.
@@ -47,6 +48,13 @@ public final class MonkCodexKiEvents {
                         )
                         .map(SlotResult::stack)
                         .orElse(ItemStack.EMPTY);
+
+        if (equippedCodex.isEmpty()) {
+            StillnessOfMindEvents
+                    .terminateForCodexRemoval(
+                            serverPlayer
+                    );
+        }
 
         int desiredMaximumKi =
                 equippedCodex.isEmpty()

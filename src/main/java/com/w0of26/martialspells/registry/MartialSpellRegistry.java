@@ -76,6 +76,13 @@ public final class MartialSpellRegistry {
                     HeavenfallStrikeSpell::new
             );
 
+    public static final RegistryObject<AbstractSpell>
+            STILLNESS_OF_MIND =
+            SPELLS.register(
+                    "stillness_of_mind",
+                    StillnessOfMindSpell::new
+            );
+
     private MartialSpellRegistry() {
     }
 
