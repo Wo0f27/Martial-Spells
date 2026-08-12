@@ -17,6 +17,7 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import com.w0of26.martialspells.visual.StillnessOfMindVfx;
 
 import java.util.List;
 
@@ -54,9 +55,9 @@ public final class StillnessOfMindSpell
                             MAX_LEVEL
                     )
                     /*
-                     * Iron's still requires a configured value.
-                     * StillnessOfMindCooldownEvents replaces
-                     * the effective value with the fixed value.
+                     * Monk techniques use their configured cooldown directly.
+                     * Generic Iron's cooldown reduction is bypassed by the
+                     * shared Monk cooldown integration.
                      */
                     .setCooldownSeconds(
                             COOLDOWN_SECONDS
@@ -162,6 +163,10 @@ public final class StillnessOfMindSpell
                         false,
                         true
                 )
+        );
+
+        StillnessOfMindVfx.spawnActivation(
+                player
         );
     }
 

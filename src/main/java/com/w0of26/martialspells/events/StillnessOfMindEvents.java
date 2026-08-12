@@ -10,6 +10,8 @@ import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import com.w0of26.martialspells.visual.StillnessOfMindVfx;
+
 
 @Mod.EventBusSubscriber(
         modid = MartialSpells.MOD_ID,
@@ -67,6 +69,10 @@ public final class StillnessOfMindEvents {
                             true
                     );
 
+            StillnessOfMindVfx.tickActive(
+                    player
+            );
+
             return;
         }
 
@@ -87,6 +93,10 @@ public final class StillnessOfMindEvents {
                 || player.isDeadOrDying()) {
             return;
         }
+
+        StillnessOfMindVfx.spawnTermination(
+                player
+        );
 
         applyWeakness(player);
     }
@@ -125,6 +135,10 @@ public final class StillnessOfMindEvents {
 
         if (player.isAlive()
                 && !player.isDeadOrDying()) {
+            StillnessOfMindVfx.spawnTermination(
+                    player
+            );
+
             applyWeakness(player);
         }
     }
