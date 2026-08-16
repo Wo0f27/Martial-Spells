@@ -1,4 +1,4 @@
-package com.w0of26.martialspells.mixin.client;
+package com.w0of26.martialspells.mixin;
 
 import com.w0of26.martialspells.spells.AbstractMonkTechniqueSpell;
 import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
