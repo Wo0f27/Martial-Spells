@@ -16,7 +16,7 @@ public final class MartialNetwork {
     /*
      * Increment whenever the packet protocol changes.
      */
-    private static final String PROTOCOL_VERSION = "9";
+    private static final String PROTOCOL_VERSION = "10";
 
     private static SimpleChannel instance;
     private static int packetId;
@@ -239,6 +239,29 @@ public final class MartialNetwork {
                 )
                 .add();
 
+        /*
+         * Prone animation state.
+         *
+         * Gameplay remains server-authoritative.
+         * Clients receive only the entity ID and whether
+         * the Prone visual should be active.
+         */
+        instance.messageBuilder(
+                        SyncProneAnimationPacket.class,
+                        nextPacketId(),
+                        NetworkDirection.PLAY_TO_CLIENT
+                )
+                .decoder(
+                        SyncProneAnimationPacket::new
+                )
+                .encoder(
+                        SyncProneAnimationPacket::toBytes
+                )
+                .consumerMainThread(
+                        SyncProneAnimationPacket::handle
+                )
+                .add();
+
     }
 
 
@@ -308,6 +331,32 @@ public final class MartialNetwork {
                         .TRACKING_ENTITY_AND_SELF
                         .with(
                                 () -> player
+                        ),
+                message
+        );
+    }
+
+    /**
+     * Sends a packet to every client currently tracking
+     * an entity, and also to the entity itself when the
+     * entity is a player.
+     */
+    public static <MSG> void sendToTrackingEntityAndSelf(
+            MSG message,
+            net.minecraft.world.entity.Entity entity
+    ) {
+        if (instance == null) {
+            throw new IllegalStateException(
+                    "Martial Spells network has not "
+                            + "been registered."
+            );
+        }
+
+        instance.send(
+                PacketDistributor
+                        .TRACKING_ENTITY_AND_SELF
+                        .with(
+                                () -> entity
                         ),
                 message
         );
