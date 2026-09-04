@@ -25,7 +25,7 @@ public final class ProneBipedAnimator {
     private static final ResourceLocation TEST_ANIMATION =
             ResourceLocation.fromNamespaceAndPath(
                     MartialSpells.MOD_ID,
-                    "stillwater_meditation"
+                    "prone_knockdown"
             );
 
     private ProneBipedAnimator() {
