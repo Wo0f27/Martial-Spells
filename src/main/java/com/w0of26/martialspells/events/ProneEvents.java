@@ -16,6 +16,10 @@ import net.minecraftforge.fml.common.Mod;
 import com.w0of26.martialspells.network.MartialNetwork;
 import com.w0of26.martialspells.network.SyncProneAnimationPacket;
 import com.w0of26.martialspells.prone.ProneRecoveryModifierService;
+import com.w0of26.martialspells.mixin.MobEffectInstanceAccessor;
+import com.w0of26.martialspells.prone.ProneDurationModifierService;
+import com.w0of26.martialspells.registry.MartialEffectRegistry;
+import net.minecraftforge.event.entity.living.MobEffectEvent;
 
 @Mod.EventBusSubscriber(
         modid = MartialSpells.MOD_ID,
@@ -252,5 +256,54 @@ public final class ProneEvents {
                 ),
                 player
         );
+    }
+    @SubscribeEvent
+    public static void onProneAdded(
+            MobEffectEvent.Added event
+    ) {
+        LivingEntity entity =
+                event.getEntity();
+
+        /*
+         * Duration is server-authoritative.
+         *
+         * The client will receive the already-modified
+         * duration through normal effect synchronization.
+         */
+        if (entity.level().isClientSide) {
+            return;
+        }
+
+        MobEffectInstance effect =
+                event.getEffectInstance();
+
+        if (effect.getEffect()
+                != MartialEffectRegistry
+                .PRONE
+                .get()) {
+
+            return;
+        }
+
+        int originalDuration =
+                effect.getDuration();
+
+        int modifiedDuration =
+                ProneDurationModifierService
+                        .getDurationTicks(
+                                entity,
+                                originalDuration
+                        );
+
+        if (modifiedDuration
+                == originalDuration) {
+
+            return;
+        }
+
+        ((MobEffectInstanceAccessor) (Object) effect)
+                .martialSpells$setDuration(
+                        modifiedDuration
+                );
     }
 }

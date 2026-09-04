@@ -6,7 +6,8 @@
   "refmap": "martial_spells.refmap.json",
   "mixins": [
     "MagicManagerMixin",
-    "MobProneAiMixin"
+    "MobProneAiMixin",
+    "MobEffectInstanceAccessor"
   ],
   "client": [
     "client.PlayerItemInHandLayerMixin",
