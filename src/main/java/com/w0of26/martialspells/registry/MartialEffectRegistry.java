@@ -1,12 +1,13 @@
 package com.w0of26.martialspells.registry;
 
-import com.w0of26.martialspells.effects.GuardiansCovenantLinkedEffect;
-import com.w0of26.martialspells.effects.GuardiansCovenantTankEffect;
 import com.w0of26.martialspells.MartialSpells;
-import com.w0of26.martialspells.effects.GuardiansCryActiveEffect;
-import com.w0of26.martialspells.effects.GuardiansCryEffect;
 import com.w0of26.martialspells.effects.DiamondBodyEffect;
 import com.w0of26.martialspells.effects.DiamondHeartEffect;
+import com.w0of26.martialspells.effects.GuardiansCovenantLinkedEffect;
+import com.w0of26.martialspells.effects.GuardiansCovenantTankEffect;
+import com.w0of26.martialspells.effects.GuardiansCryActiveEffect;
+import com.w0of26.martialspells.effects.GuardiansCryEffect;
+import com.w0of26.martialspells.effects.ProneEffect;
 import com.w0of26.martialspells.effects.StillnessOfMindEffect;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -14,8 +15,8 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
-
 public final class MartialEffectRegistry {
+
     public static final DeferredRegister<MobEffect> MOB_EFFECTS =
             DeferredRegister.create(
                     ForgeRegistries.MOB_EFFECTS,
@@ -67,14 +68,21 @@ public final class MartialEffectRegistry {
                     StillnessOfMindEffect::new
             );
 
-
-
-
+    public static final RegistryObject<MobEffect>
+            PRONE =
+            MOB_EFFECTS.register(
+                    "prone",
+                    ProneEffect::new
+            );
 
     private MartialEffectRegistry() {
     }
 
-    public static void register(IEventBus modEventBus) {
-        MOB_EFFECTS.register(modEventBus);
+    public static void register(
+            IEventBus modEventBus
+    ) {
+        MOB_EFFECTS.register(
+                modEventBus
+        );
     }
 }

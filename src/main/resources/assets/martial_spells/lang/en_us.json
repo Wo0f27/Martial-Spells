@@ -4,6 +4,8 @@
   "attribute.martial_spells.martial_magic_resist": "Martial Resistance",
   "item.martial_spells.martial_focus": "Martial Focus",
 
+  "effect.martial_spells.prone": "Prone",
+
   "death.attack.martial": "%1$s was defeated by a martial technique",
   "death.attack.martial.player": "%1$s was defeated by %2$s's martial technique",
   "ui.martial_spells.scales_with_martial_power": "Scales with Martial Spell Power.",
