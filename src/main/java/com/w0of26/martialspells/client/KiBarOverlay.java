@@ -7,6 +7,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraftforge.client.gui.overlay.ForgeGui;
 import net.minecraftforge.client.gui.overlay.IGuiOverlay;
+import com.w0of26.martialspells.registry.MartialEffectRegistry;
 
 /**
  * Displays the local player's synchronized Ki above Iron's mana bar.
@@ -81,6 +82,13 @@ public final class KiBarOverlay implements IGuiOverlay {
                         maximumKi
                 );
 
+        boolean infiniteKi =
+                minecraft.player.hasEffect(
+                        MartialEffectRegistry
+                                .STILLNESS_OF_MIND
+                                .get()
+                );
+
         /*
          * Same horizontal position as Iron's Hunger-anchored
          * mana bar: directly to the right of screen center.
@@ -101,8 +109,11 @@ public final class KiBarOverlay implements IGuiOverlay {
                         - EXTRA_VERTICAL_SEPARATION;
 
         double fillRatio =
-                Mth.clamp(
-                        currentKi / (double) maximumKi,
+                infiniteKi
+                        ? 1.0D
+                        : Mth.clamp(
+                        currentKi
+                                / (double) maximumKi,
                         0.0D,
                         1.0D
                 );
@@ -153,7 +164,11 @@ public final class KiBarOverlay implements IGuiOverlay {
         );
 
         String kiText =
-                currentKi + "/" + maximumKi;
+                infiniteKi
+                        ? "\u221E"
+                        : currentKi
+                        + "/"
+                        + maximumKi;
 
         int textX =
                 barX
