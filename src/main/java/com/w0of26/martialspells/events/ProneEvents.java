@@ -13,6 +13,8 @@ import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import com.w0of26.martialspells.network.MartialNetwork;
+import com.w0of26.martialspells.network.SyncProneAnimationPacket;
 
 @Mod.EventBusSubscriber(
         modid = MartialSpells.MOD_ID,
@@ -47,12 +49,26 @@ public final class ProneEvents {
                         );
 
         if (active) {
-            entity.getPersistentData()
-                    .putBoolean(
-                            ProneConstants
-                                    .ACTIVE_TRACKER_TAG,
-                            true
-                    );
+
+            /*
+             * Only synchronize when transitioning into Prone.
+             *
+             * Refreshing Prone does not restart the animation.
+             */
+            if (!wasActive) {
+
+                entity.getPersistentData()
+                        .putBoolean(
+                                ProneConstants
+                                        .ACTIVE_TRACKER_TAG,
+                                true
+                        );
+
+                syncProneVisual(
+                        entity,
+                        true
+                );
+            }
 
             enforceProneMovement(
                     entity
@@ -70,6 +86,11 @@ public final class ProneEvents {
                         ProneConstants
                                 .ACTIVE_TRACKER_TAG
                 );
+
+        syncProneVisual(
+                entity,
+                false
+        );
 
         if (!entity.isAlive()
                 || entity.isDeadOrDying()) {
@@ -169,5 +190,51 @@ public final class ProneEvents {
                         ProneConstants
                                 .ACTIVE_TRACKER_TAG
                 );
+    }
+    private static void syncProneVisual(
+            LivingEntity entity,
+            boolean active
+    ) {
+        if (entity.level().isClientSide) {
+            return;
+        }
+
+        MartialNetwork
+                .sendToTrackingEntityAndSelf(
+                        new SyncProneAnimationPacket(
+                                entity.getId(),
+                                active
+                        ),
+                        entity
+                );
+    }
+
+    @SubscribeEvent
+    public static void onStartTracking(
+            PlayerEvent.StartTracking event
+    ) {
+        if (!(event.getEntity()
+                instanceof net.minecraft.server.level.ServerPlayer player)) {
+            return;
+        }
+
+        if (!(event.getTarget()
+                instanceof LivingEntity target)) {
+            return;
+        }
+
+        if (!ProneHelper.isProne(
+                target
+        )) {
+            return;
+        }
+
+        MartialNetwork.sendToPlayer(
+                new SyncProneAnimationPacket(
+                        target.getId(),
+                        true
+                ),
+                player
+        );
     }
 }
