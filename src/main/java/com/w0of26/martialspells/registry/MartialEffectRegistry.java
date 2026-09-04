@@ -13,6 +13,7 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
+
 public final class MartialEffectRegistry {
     public static final DeferredRegister<MobEffect> MOB_EFFECTS =
             DeferredRegister.create(
