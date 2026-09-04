@@ -15,6 +15,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import com.w0of26.martialspells.network.MartialNetwork;
 import com.w0of26.martialspells.network.SyncProneAnimationPacket;
+import com.w0of26.martialspells.prone.ProneRecoveryModifierService;
 
 @Mod.EventBusSubscriber(
         modid = MartialSpells.MOD_ID,
@@ -153,12 +154,27 @@ public final class ProneEvents {
     private static void applyRecoverySlowness(
             LivingEntity entity
     ) {
+        int recoveryTicks =
+                ProneRecoveryModifierService
+                        .getRecoveryTicks(
+                                entity,
+                                ProneConstants
+                                        .POST_SLOWNESS_TICKS
+                        );
+
+        /*
+         * Providers may completely remove the
+         * post-Prone recovery penalty.
+         */
+        if (recoveryTicks <= 0) {
+            return;
+        }
+
         entity.addEffect(
                 new MobEffectInstance(
                         MobEffects
                                 .MOVEMENT_SLOWDOWN,
-                        ProneConstants
-                                .POST_SLOWNESS_TICKS,
+                        recoveryTicks,
                         ProneConstants
                                 .POST_SLOWNESS_AMPLIFIER,
                         false,
