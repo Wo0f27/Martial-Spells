@@ -119,14 +119,24 @@
   "spell.martial_spells.heavenfall_strike": "Heavenfall Strike",
   "spell.martial_spells.heavenfall_strike.description": "Launch into the air, choose a hostile target, and descend upon them with overwhelming martial force, unleashing a shockwave on impact.",
   "spell.martial_spells.heavenfall_strike.guide": "Launch skyward and aim at a hostile creature until it is marked in gold, then press Attack to commit to Heavenfall and dive toward it. A successful impact deals heavy martial damage, applies Rend and Blight, briefly stuns the primary target, and releases a damaging shockwave that knocks nearby enemies away. Stun-resistant enemies suffer a shorter stun. Landing without committing or losing a valid target safely ends the technique.",
-
   "ui.martial_spells.heavenfall_invalid_movement": "Heavenfall Strike cannot be used while mounted, swimming, climbing, or flying.",
   "ui.martial_spells.heavenfall_no_clearance": "There is not enough space above you to begin Heavenfall Strike.",
-
   "ui.martial_spells.heavenfall_impact_damage": "Impact Damage: %s%% Attack Damage",
   "ui.martial_spells.heavenfall_shockwave_damage": "Shockwave Damage: %s%% Attack Damage",
   "ui.martial_spells.heavenfall_shockwave_radius": "Shockwave Radius: %s blocks",
   "ui.martial_spells.heavenfall_stun_duration": "Stun Duration: %s seconds; halved against resistant enemies",
-  "ui.martial_spells.heavenfall_debuffs": "Rend %s / Blight %s: %s seconds"
+  "ui.martial_spells.heavenfall_debuffs": "Rend %s / Blight %s: %s seconds",
+
+  "effect.martial_spells.stillness_of_mind": "Stillness of Mind",
+  "spell.martial_spells.stillness_of_mind": "Stillness of Mind",
+  "spell.martial_spells.stillness_of_mind.description": "Transcend the limits of Ki for a brief moment, allowing martial techniques to be used without consuming Ki.",
+  "spell.martial_spells.stillness_of_mind.guide": "Enter Stillness of Mind for 20 seconds. While active, Monk techniques do not consume Ki, though their normal cooldowns remain. Your Armor and Armor Toughness are reduced by 50%, but defensive techniques such as Diamond Body may still be used normally. Your stored Ki is preserved, and Ki gained during Stillness remains afterward. When Stillness ends, you suffer Weakness I for 60 seconds. Unequipping the Monk Codex ends the technique immediately.",
+  "ui.martial_spells.stillness_infinite_ki": "Infinite Ki: %s seconds",
+  "ui.martial_spells.stillness_defense_penalty": "Armor and Armor Toughness reduced by 50% while active",
+  "ui.martial_spells.stillness_preserves_ki": "Stored Ki is not consumed while active",
+  "ui.martial_spells.stillness_already_active": "Stillness of Mind is already active.",
+  "ui.martial_spells.stillness_aftereffect": "Aftereffect: Weakness I for 60 seconds",
+  "ui.martial_spells.stillness_requires_codex_active": "Unequipping the Monk Codex ends Stillness immediately"
+
 
 }

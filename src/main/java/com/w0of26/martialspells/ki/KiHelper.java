@@ -4,6 +4,7 @@ import com.w0of26.martialspells.network.MartialNetwork;
 import com.w0of26.martialspells.network.SyncKiPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
+import com.w0of26.martialspells.registry.MartialEffectRegistry;
 
 import java.util.Optional;
 
@@ -24,6 +25,17 @@ public final class KiHelper {
                         MartialCapabilities.KI
                 )
                 .resolve();
+    }
+
+    private static boolean hasInfiniteKi(
+            Player player
+    ) {
+        return player != null
+                && player.hasEffect(
+                MartialEffectRegistry
+                        .STILLNESS_OF_MIND
+                        .get()
+        );
     }
 
     public static int getCurrentKi(
@@ -134,6 +146,17 @@ public final class KiHelper {
             Player player,
             int amount
     ) {
+        /*
+         * Stillness of Mind suspends Ki expenditure.
+         *
+         * The underlying Ki capability is deliberately left
+         * untouched so the player returns to exactly the same
+         * stored Ki when Stillness ends.
+         */
+        if (hasInfiniteKi(player)) {
+            return true;
+        }
+
         Optional<KiData> optional =
                 getData(player);
 
@@ -159,6 +182,10 @@ public final class KiHelper {
             Player player,
             int amount
     ) {
+        if (hasInfiniteKi(player)) {
+            return true;
+        }
+
         return getData(player)
                 .map(data -> data.hasKi(amount))
                 .orElse(false);
