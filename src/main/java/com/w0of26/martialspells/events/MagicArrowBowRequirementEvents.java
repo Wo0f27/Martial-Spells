@@ -7,17 +7,18 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BowItem;
+import net.minecraft.world.item.CrossbowItem;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 /**
- * Makes Iron's base Magic Arrow behave like a bow technique while
- * Martial Spells is installed.
+ * Makes Iron's base Magic Arrow behave like a ranged weapon technique
+ * while Martial Spells is installed.
  *
  * The base spell itself is left untouched; this only vetoes player
- * casts that begin without a bow held in either hand. Because this
- * runs through Iron's SpellPreCastEvent, the rule applies consistently
- * to scroll, spellbook, and other player cast sources.
+ * casts that begin without a bow or crossbow held in either hand.
+ * Because this runs through Iron's SpellPreCastEvent, the rule applies
+ * consistently to scroll, spellbook, and other player cast sources.
  */
 @Mod.EventBusSubscriber(
         modid = MartialSpells.MOD_ID,
@@ -37,7 +38,7 @@ public final class MagicArrowBowRequirementEvents {
         }
 
         Player player = event.getEntity();
-        if (isHoldingBow(player)) {
+        if (isHoldingValidRangedWeapon(player)) {
             return;
         }
 
@@ -46,15 +47,19 @@ public final class MagicArrowBowRequirementEvents {
         if (player instanceof ServerPlayer serverPlayer) {
             serverPlayer.displayClientMessage(
                     Component.literal(
-                            "Magic Arrow requires a bow in either hand."
+                            "Magic Arrow requires a bow or crossbow in either hand."
                     ).withStyle(ChatFormatting.RED),
                     true
             );
         }
     }
 
-    private static boolean isHoldingBow(Player player) {
-        return player.getMainHandItem().getItem() instanceof BowItem
-                || player.getOffhandItem().getItem() instanceof BowItem;
+    private static boolean isHoldingValidRangedWeapon(Player player) {
+        return isBowOrCrossbow(player.getMainHandItem().getItem())
+                || isBowOrCrossbow(player.getOffhandItem().getItem());
+    }
+
+    private static boolean isBowOrCrossbow(Object item) {
+        return item instanceof BowItem || item instanceof CrossbowItem;
     }
 }
