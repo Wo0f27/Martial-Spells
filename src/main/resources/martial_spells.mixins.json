@@ -11,7 +11,8 @@
   ],
   "client": [
     "client.PlayerItemInHandLayerMixin",
-    "client.ItemInHandLayerMixin"
+    "client.ItemInHandLayerMixin",
+    "client.ItemPropertiesMixin"
   ],
   "injectors": {
     "defaultRequire": 1
