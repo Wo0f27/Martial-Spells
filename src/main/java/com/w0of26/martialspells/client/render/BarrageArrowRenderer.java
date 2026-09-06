@@ -5,9 +5,9 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import com.w0of26.martialspells.MartialSpells;
 import com.w0of26.martialspells.entity.BarrageArrow;
-import io.redspace.ironsspellbooks.render.RenderHelper;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -21,6 +21,12 @@ import org.joml.Matrix4f;
  * Renders Barrage's physical projectile with the same crossed-quad
  * silhouette used by Iron's Magic Arrow, but with Martial Spells' own
  * recolored texture.
+ *
+ * The projectile deliberately uses Minecraft's ordinary translucent
+ * entity render type instead of Iron's additive energy-swirl type.
+ * Full-bright lighting preserves the supernatural appearance while
+ * avoiding shader/render-state compatibility issues for this custom
+ * AbstractArrow entity.
  */
 public final class BarrageArrowRenderer
         extends EntityRenderer<BarrageArrow> {
@@ -95,12 +101,6 @@ public final class BarrageArrowRenderer
         );
     }
 
-    /**
-     * Mirrors Iron's 1.20.1 MagicArrowRenderer geometry. The only
-     * deliberate rendering difference is NO_CULL: Barrage's crossed
-     * quads must remain visible from either face while the projectile
-     * rotates rapidly between consecutive shots.
-     */
     private static void renderModel(
             PoseStack poseStack,
             MultiBufferSource bufferSource
@@ -117,8 +117,7 @@ public final class BarrageArrowRenderer
 
         VertexConsumer consumer =
                 bufferSource.getBuffer(
-                        RenderHelper.CustomerRenderType
-                                .magicNoCull(TEXTURE)
+                        RenderType.entityTranslucent(TEXTURE)
                 );
 
         poseStack.mulPose(
@@ -195,9 +194,9 @@ public final class BarrageArrowRenderer
                         z
                 )
                 .color(
-                        200,
-                        200,
-                        200,
+                        255,
+                        255,
+                        255,
                         255
                 )
                 .uv(u, v)
