@@ -1,0 +1,35 @@
+{
+  "replace": false,
+  "values": [
+    "#forge:tools/bows",
+    "minecraft:bow",
+    {
+      "id": "archers:composite_longbow",
+      "required": false
+    },
+    {
+      "id": "archers:mechanic_shortbow",
+      "required": false
+    },
+    {
+      "id": "archers:royal_longbow",
+      "required": false
+    },
+    {
+      "id": "archers:netherite_shortbow",
+      "required": false
+    },
+    {
+      "id": "archers:netherite_longbow",
+      "required": false
+    },
+    {
+      "id": "cataclysm:cursed_bow",
+      "required": false
+    },
+    {
+      "id": "cataclysm:wrath_of_the_desert",
+      "required": false
+    }
+  ]
+}

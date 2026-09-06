@@ -2,6 +2,7 @@ package com.w0of26.martialspells.client.animation;
 
 import com.w0of26.martialspells.MartialSpells;
 import com.w0of26.martialspells.client.visual.MagicArrowClientVisuals;
+import com.w0of26.martialspells.ranged.RangedWeaponClassifier;
 import dev.kosmx.playerAnim.api.layered.IAnimation;
 import dev.kosmx.playerAnim.api.layered.KeyframeAnimationPlayer;
 import dev.kosmx.playerAnim.api.layered.ModifierLayer;
@@ -12,7 +13,6 @@ import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.BowItem;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -147,8 +147,11 @@ public final class MagicArrowClientAnimations {
     }
 
     private static boolean isHoldingBow(Player player) {
-        return player.getMainHandItem().getItem() instanceof BowItem
-                || player.getOffhandItem().getItem() instanceof BowItem;
+        return RangedWeaponClassifier.isBow(
+                player.getMainHandItem()
+        ) || RangedWeaponClassifier.isBow(
+                player.getOffhandItem()
+        );
     }
 
     @SuppressWarnings("unchecked")

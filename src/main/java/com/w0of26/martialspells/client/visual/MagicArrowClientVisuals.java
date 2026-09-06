@@ -1,5 +1,6 @@
 package com.w0of26.martialspells.client.visual;
 
+import com.w0of26.martialspells.ranged.RangedWeaponClassifier;
 import io.redspace.ironsspellbooks.capabilities.magic.SyncedSpellData;
 import io.redspace.ironsspellbooks.player.ClientMagicData;
 import net.minecraft.client.Minecraft;
@@ -7,8 +8,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.BowItem;
-import net.minecraft.world.item.CrossbowItem;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
@@ -88,18 +87,20 @@ public final class MagicArrowClientVisuals {
     }
 
     /**
-     * Returns the physical player arm currently holding the crossbow,
-     * preferring the main hand if both hands contain crossbows.
+     * Returns the physical player arm currently holding a classified
+     * crossbow, preferring the main hand when both hands qualify.
      */
     @Nullable
     public static HumanoidArm getCrossbowArm(Player player) {
-        if (player.getMainHandItem().getItem()
-                instanceof CrossbowItem) {
+        if (RangedWeaponClassifier.isCrossbow(
+                player.getMainHandItem()
+        )) {
             return player.getMainArm();
         }
 
-        if (player.getOffhandItem().getItem()
-                instanceof CrossbowItem) {
+        if (RangedWeaponClassifier.isCrossbow(
+                player.getOffhandItem()
+        )) {
             return player.getMainArm().getOpposite();
         }
 
@@ -107,7 +108,6 @@ public final class MagicArrowClientVisuals {
     }
 
     public static boolean isSupportedRangedWeapon(ItemStack stack) {
-        return stack.getItem() instanceof BowItem
-                || stack.getItem() instanceof CrossbowItem;
+        return RangedWeaponClassifier.isSupported(stack);
     }
 }

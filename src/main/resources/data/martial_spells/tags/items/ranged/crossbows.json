@@ -1,0 +1,23 @@
+{
+  "replace": false,
+  "values": [
+    "#forge:tools/crossbows",
+    "minecraft:crossbow",
+    {
+      "id": "archers:rapid_crossbow",
+      "required": false
+    },
+    {
+      "id": "archers:heavy_crossbow",
+      "required": false
+    },
+    {
+      "id": "archers:netherite_rapid_crossbow",
+      "required": false
+    },
+    {
+      "id": "archers:netherite_heavy_crossbow",
+      "required": false
+    }
+  ]
+}

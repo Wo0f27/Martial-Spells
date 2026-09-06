@@ -1,13 +1,12 @@
 package com.w0of26.martialspells.events;
 
 import com.w0of26.martialspells.MartialSpells;
+import com.w0of26.martialspells.ranged.RangedWeaponClassifier;
 import io.redspace.ironsspellbooks.api.events.SpellPreCastEvent;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.BowItem;
-import net.minecraft.world.item.CrossbowItem;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -16,9 +15,9 @@ import net.minecraftforge.fml.common.Mod;
  * while Martial Spells is installed.
  *
  * The base spell itself is left untouched; this only vetoes player
- * casts that begin without a bow or crossbow held in either hand.
- * Because this runs through Iron's SpellPreCastEvent, the rule applies
- * consistently to scroll, spellbook, and other player cast sources.
+ * casts that begin without a recognized bow or crossbow held in either
+ * hand. Recognition is datapack-extensible through Martial Spells item
+ * tags, with normal BowItem/CrossbowItem inheritance as a fallback.
  */
 @Mod.EventBusSubscriber(
         modid = MartialSpells.MOD_ID,
@@ -55,11 +54,10 @@ public final class MagicArrowBowRequirementEvents {
     }
 
     private static boolean isHoldingValidRangedWeapon(Player player) {
-        return isBowOrCrossbow(player.getMainHandItem().getItem())
-                || isBowOrCrossbow(player.getOffhandItem().getItem());
-    }
-
-    private static boolean isBowOrCrossbow(Object item) {
-        return item instanceof BowItem || item instanceof CrossbowItem;
+        return RangedWeaponClassifier.isSupported(
+                player.getMainHandItem()
+        ) || RangedWeaponClassifier.isSupported(
+                player.getOffhandItem()
+        );
     }
 }

@@ -1,11 +1,10 @@
 package com.w0of26.martialspells.mixin.client;
 
 import com.w0of26.martialspells.client.visual.MagicArrowClientVisuals;
+import com.w0of26.martialspells.ranged.RangedWeaponClassifier;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.client.renderer.item.ItemPropertyFunction;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.BowItem;
-import net.minecraft.world.item.CrossbowItem;
 import net.minecraft.world.item.Item;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -41,8 +40,8 @@ public abstract class ItemPropertiesMixin {
             ResourceLocation propertyId,
             CallbackInfoReturnable<ItemPropertyFunction> cir
     ) {
-        boolean bow = item instanceof BowItem;
-        boolean crossbow = item instanceof CrossbowItem;
+        boolean bow = RangedWeaponClassifier.isBow(item);
+        boolean crossbow = RangedWeaponClassifier.isCrossbow(item);
 
         if (!bow && !crossbow) {
             return;
