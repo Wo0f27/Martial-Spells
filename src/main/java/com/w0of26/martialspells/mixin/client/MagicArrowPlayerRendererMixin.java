@@ -11,44 +11,22 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-/**
- * Lets Magic Arrow use Minecraft's native bow/crossbow arm poses without
- * putting the player into real item-use state.
- */
 @Mixin(PlayerRenderer.class)
 public abstract class MagicArrowPlayerRendererMixin {
+    @Inject(method = "getArmPose", at = @At("HEAD"), cancellable = true)
+    private static void martialSpells$rangedNativePose(AbstractClientPlayer player, InteractionHand hand,
+                                                        CallbackInfoReturnable<HumanoidModel.ArmPose> cir) {
+        if (!MagicArrowClientVisuals.isRangedSpellCasting(player)) return;
+        InteractionHand selected = MagicArrowClientVisuals.getSelectedRangedHand(player);
+        if (selected != hand) return;
 
-    @Inject(
-            method = "getArmPose",
-            at = @At("HEAD"),
-            cancellable = true
-    )
-    private static void martialSpells$magicArrowNativeRangedPose(
-            AbstractClientPlayer player,
-            InteractionHand hand,
-            CallbackInfoReturnable<HumanoidModel.ArmPose> cir
-    ) {
-        if (!MagicArrowClientVisuals.isMagicArrowCasting(player)) {
-            return;
-        }
-
-        InteractionHand selectedHand =
-                MagicArrowClientVisuals.getSelectedRangedHand(player);
-        if (selectedHand != hand) {
-            return;
-        }
-
-        RangedWeaponClassifier.Type type =
-                MagicArrowClientVisuals.getSelectedRangedType(player);
-
+        RangedWeaponClassifier.Type type = MagicArrowClientVisuals.getSelectedRangedType(player);
         if (type == RangedWeaponClassifier.Type.BOW) {
             cir.setReturnValue(HumanoidModel.ArmPose.BOW_AND_ARROW);
         } else if (type == RangedWeaponClassifier.Type.CROSSBOW) {
-            cir.setReturnValue(
-                    MagicArrowClientVisuals.isCrossbowReady(player)
-                            ? HumanoidModel.ArmPose.CROSSBOW_HOLD
-                            : HumanoidModel.ArmPose.CROSSBOW_CHARGE
-            );
+            cir.setReturnValue(MagicArrowClientVisuals.isCrossbowReady(player)
+                    ? HumanoidModel.ArmPose.CROSSBOW_HOLD
+                    : HumanoidModel.ArmPose.CROSSBOW_CHARGE);
         }
     }
 }

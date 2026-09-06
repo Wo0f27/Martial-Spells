@@ -1,6 +1,7 @@
 package com.w0of26.martialspells.client.visual;
 
 import com.w0of26.martialspells.ranged.RangedWeaponClassifier;
+import com.w0of26.martialspells.spells.BarrageSpell;
 import io.redspace.ironsspellbooks.capabilities.magic.SyncedSpellData;
 import io.redspace.ironsspellbooks.player.ClientMagicData;
 import net.minecraft.client.Minecraft;
@@ -12,178 +13,95 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * Client-only render state for Iron's base Magic Arrow while Martial
- * Spells is installed. Nothing here starts real item use or mutates
- * ranged-weapon gameplay state; it only exposes the visual state needed
- * to make the held weapon look as though it is being prepared normally.
- */
 public final class MagicArrowClientVisuals {
-    public static final String MAGIC_ARROW_ID =
-            "irons_spellbooks:magic_arrow";
+    public static final String MAGIC_ARROW_ID = "irons_spellbooks:magic_arrow";
+    public static final String BARRAGE_ID = "martial_spells:barrage";
+    private static final float MAGIC_ARROW_CROSSBOW_CHARGE_END_PROGRESS = 2.0F / 3.0F;
+    private static final float BARRAGE_PREPARE_END_PROGRESS =
+            (float) BarrageSpell.PREPARE_TICKS / (float) BarrageSpell.CAST_TIME_TICKS;
 
-    /*
-     * Magic Arrow channels for 30 ticks. Give crossbows the first 20
-     * ticks to visually load, then leave the final 10 ticks in their
-     * normal loaded/aimed pose before the spell releases.
-     */
-    private static final float CROSSBOW_CHARGE_END_PROGRESS =
-            2.0F / 3.0F;
+    private MagicArrowClientVisuals() {}
 
-    private MagicArrowClientVisuals() {
+    public static boolean isMagicArrowCasting(@Nullable LivingEntity entity) { return isCastingSpell(entity, MAGIC_ARROW_ID); }
+    public static boolean isBarrageCasting(@Nullable LivingEntity entity) { return isCastingSpell(entity, BARRAGE_ID); }
+    public static boolean isRangedSpellCasting(@Nullable LivingEntity entity) {
+        return isMagicArrowCasting(entity) || isBarrageCasting(entity);
     }
 
-    public static boolean isMagicArrowCasting(
-            @Nullable LivingEntity entity
-    ) {
-        if (!(entity instanceof Player player)) {
-            return false;
-        }
+    private static boolean isCastingSpell(@Nullable LivingEntity entity, String spellId) {
+        return entity instanceof Player player && spellId.equals(getCastingSpellId(player));
+    }
 
+    private static String getCastingSpellId(Player player) {
         Minecraft minecraft = Minecraft.getInstance();
-
         if (minecraft.player == player) {
-            return ClientMagicData.isCasting()
-                    && MAGIC_ARROW_ID.equals(
-                    ClientMagicData.getCastingSpellId()
-            );
+            return ClientMagicData.isCasting() ? ClientMagicData.getCastingSpellId() : "";
         }
-
-        SyncedSpellData synced =
-                ClientMagicData.getSyncedSpellData(player);
-
-        return synced.isCasting()
-                && MAGIC_ARROW_ID.equals(
-                synced.getCastingSpellId()
-        );
+        SyncedSpellData synced = ClientMagicData.getSyncedSpellData(player);
+        return synced.isCasting() ? synced.getCastingSpellId() : "";
     }
 
-    /**
-     * Main hand is authoritative when both hands contain recognized
-     * ranged weapons. This same selection drives validation, arm pose,
-     * item-model predicates and optional compatibility render bridges.
-     */
     @Nullable
     public static InteractionHand getSelectedRangedHand(Player player) {
-        if (RangedWeaponClassifier.isSupported(
-                player.getMainHandItem()
-        )) {
-            return InteractionHand.MAIN_HAND;
-        }
-
-        if (RangedWeaponClassifier.isSupported(
-                player.getOffhandItem()
-        )) {
-            return InteractionHand.OFF_HAND;
-        }
-
+        if (RangedWeaponClassifier.isSupported(player.getMainHandItem())) return InteractionHand.MAIN_HAND;
+        if (RangedWeaponClassifier.isSupported(player.getOffhandItem())) return InteractionHand.OFF_HAND;
         return null;
     }
 
-    public static RangedWeaponClassifier.Type getSelectedRangedType(
-            Player player
-    ) {
+    public static RangedWeaponClassifier.Type getSelectedRangedType(Player player) {
         InteractionHand hand = getSelectedRangedHand(player);
-        if (hand == null) {
-            return RangedWeaponClassifier.Type.NONE;
-        }
-
-        return RangedWeaponClassifier.classify(
-                player.getItemInHand(hand)
-        );
+        return hand == null ? RangedWeaponClassifier.Type.NONE
+                : RangedWeaponClassifier.classify(player.getItemInHand(hand));
     }
 
     @Nullable
     public static HumanoidArm getSelectedRangedArm(Player player) {
         InteractionHand hand = getSelectedRangedHand(player);
-        if (hand == null) {
-            return null;
-        }
-
-        return hand == InteractionHand.MAIN_HAND
-                ? player.getMainArm()
-                : player.getMainArm().getOpposite();
+        if (hand == null) return null;
+        return hand == InteractionHand.MAIN_HAND ? player.getMainArm() : player.getMainArm().getOpposite();
     }
 
-    public static boolean isSelectedRangedStack(
-            @Nullable LivingEntity entity,
-            ItemStack stack
-    ) {
-        if (!(entity instanceof Player player)) {
-            return false;
-        }
-
+    public static boolean isSelectedRangedStack(@Nullable LivingEntity entity, ItemStack stack) {
+        if (!(entity instanceof Player player)) return false;
         InteractionHand hand = getSelectedRangedHand(player);
-        return hand != null
-                && player.getItemInHand(hand) == stack;
+        return hand != null && player.getItemInHand(hand) == stack;
     }
 
-    /**
-     * Used by optional custom-item render bridges such as Cataclysm's
-     * bows. Identity matching deliberately avoids affecting an identical
-     * stack being rendered in a GUI or held by another player.
-     */
     @Nullable
     public static Player findSelectedRangedStackHolder(ItemStack stack) {
         Minecraft minecraft = Minecraft.getInstance();
-        if (minecraft.level == null) {
-            return null;
-        }
-
+        if (minecraft.level == null) return null;
         for (Player player : minecraft.level.players()) {
-            if (!isMagicArrowCasting(player)) {
-                continue;
-            }
-
+            if (!isRangedSpellCasting(player)) continue;
             InteractionHand hand = getSelectedRangedHand(player);
-            if (hand != null && player.getItemInHand(hand) == stack) {
-                return player;
-            }
+            if (hand != null && player.getItemInHand(hand) == stack) return player;
         }
-
         return null;
     }
 
-    /**
-     * Exact local cast progress. Iron's synchronized remote-player data
-     * does not expose the effective remaining duration, so remote casts
-     * use a fully prepared visual while their casting flag is active.
-     */
-    public static float getCastProgress(
-            @Nullable LivingEntity entity
-    ) {
+    public static float getCastProgress(@Nullable LivingEntity entity) {
         Minecraft minecraft = Minecraft.getInstance();
-
-        if (entity != null && minecraft.player == entity) {
-            return Mth.clamp(
-                    ClientMagicData.getCastCompletionPercent(),
-                    0.0F,
-                    1.0F
-            );
+        if (entity != null && minecraft.player == entity && isRangedSpellCasting(entity)) {
+            return Mth.clamp(ClientMagicData.getCastCompletionPercent(), 0.0F, 1.0F);
         }
-
         return 1.0F;
     }
 
-    /**
-     * Crossbow loading progress normalized to the first two thirds of
-     * the Magic Arrow channel. This reaches 1.0 when the visual weapon
-     * should become loaded and transition to its aim/hold pose.
-     */
-    public static float getCrossbowChargeProgress(
-            @Nullable LivingEntity entity
-    ) {
-        return Mth.clamp(
-                getCastProgress(entity) / CROSSBOW_CHARGE_END_PROGRESS,
-                0.0F,
-                1.0F
-        );
+    public static float getWeaponPreparationProgress(@Nullable LivingEntity entity) {
+        float raw = getCastProgress(entity);
+        return isBarrageCasting(entity)
+                ? Mth.clamp(raw / BARRAGE_PREPARE_END_PROGRESS, 0.0F, 1.0F)
+                : raw;
     }
 
-    public static boolean isCrossbowReady(
-            @Nullable LivingEntity entity
-    ) {
-        return getCastProgress(entity)
-                >= CROSSBOW_CHARGE_END_PROGRESS;
+    public static float getCrossbowChargeProgress(@Nullable LivingEntity entity) {
+        if (isBarrageCasting(entity)) return getWeaponPreparationProgress(entity);
+        return Mth.clamp(getCastProgress(entity) / MAGIC_ARROW_CROSSBOW_CHARGE_END_PROGRESS, 0.0F, 1.0F);
+    }
+
+    public static boolean isCrossbowReady(@Nullable LivingEntity entity) {
+        return isBarrageCasting(entity)
+                ? getWeaponPreparationProgress(entity) >= 1.0F
+                : getCastProgress(entity) >= MAGIC_ARROW_CROSSBOW_CHARGE_END_PROGRESS;
     }
 }
