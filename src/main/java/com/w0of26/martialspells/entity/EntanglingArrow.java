@@ -3,6 +3,7 @@ package com.w0of26.martialspells.entity;
 import com.w0of26.martialspells.registry.MartialEntityRegistry;
 import io.redspace.ironsspellbooks.entity.spells.root.RootEntity;
 import io.redspace.ironsspellbooks.util.ModTags;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.world.entity.EntityType;
@@ -18,7 +19,8 @@ import net.minecraftforge.network.NetworkHooks;
  * Physical Ranger projectile that applies Iron's real RootEntity on a valid hit.
  */
 public final class EntanglingArrow extends AbstractArrow {
-    public static final int ROOT_DURATION_TICKS = 60;
+    private static final int DEFAULT_ROOT_DURATION_TICKS = 60;
+    private int rootDurationTicks = DEFAULT_ROOT_DURATION_TICKS;
 
     public EntanglingArrow(EntityType<? extends EntanglingArrow> type, Level level) {
         super(type, level);
@@ -28,6 +30,14 @@ public final class EntanglingArrow extends AbstractArrow {
     public EntanglingArrow(Level level, LivingEntity owner) {
         super(MartialEntityRegistry.ENTANGLING_ARROW.get(), owner, level);
         pickup = Pickup.DISALLOWED;
+    }
+
+    public void setRootDurationTicks(int rootDurationTicks) {
+        this.rootDurationTicks = Math.max(1, rootDurationTicks);
+    }
+
+    public int getRootDurationTicks() {
+        return rootDurationTicks;
     }
 
     @Override
@@ -62,13 +72,27 @@ public final class EntanglingArrow extends AbstractArrow {
         if (owner == null) return;
 
         RootEntity root = new RootEntity(level(), owner);
-        root.setDuration(ROOT_DURATION_TICKS);
+        root.setDuration(rootDurationTicks);
         root.setTarget(target);
         root.moveTo(target.position());
         level().addFreshEntity(root);
 
         target.stopRiding();
         target.startRiding(root, true);
+    }
+
+    @Override
+    public void addAdditionalSaveData(CompoundTag tag) {
+        super.addAdditionalSaveData(tag);
+        tag.putInt("RootDuration", rootDurationTicks);
+    }
+
+    @Override
+    public void readAdditionalSaveData(CompoundTag tag) {
+        super.readAdditionalSaveData(tag);
+        if (tag.contains("RootDuration")) {
+            rootDurationTicks = Math.max(1, tag.getInt("RootDuration"));
+        }
     }
 
     @Override
