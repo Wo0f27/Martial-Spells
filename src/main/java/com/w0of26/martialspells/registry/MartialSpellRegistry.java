@@ -83,6 +83,13 @@ public final class MartialSpellRegistry {
                     StillnessOfMindSpell::new
             );
 
+    public static final RegistryObject<AbstractSpell>
+            BARRAGE =
+            SPELLS.register(
+                    "barrage",
+                    BarrageSpell::new
+            );
+
     private MartialSpellRegistry() {
     }
 

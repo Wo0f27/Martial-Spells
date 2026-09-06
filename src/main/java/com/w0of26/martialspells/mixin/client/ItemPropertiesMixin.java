@@ -13,12 +13,12 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /**
- * Render-only predicate overrides for Magic Arrow.
+ * Render-only predicate overrides for ranged channel spells.
  *
  * Vanilla item models normally decide whether a bow is pulling or a
  * crossbow is charged from normal item-use state/NBT. Iron's spell
- * casting does not use those states, so Magic Arrow needs a visual-only
- * bridge while it is being channeled.
+ * casting does not use those states, so Magic Arrow and Barrage need a
+ * visual-only bridge while they are being channeled.
  */
 @Mixin(ItemProperties.class)
 public abstract class ItemPropertiesMixin {
@@ -36,7 +36,7 @@ public abstract class ItemPropertiesMixin {
             at = @At("RETURN"),
             cancellable = true
     )
-    private static void martialSpells$magicArrowRangedVisuals(
+    private static void martialSpells$rangedChannelVisuals(
             Item item,
             ResourceLocation propertyId,
             CallbackInfoReturnable<ItemPropertyFunction> cir
@@ -61,7 +61,8 @@ public abstract class ItemPropertiesMixin {
         ItemPropertyFunction original = cir.getReturnValue();
 
         cir.setReturnValue((stack, level, entity, seed) -> {
-            if (MagicArrowClientVisuals.isMagicArrowCasting(entity)
+            if (MagicArrowClientVisuals
+                    .isRangedChannelCasting(entity)
                     && MagicArrowClientVisuals.isHeldRangedStack(
                     entity,
                     stack
