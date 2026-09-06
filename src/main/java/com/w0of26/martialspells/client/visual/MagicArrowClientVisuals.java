@@ -16,6 +16,7 @@ import org.jetbrains.annotations.Nullable;
 public final class MagicArrowClientVisuals {
     public static final String MAGIC_ARROW_ID = "irons_spellbooks:magic_arrow";
     public static final String BARRAGE_ID = "martial_spells:barrage";
+    public static final String ENTANGLING_ARROW_ID = "martial_spells:entangling_arrow";
     private static final float MAGIC_ARROW_CROSSBOW_CHARGE_END_PROGRESS = 2.0F / 3.0F;
     private static final float BARRAGE_PREPARE_END_PROGRESS =
             (float) BarrageSpell.PREPARE_TICKS / (float) BarrageSpell.CAST_TIME_TICKS;
@@ -24,8 +25,11 @@ public final class MagicArrowClientVisuals {
 
     public static boolean isMagicArrowCasting(@Nullable LivingEntity entity) { return isCastingSpell(entity, MAGIC_ARROW_ID); }
     public static boolean isBarrageCasting(@Nullable LivingEntity entity) { return isCastingSpell(entity, BARRAGE_ID); }
+    public static boolean isEntanglingArrowCasting(@Nullable LivingEntity entity) {
+        return isCastingSpell(entity, ENTANGLING_ARROW_ID);
+    }
     public static boolean isRangedSpellCasting(@Nullable LivingEntity entity) {
-        return isMagicArrowCasting(entity) || isBarrageCasting(entity);
+        return isMagicArrowCasting(entity) || isBarrageCasting(entity) || isEntanglingArrowCasting(entity);
     }
 
     private static boolean isCastingSpell(@Nullable LivingEntity entity, String spellId) {
