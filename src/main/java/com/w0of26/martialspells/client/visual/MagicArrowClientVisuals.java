@@ -13,17 +13,13 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Client-only render state shared by ranged channel spells that need a
- * real held bow/crossbow to visually participate in the cast.
- *
- * Nothing here mutates item-use state or crossbow NBT; it only answers
- * questions consumed by render hooks.
+ * Client-only render state for Iron's base Magic Arrow while Martial
+ * Spells is installed. Nothing in this class mutates item-use state or
+ * crossbow NBT; it only answers questions used by render hooks.
  */
 public final class MagicArrowClientVisuals {
     public static final String MAGIC_ARROW_ID =
             "irons_spellbooks:magic_arrow";
-    public static final String BARRAGE_ID =
-            "martial_spells:barrage";
 
     private MagicArrowClientVisuals() {
     }
@@ -31,33 +27,10 @@ public final class MagicArrowClientVisuals {
     public static boolean isMagicArrowCasting(
             @Nullable LivingEntity entity
     ) {
-        return isCastingSpell(entity, MAGIC_ARROW_ID);
-    }
-
-    public static boolean isRangedChannelCasting(
-            @Nullable LivingEntity entity
-    ) {
         if (!(entity instanceof Player player)) {
             return false;
         }
 
-        String castingSpellId = getCastingSpellId(player);
-        return MAGIC_ARROW_ID.equals(castingSpellId)
-                || BARRAGE_ID.equals(castingSpellId);
-    }
-
-    private static boolean isCastingSpell(
-            @Nullable LivingEntity entity,
-            String spellId
-    ) {
-        if (!(entity instanceof Player player)) {
-            return false;
-        }
-
-        return spellId.equals(getCastingSpellId(player));
-    }
-
-    private static String getCastingSpellId(Player player) {
         Minecraft minecraft = Minecraft.getInstance();
 
         /*
@@ -67,16 +40,18 @@ public final class MagicArrowClientVisuals {
          */
         if (minecraft.player == player) {
             return ClientMagicData.isCasting()
-                    ? ClientMagicData.getCastingSpellId()
-                    : "";
+                    && MAGIC_ARROW_ID.equals(
+                    ClientMagicData.getCastingSpellId()
+            );
         }
 
         SyncedSpellData synced =
                 ClientMagicData.getSyncedSpellData(player);
 
         return synced.isCasting()
-                ? synced.getCastingSpellId()
-                : "";
+                && MAGIC_ARROW_ID.equals(
+                synced.getCastingSpellId()
+        );
     }
 
     public static boolean isHeldRangedStack(

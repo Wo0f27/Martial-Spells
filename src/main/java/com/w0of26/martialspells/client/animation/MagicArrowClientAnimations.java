@@ -64,8 +64,7 @@ public final class MagicArrowClientAnimations {
     }
 
     private static void update(AbstractClientPlayer player) {
-        if (!MagicArrowClientVisuals
-                .isRangedChannelCasting(player)) {
+        if (!MagicArrowClientVisuals.isMagicArrowCasting(player)) {
             stop(player);
             return;
         }
@@ -75,9 +74,9 @@ public final class MagicArrowClientAnimations {
 
         if (crossbowArm == null) {
             /*
-             * Bow casting needs no override here. Iron's charge_arrow
-             * animation supplies the normal bow-drawing body pose for
-             * both Magic Arrow and Barrage.
+             * Bow casting needs no override here. Iron's own
+             * charge_arrow animation remains visible underneath this
+             * layer and supplies the normal bow-drawing body pose.
              */
             stop(player);
             return;
@@ -117,7 +116,7 @@ public final class MagicArrowClientAnimations {
 
         if (animation == null) {
             MartialSpells.LOGGER.warn(
-                    "Could not find ranged crossbow hold animation {}",
+                    "Could not find Magic Arrow crossbow animation {}",
                     animationId
             );
             return;
