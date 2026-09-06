@@ -16,6 +16,7 @@
     "client.ItemPropertiesMixin",
     "client.MagicArrowPlayerRendererMixin",
     "client.MagicArrowHumanoidModelMixin",
+    "client.MagicArrowChargeSpellLayerMixin",
     "client.compat.cataclysm.CursedBowPullMixin",
     "client.compat.cataclysm.WrathOfTheDesertPullMixin"
   ],
