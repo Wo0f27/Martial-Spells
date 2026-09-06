@@ -6,6 +6,7 @@
   "refmap": "martial_spells.refmap.json",
   "mixins": [
     "MagicManagerMixin",
+    "MagicArrowSpellAnimationMixin",
     "MobProneAiMixin",
     "MobEffectInstanceAccessor"
   ],
