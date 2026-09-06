@@ -137,6 +137,13 @@
   "ui.martial_spells.barrage_damage_per_arrow": "Damage per Arrow: %s%% weapon damage",
   "ui.martial_spells.barrage_interval": "Shot Interval: %s ticks",
 
+  "spell.martial_spells.entangling_arrow": "Entangling Arrow",
+  "spell.martial_spells.entangling_arrow.description": "Loose a martial arrow that binds a surviving target in grasping roots.",
+  "spell.martial_spells.entangling_arrow.guide": "Requires a bow or crossbow. Entangling Arrow fires a physical projectile dealing 75% weapon damage before Martial Spell Power and other ranged modifiers are applied. A surviving target that can be rooted is bound by Iron's Root for 3 seconds. Targets tagged as unable to be rooted still take the arrow damage.",
+  "ui.martial_spells.entangling_arrow_requires_ranged_weapon": "Entangling Arrow requires a bow or crossbow.",
+  "ui.martial_spells.entangling_arrow_damage": "Damage: %s%% weapon damage",
+  "ui.martial_spells.entangling_arrow_root_duration": "Root Duration: %s seconds",
+
   "effect.martial_spells.stillness_of_mind": "Stillness of Mind",
   "spell.martial_spells.stillness_of_mind": "Stillness of Mind",
   "spell.martial_spells.stillness_of_mind.description": "Transcend the limits of Ki for a brief moment, allowing martial techniques to be used without consuming Ki.",
