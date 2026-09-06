@@ -8,9 +8,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /**
- * Prevents Iron's own bow-charge pose from playing for Magic Arrow.
- * Martial Spells supplies the complete bow/crossbow casting animation
- * on its higher-priority PlayerAnimator layer instead.
+ * Prevents Iron's generic PlayerAnimator bow-charge animation from
+ * competing with the held weapon's native bow/crossbow preparation
+ * presentation supplied by Martial Spells' client render hooks.
  */
 @Mixin(
         value = MagicArrowSpell.class,

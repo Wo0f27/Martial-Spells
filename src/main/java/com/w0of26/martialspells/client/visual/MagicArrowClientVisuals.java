@@ -5,6 +5,7 @@ import io.redspace.ironsspellbooks.capabilities.magic.SyncedSpellData;
 import io.redspace.ironsspellbooks.player.ClientMagicData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -13,8 +14,9 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * Client-only render state for Iron's base Magic Arrow while Martial
- * Spells is installed. Nothing in this class mutates item-use state or
- * crossbow NBT; it only answers questions used by render hooks.
+ * Spells is installed. Nothing here starts real item use or mutates
+ * ranged-weapon gameplay state; it only exposes the visual state needed
+ * to make the held weapon look as though it is being prepared normally.
  */
 public final class MagicArrowClientVisuals {
     public static final String MAGIC_ARROW_ID =
@@ -32,11 +34,6 @@ public final class MagicArrowClientVisuals {
 
         Minecraft minecraft = Minecraft.getInstance();
 
-        /*
-         * The local player's exact cast state lives in MagicData.
-         * Remote players are represented by Iron's synchronized spell
-         * data, so third-person multiplayer rendering works as well.
-         */
         if (minecraft.player == player) {
             return ClientMagicData.isCasting()
                     && MAGIC_ARROW_ID.equals(
@@ -53,7 +50,54 @@ public final class MagicArrowClientVisuals {
         );
     }
 
-    public static boolean isHeldRangedStack(
+    /**
+     * Main hand is authoritative when both hands contain recognized
+     * ranged weapons. This same selection drives validation, arm pose,
+     * item-model predicates and optional compatibility render bridges.
+     */
+    @Nullable
+    public static InteractionHand getSelectedRangedHand(Player player) {
+        if (RangedWeaponClassifier.isSupported(
+                player.getMainHandItem()
+        )) {
+            return InteractionHand.MAIN_HAND;
+        }
+
+        if (RangedWeaponClassifier.isSupported(
+                player.getOffhandItem()
+        )) {
+            return InteractionHand.OFF_HAND;
+        }
+
+        return null;
+    }
+
+    public static RangedWeaponClassifier.Type getSelectedRangedType(
+            Player player
+    ) {
+        InteractionHand hand = getSelectedRangedHand(player);
+        if (hand == null) {
+            return RangedWeaponClassifier.Type.NONE;
+        }
+
+        return RangedWeaponClassifier.classify(
+                player.getItemInHand(hand)
+        );
+    }
+
+    @Nullable
+    public static HumanoidArm getSelectedRangedArm(Player player) {
+        InteractionHand hand = getSelectedRangedHand(player);
+        if (hand == null) {
+            return null;
+        }
+
+        return hand == InteractionHand.MAIN_HAND
+                ? player.getMainArm()
+                : player.getMainArm().getOpposite();
+    }
+
+    public static boolean isSelectedRangedStack(
             @Nullable LivingEntity entity,
             ItemStack stack
     ) {
@@ -61,16 +105,43 @@ public final class MagicArrowClientVisuals {
             return false;
         }
 
-        return stack == player.getMainHandItem()
-                || stack == player.getOffhandItem();
+        InteractionHand hand = getSelectedRangedHand(player);
+        return hand != null
+                && player.getItemInHand(hand) == stack;
     }
 
     /**
-     * Exact local visual pull progress. Remote players do not receive
-     * the effective cast duration, so they render as fully drawn while
-     * the synchronized cast flag is active.
+     * Used by optional custom-item render bridges such as Cataclysm's
+     * bows. Identity matching deliberately avoids affecting an identical
+     * stack being rendered in a GUI or held by another player.
      */
-    public static float getBowPullProgress(
+    @Nullable
+    public static Player findSelectedRangedStackHolder(ItemStack stack) {
+        Minecraft minecraft = Minecraft.getInstance();
+        if (minecraft.level == null) {
+            return null;
+        }
+
+        for (Player player : minecraft.level.players()) {
+            if (!isMagicArrowCasting(player)) {
+                continue;
+            }
+
+            InteractionHand hand = getSelectedRangedHand(player);
+            if (hand != null && player.getItemInHand(hand) == stack) {
+                return player;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Exact local cast progress. Iron's synchronized remote-player data
+     * does not expose the effective remaining duration, so remote casts
+     * use a fully prepared visual while their casting flag is active.
+     */
+    public static float getCastProgress(
             @Nullable LivingEntity entity
     ) {
         Minecraft minecraft = Minecraft.getInstance();
@@ -84,30 +155,5 @@ public final class MagicArrowClientVisuals {
         }
 
         return 1.0F;
-    }
-
-    /**
-     * Returns the physical player arm currently holding a classified
-     * crossbow, preferring the main hand when both hands qualify.
-     */
-    @Nullable
-    public static HumanoidArm getCrossbowArm(Player player) {
-        if (RangedWeaponClassifier.isCrossbow(
-                player.getMainHandItem()
-        )) {
-            return player.getMainArm();
-        }
-
-        if (RangedWeaponClassifier.isCrossbow(
-                player.getOffhandItem()
-        )) {
-            return player.getMainArm().getOpposite();
-        }
-
-        return null;
-    }
-
-    public static boolean isSupportedRangedWeapon(ItemStack stack) {
-        return RangedWeaponClassifier.isSupported(stack);
     }
 }

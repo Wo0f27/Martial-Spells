@@ -13,7 +13,11 @@
   "client": [
     "client.PlayerItemInHandLayerMixin",
     "client.ItemInHandLayerMixin",
-    "client.ItemPropertiesMixin"
+    "client.ItemPropertiesMixin",
+    "client.MagicArrowPlayerRendererMixin",
+    "client.MagicArrowHumanoidModelMixin",
+    "client.compat.cataclysm.CursedBowPullMixin",
+    "client.compat.cataclysm.WrathOfTheDesertPullMixin"
   ],
   "injectors": {
     "defaultRequire": 1

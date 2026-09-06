@@ -12,12 +12,11 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /**
- * Render-only predicate overrides for Magic Arrow.
+ * Render-only item-property bridge for Magic Arrow.
  *
- * Vanilla item models normally decide whether a bow is pulling or a
- * crossbow is charged from normal item-use state/NBT. Iron's spell
- * casting does not use those states, so Magic Arrow needs a visual-only
- * bridge while it is being channeled.
+ * The spell never starts real item use. Instead, recognized bows and
+ * crossbows expose the same pulling/pull model predicates they normally
+ * use while being prepared, driven by Iron's spell-cast progress.
  */
 @Mixin(ItemProperties.class)
 public abstract class ItemPropertiesMixin {
@@ -50,6 +49,7 @@ public abstract class ItemPropertiesMixin {
         boolean relevant = bow
                 ? PULLING.equals(propertyId) || PULL.equals(propertyId)
                 : PULLING.equals(propertyId)
+                        || PULL.equals(propertyId)
                         || CHARGED.equals(propertyId)
                         || FIREWORK.equals(propertyId);
 
@@ -61,30 +61,22 @@ public abstract class ItemPropertiesMixin {
 
         cir.setReturnValue((stack, level, entity, seed) -> {
             if (MagicArrowClientVisuals.isMagicArrowCasting(entity)
-                    && MagicArrowClientVisuals.isHeldRangedStack(
+                    && MagicArrowClientVisuals.isSelectedRangedStack(
                     entity,
                     stack
             )) {
-                if (bow) {
-                    if (PULLING.equals(propertyId)) {
-                        return 1.0F;
-                    }
-
-                    if (PULL.equals(propertyId)) {
-                        return MagicArrowClientVisuals
-                                .getBowPullProgress(entity);
-                    }
+                if (PULLING.equals(propertyId)) {
+                    return 1.0F;
                 }
 
-                if (crossbow) {
-                    if (CHARGED.equals(propertyId)) {
-                        return 1.0F;
-                    }
+                if (PULL.equals(propertyId)) {
+                    return MagicArrowClientVisuals
+                            .getCastProgress(entity);
+                }
 
-                    if (FIREWORK.equals(propertyId)
-                            || PULLING.equals(propertyId)) {
-                        return 0.0F;
-                    }
+                if (crossbow && (CHARGED.equals(propertyId)
+                        || FIREWORK.equals(propertyId))) {
+                    return 0.0F;
                 }
             }
 
