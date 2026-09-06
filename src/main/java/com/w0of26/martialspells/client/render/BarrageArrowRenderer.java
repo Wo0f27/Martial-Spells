@@ -22,11 +22,11 @@ import org.joml.Matrix4f;
  * silhouette used by Iron's Magic Arrow, but with Martial Spells' own
  * recolored texture.
  *
- * The projectile deliberately uses Minecraft's ordinary translucent
- * entity render type instead of Iron's additive energy-swirl type.
- * Full-bright lighting preserves the supernatural appearance while
- * avoiding shader/render-state compatibility issues for this custom
- * AbstractArrow entity.
+ * The projectile is rendered emissively so its texture color is not
+ * multiplied by Minecraft's directional entity lighting. This is
+ * important for the crossed-quad model because each face points in a
+ * different direction and ordinary entity lighting can make the model
+ * appear nearly black even with full-bright lightmap coordinates.
  */
 public final class BarrageArrowRenderer
         extends EntityRenderer<BarrageArrow> {
@@ -43,6 +43,11 @@ public final class BarrageArrowRenderer
             EntityRendererProvider.Context context
     ) {
         super(context);
+
+        // Magical projectiles should not cast Minecraft's ordinary
+        // circular entity shadow beneath themselves.
+        this.shadowRadius = 0.0F;
+        this.shadowStrength = 0.0F;
     }
 
     @Override
@@ -117,7 +122,7 @@ public final class BarrageArrowRenderer
 
         VertexConsumer consumer =
                 bufferSource.getBuffer(
-                        RenderType.entityTranslucent(TEXTURE)
+                        RenderType.entityTranslucentEmissive(TEXTURE)
                 );
 
         poseStack.mulPose(
