@@ -4,6 +4,7 @@ import com.w0of26.martialspells.MartialSpells;
 import com.w0of26.martialspells.client.particle.BarrageTrailParticle;
 import com.w0of26.martialspells.client.render.BarrageArrowRenderer;
 import com.w0of26.martialspells.client.render.DiamondBodyShieldLayer;
+import com.w0of26.martialspells.client.render.EntanglingArrowRenderer;
 import com.w0of26.martialspells.registry.MartialEntityRegistry;
 import com.w0of26.martialspells.registry.MartialParticleRegistry;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
@@ -20,6 +21,7 @@ public final class MartialClientEvents {
     @SubscribeEvent
     public static void registerEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(MartialEntityRegistry.BARRAGE_ARROW.get(), BarrageArrowRenderer::new);
+        event.registerEntityRenderer(MartialEntityRegistry.ENTANGLING_ARROW.get(), EntanglingArrowRenderer::new);
     }
 
     @SubscribeEvent
