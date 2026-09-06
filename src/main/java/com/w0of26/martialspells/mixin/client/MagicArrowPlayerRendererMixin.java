@@ -44,7 +44,11 @@ public abstract class MagicArrowPlayerRendererMixin {
         if (type == RangedWeaponClassifier.Type.BOW) {
             cir.setReturnValue(HumanoidModel.ArmPose.BOW_AND_ARROW);
         } else if (type == RangedWeaponClassifier.Type.CROSSBOW) {
-            cir.setReturnValue(HumanoidModel.ArmPose.CROSSBOW_CHARGE);
+            cir.setReturnValue(
+                    MagicArrowClientVisuals.isCrossbowReady(player)
+                            ? HumanoidModel.ArmPose.CROSSBOW_HOLD
+                            : HumanoidModel.ArmPose.CROSSBOW_CHARGE
+            );
         }
     }
 }
