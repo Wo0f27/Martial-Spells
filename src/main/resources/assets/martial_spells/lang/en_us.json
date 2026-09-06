@@ -16,6 +16,8 @@
   "effect.martial_spells.guardians_cry_active": "Guardian's Cry",
   "ui.martial_spells.fixed_cooldown": "Fixed Cooldown: %s seconds",
   "ui.martial_spells.cooldown_reduction_immune": "Unaffected by Cooldown Reduction",
+  "ui.martial_spells.base_cooldown": "Base Cooldown: %s seconds",
+  "ui.martial_spells.minimum_cooldown": "Minimum Cooldown: %s seconds",
 
   "effect.martial_spells.guardians_covenant_tank": "Guardian's Covenant",
   "effect.martial_spells.guardians_covenant_linked": "Guardian's Protection",
@@ -131,7 +133,7 @@
 
   "spell.martial_spells.barrage": "Barrage",
   "spell.martial_spells.barrage.description": "Loose a rapid sequence of martial arrows, with higher spell levels increasing both arrow count and damage.",
-  "spell.martial_spells.barrage.guide": "Requires a bow or crossbow. Barrage fires 2 to 5 consecutive physical arrows depending on spell level. Each shot follows your current aim independently. Damage per arrow scales from 50% weapon damage at Common to 100% at Legendary before Martial Spell Power and other ranged modifiers are applied.",
+  "spell.martial_spells.barrage.guide": "Requires a bow or crossbow. Barrage fires 2 to 5 consecutive physical arrows depending on spell level. Each shot follows your current aim independently. Damage per arrow scales from 50% weapon damage at Common to 100% at Legendary before Martial Spell Power and other ranged modifiers are applied. Barrage always has a 6-second cooldown and is unaffected by Cooldown Reduction.",
   "ui.martial_spells.barrage_requires_ranged_weapon": "Barrage requires a bow or crossbow.",
   "ui.martial_spells.barrage_projectiles": "Projectiles: %s",
   "ui.martial_spells.barrage_damage_per_arrow": "Damage per Arrow: %s%% weapon damage",
@@ -139,7 +141,7 @@
 
   "spell.martial_spells.entangling_arrow": "Entangling Arrow",
   "spell.martial_spells.entangling_arrow.description": "Loose a martial arrow that binds a surviving target in grasping roots.",
-  "spell.martial_spells.entangling_arrow.guide": "Requires a bow or crossbow. Entangling Arrow deals 50% to 100% weapon damage depending on spell level before Martial Spell Power and other ranged modifiers are applied. A surviving target that can be rooted is bound by Iron's Root for 2 to 6 seconds depending on spell level. Targets tagged as unable to be rooted still take the arrow damage.",
+  "spell.martial_spells.entangling_arrow.guide": "Requires a bow or crossbow. Entangling Arrow deals 50% to 100% weapon damage depending on spell level before Martial Spell Power and other ranged modifiers are applied. A surviving target that can be rooted is bound by Iron's Root for 2 to 6 seconds depending on spell level. Targets tagged as unable to be rooted still take the arrow damage. Its base cooldown is 15 seconds and Cooldown Reduction can lower it, but never below 7 seconds.",
   "ui.martial_spells.entangling_arrow_requires_ranged_weapon": "Entangling Arrow requires a bow or crossbow.",
   "ui.martial_spells.entangling_arrow_damage": "Damage: %s%% weapon damage",
   "ui.martial_spells.entangling_arrow_root_duration": "Root Duration: %s seconds",
