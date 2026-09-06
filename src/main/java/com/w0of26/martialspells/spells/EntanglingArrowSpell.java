@@ -35,13 +35,15 @@ public final class EntanglingArrowSpell extends AbstractSpell implements Martial
 
     public static final int MAX_LEVEL = 5;
     public static final int CAST_TIME_TICKS = 20;
+    public static final int BASE_COOLDOWN_SECONDS = 15;
+    public static final int MIN_COOLDOWN_SECONDS = 7;
     private static final float INACCURACY = 0.0F;
 
     private final DefaultConfig defaultConfig = new DefaultConfig()
             .setMinRarity(SpellRarity.COMMON)
             .setSchoolResource(MartialSchoolRegistry.MARTIAL_RESOURCE)
             .setMaxLevel(MAX_LEVEL)
-            .setCooldownSeconds(12)
+            .setCooldownSeconds(BASE_COOLDOWN_SECONDS)
             .build();
 
     public EntanglingArrowSpell() {
@@ -106,6 +108,8 @@ public final class EntanglingArrowSpell extends AbstractSpell implements Martial
                         Math.round(getDamageMultiplier(spellLevel) * 100.0F)),
                 Component.translatable("ui.martial_spells.entangling_arrow_root_duration",
                         getRootDurationTicks(spellLevel) / 20.0F),
+                Component.translatable("ui.martial_spells.base_cooldown", BASE_COOLDOWN_SECONDS),
+                Component.translatable("ui.martial_spells.minimum_cooldown", MIN_COOLDOWN_SECONDS),
                 Component.translatable("ui.martial_spells.scales_with_martial_power")
         );
     }
