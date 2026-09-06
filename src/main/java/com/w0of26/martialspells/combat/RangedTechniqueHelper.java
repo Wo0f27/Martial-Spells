@@ -31,9 +31,10 @@ public final class RangedTechniqueHelper {
     }
 
     public static EntanglingArrow createEntanglingArrow(Level level, Player player, ItemStack weapon,
-                                                        float techniqueMultiplier) {
+                                                        float techniqueMultiplier, int rootDurationTicks) {
         RangedWeaponClassifier.Type type = requireRangedType(weapon, "Entangling Arrow");
         EntanglingArrow arrow = new EntanglingArrow(level, player);
+        arrow.setRootDurationTicks(rootDurationTicks);
         applyEnchantments(arrow, weapon, type);
         applyScaling(arrow, player, weapon, type, techniqueMultiplier);
         return arrow;
