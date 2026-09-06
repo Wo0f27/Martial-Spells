@@ -36,6 +36,7 @@ public final class BarrageSpell extends AbstractSpell implements MartialTechniqu
     public static final int MAX_LEVEL = 5;
     public static final int SHOT_INTERVAL_TICKS = 4;
     public static final int PREPARE_TICKS = 10;
+    public static final int COOLDOWN_SECONDS = 6;
 
     private static final float INACCURACY = 0.0F;
 
@@ -43,7 +44,7 @@ public final class BarrageSpell extends AbstractSpell implements MartialTechniqu
             .setMinRarity(SpellRarity.COMMON)
             .setSchoolResource(MartialSchoolRegistry.MARTIAL_RESOURCE)
             .setMaxLevel(MAX_LEVEL)
-            .setCooldownSeconds(10)
+            .setCooldownSeconds(COOLDOWN_SECONDS)
             .build();
 
     public BarrageSpell() {
@@ -111,6 +112,8 @@ public final class BarrageSpell extends AbstractSpell implements MartialTechniqu
                 Component.translatable("ui.martial_spells.barrage_damage_per_arrow",
                         Math.round(getDamageMultiplier(spellLevel) * 100.0F)),
                 Component.translatable("ui.martial_spells.barrage_interval", SHOT_INTERVAL_TICKS),
+                Component.translatable("ui.martial_spells.fixed_cooldown", COOLDOWN_SECONDS),
+                Component.translatable("ui.martial_spells.cooldown_reduction_immune"),
                 Component.translatable("ui.martial_spells.scales_with_martial_power")
         );
     }
