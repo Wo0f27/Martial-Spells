@@ -12,6 +12,7 @@ import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BowItem;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -21,12 +22,41 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * Replaces Iron's default Magic Arrow casting pose with the dedicated
+ * ranged-weapon poses used by Martial Spells.
+ *
+ * Bow casts use the Bow Pulling Animation keyframes supplied by MaBroxx.
+ * Crossbow casts keep the already-tested loaded-crossbow hold.
+ */
 @Mod.EventBusSubscriber(
         modid = MartialSpells.MOD_ID,
         bus = Mod.EventBusSubscriber.Bus.FORGE,
         value = Dist.CLIENT
 )
 public final class MagicArrowClientAnimations {
+    private static final int BOW_PULL_TICKS = 20;
+
+    private static final ResourceLocation BOW_PULL =
+            ResourceLocation.fromNamespaceAndPath(
+                    MartialSpells.MOD_ID,
+                    "pulling_bow"
+            );
+    private static final ResourceLocation BOW_IDLE =
+            ResourceLocation.fromNamespaceAndPath(
+                    MartialSpells.MOD_ID,
+                    "pulling_bow_idle"
+            );
+    private static final ResourceLocation BOW_CROUCH_PULL =
+            ResourceLocation.fromNamespaceAndPath(
+                    MartialSpells.MOD_ID,
+                    "pulling_bow_crouch"
+            );
+    private static final ResourceLocation BOW_CROUCH_IDLE =
+            ResourceLocation.fromNamespaceAndPath(
+                    MartialSpells.MOD_ID,
+                    "pulling_bow_crouch_idle"
+            );
     private static final ResourceLocation CROSSBOW_HOLD_RIGHT =
             ResourceLocation.fromNamespaceAndPath(
                     MartialSpells.MOD_ID,
@@ -38,7 +68,7 @@ public final class MagicArrowClientAnimations {
                     "magic_arrow_crossbow_hold_left"
             );
 
-    private static final Map<UUID, HumanoidArm> PLAYING =
+    private static final Map<UUID, PlaybackState> PLAYING =
             new HashMap<>();
 
     private MagicArrowClientAnimations() {
@@ -69,31 +99,68 @@ public final class MagicArrowClientAnimations {
             return;
         }
 
+        UUID id = player.getUUID();
+        PlaybackState current = PLAYING.get(id);
+        int castStartTick = current == null
+                ? player.tickCount
+                : current.castStartTick();
+
         HumanoidArm crossbowArm =
                 MagicArrowClientVisuals.getCrossbowArm(player);
 
-        if (crossbowArm == null) {
-            /*
-             * Bow casting needs no override here. Iron's own
-             * charge_arrow animation remains visible underneath this
-             * layer and supplies the normal bow-drawing body pose.
-             */
-            stop(player);
+        if (crossbowArm != null) {
+            Pose pose = crossbowArm == HumanoidArm.RIGHT
+                    ? Pose.CROSSBOW_RIGHT
+                    : Pose.CROSSBOW_LEFT;
+            play(player, pose, castStartTick);
             return;
         }
 
-        play(player, crossbowArm);
+        if (isHoldingBow(player)) {
+            int elapsedTicks = Math.max(
+                    0,
+                    player.tickCount - castStartTick
+            );
+            boolean settled = elapsedTicks >= BOW_PULL_TICKS;
+            boolean crouching = player.isCrouching();
+
+            Pose pose;
+            if (crouching) {
+                pose = settled
+                        ? Pose.BOW_CROUCH_IDLE
+                        : Pose.BOW_CROUCH_PULL;
+            } else {
+                pose = settled
+                        ? Pose.BOW_IDLE
+                        : Pose.BOW_PULL;
+            }
+
+            play(player, pose, castStartTick);
+            return;
+        }
+
+        /*
+         * This can only normally happen if equipment is changed after
+         * the server accepted the cast. Do not leave a stale pose active.
+         */
+        stop(player);
+    }
+
+    private static boolean isHoldingBow(Player player) {
+        return player.getMainHandItem().getItem() instanceof BowItem
+                || player.getOffhandItem().getItem() instanceof BowItem;
     }
 
     @SuppressWarnings("unchecked")
     private static void play(
             AbstractClientPlayer player,
-            HumanoidArm crossbowArm
+            Pose pose,
+            int castStartTick
     ) {
         UUID id = player.getUUID();
-        HumanoidArm current = PLAYING.get(id);
+        PlaybackState current = PLAYING.get(id);
 
-        if (current == crossbowArm) {
+        if (current != null && current.pose() == pose) {
             return;
         }
 
@@ -106,24 +173,23 @@ public final class MagicArrowClientAnimations {
             return;
         }
 
-        ResourceLocation animationId =
-                crossbowArm == HumanoidArm.RIGHT
-                        ? CROSSBOW_HOLD_RIGHT
-                        : CROSSBOW_HOLD_LEFT;
-
+        ResourceLocation animationId = pose.animationId();
         var animation =
                 PlayerAnimationRegistry.getAnimation(animationId);
 
         if (animation == null) {
             MartialSpells.LOGGER.warn(
-                    "Could not find Magic Arrow crossbow animation {}",
+                    "Could not find Magic Arrow ranged animation {}",
                     animationId
             );
             return;
         }
 
         layer.setAnimation(new KeyframeAnimationPlayer(animation));
-        PLAYING.put(id, crossbowArm);
+        PLAYING.put(
+                id,
+                new PlaybackState(castStartTick, pose)
+        );
     }
 
     @SuppressWarnings("unchecked")
@@ -141,6 +207,31 @@ public final class MagicArrowClientAnimations {
 
         if (layer != null) {
             layer.setAnimation(null);
+        }
+    }
+
+    private record PlaybackState(
+            int castStartTick,
+            Pose pose
+    ) {
+    }
+
+    private enum Pose {
+        BOW_PULL(BOW_PULL),
+        BOW_IDLE(BOW_IDLE),
+        BOW_CROUCH_PULL(BOW_CROUCH_PULL),
+        BOW_CROUCH_IDLE(BOW_CROUCH_IDLE),
+        CROSSBOW_RIGHT(CROSSBOW_HOLD_RIGHT),
+        CROSSBOW_LEFT(CROSSBOW_HOLD_LEFT);
+
+        private final ResourceLocation animationId;
+
+        Pose(ResourceLocation animationId) {
+            this.animationId = animationId;
+        }
+
+        private ResourceLocation animationId() {
+            return animationId;
         }
     }
 }
