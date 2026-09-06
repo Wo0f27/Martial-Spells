@@ -19,6 +19,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -32,14 +33,14 @@ public final class EntanglingArrowSpell extends AbstractSpell implements Martial
     public static final ResourceLocation SPELL_ID =
             ResourceLocation.fromNamespaceAndPath(MartialSpells.MOD_ID, "entangling_arrow");
 
+    public static final int MAX_LEVEL = 5;
     public static final int CAST_TIME_TICKS = 20;
-    private static final float DAMAGE_MULTIPLIER = 0.75F;
     private static final float INACCURACY = 0.0F;
 
     private final DefaultConfig defaultConfig = new DefaultConfig()
-            .setMinRarity(SpellRarity.RARE)
+            .setMinRarity(SpellRarity.COMMON)
             .setSchoolResource(MartialSchoolRegistry.MARTIAL_RESOURCE)
-            .setMaxLevel(1)
+            .setMaxLevel(MAX_LEVEL)
             .setCooldownSeconds(12)
             .build();
 
@@ -62,6 +63,30 @@ public final class EntanglingArrowSpell extends AbstractSpell implements Martial
     @Override public AnimationHolder getCastStartAnimation() { return AnimationHolder.none(); }
     @Override public AnimationHolder getCastFinishAnimation() { return AnimationHolder.none(); }
 
+    public static float getDamageMultiplier(int spellLevel) {
+        return switch (clampLevel(spellLevel)) {
+            case 1 -> 0.50F;
+            case 2 -> 0.625F;
+            case 3 -> 0.75F;
+            case 4 -> 0.875F;
+            default -> 1.00F;
+        };
+    }
+
+    public static int getRootDurationTicks(int spellLevel) {
+        return switch (clampLevel(spellLevel)) {
+            case 1 -> 40;   // 2.0 seconds
+            case 2 -> 50;   // 2.5 seconds
+            case 3 -> 60;   // 3.0 seconds - preserves the tested Rare version
+            case 4 -> 80;   // 4.0 seconds
+            default -> 120; // 6.0 seconds
+        };
+    }
+
+    private static int clampLevel(int spellLevel) {
+        return Mth.clamp(spellLevel, 1, MAX_LEVEL);
+    }
+
     @Override
     public CastResult canBeCastedBy(int spellLevel, CastSource source, MagicData magicData, Player player) {
         CastResult result = super.canBeCastedBy(spellLevel, source, magicData, player);
@@ -77,9 +102,10 @@ public final class EntanglingArrowSpell extends AbstractSpell implements Martial
     @Override
     public List<MutableComponent> getUniqueInfo(int spellLevel, LivingEntity caster) {
         return List.of(
-                Component.translatable("ui.martial_spells.entangling_arrow_damage", 75),
+                Component.translatable("ui.martial_spells.entangling_arrow_damage",
+                        Math.round(getDamageMultiplier(spellLevel) * 100.0F)),
                 Component.translatable("ui.martial_spells.entangling_arrow_root_duration",
-                        EntanglingArrow.ROOT_DURATION_TICKS / 20.0F),
+                        getRootDurationTicks(spellLevel) / 20.0F),
                 Component.translatable("ui.martial_spells.scales_with_martial_power")
         );
     }
@@ -88,17 +114,21 @@ public final class EntanglingArrowSpell extends AbstractSpell implements Martial
     public void onCast(Level level, int spellLevel, LivingEntity caster,
                        CastSource castSource, MagicData magicData) {
         if (!level.isClientSide && caster instanceof ServerPlayer player) {
-            fireShot(player);
+            fireShot(player, spellLevel);
         }
         super.onCast(level, spellLevel, caster, castSource, magicData);
     }
 
-    private static void fireShot(ServerPlayer player) {
+    private static void fireShot(ServerPlayer player, int spellLevel) {
         ItemStack weapon = RangedTechniqueHelper.findHeldRangedWeapon(player);
         if (weapon.isEmpty()) return;
 
         EntanglingArrow arrow = RangedTechniqueHelper.createEntanglingArrow(
-                player.level(), player, weapon, DAMAGE_MULTIPLIER);
+                player.level(),
+                player,
+                weapon,
+                getDamageMultiplier(spellLevel),
+                getRootDurationTicks(spellLevel));
         float velocity = RangedTechniqueHelper.getProjectileVelocity(weapon);
         arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, velocity, INACCURACY);
         player.level().addFreshEntity(arrow);
