@@ -19,6 +19,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -32,21 +33,16 @@ public final class BarrageSpell extends AbstractSpell implements MartialTechniqu
     public static final ResourceLocation SPELL_ID =
             ResourceLocation.fromNamespaceAndPath(MartialSpells.MOD_ID, "barrage");
 
-    public static final int PROJECTILE_COUNT = 3;
+    public static final int MAX_LEVEL = 5;
     public static final int SHOT_INTERVAL_TICKS = 4;
     public static final int PREPARE_TICKS = 10;
-    public static final int CAST_TIME_TICKS = 19;
 
-    private static final int FIRST_SHOT_REMAINING = CAST_TIME_TICKS - PREPARE_TICKS;
-    private static final int SECOND_SHOT_REMAINING = FIRST_SHOT_REMAINING - SHOT_INTERVAL_TICKS;
-    private static final int THIRD_SHOT_REMAINING = SECOND_SHOT_REMAINING - SHOT_INTERVAL_TICKS;
-    private static final float DAMAGE_MULTIPLIER = 0.75F;
     private static final float INACCURACY = 0.0F;
 
     private final DefaultConfig defaultConfig = new DefaultConfig()
-            .setMinRarity(SpellRarity.RARE)
+            .setMinRarity(SpellRarity.COMMON)
             .setSchoolResource(MartialSchoolRegistry.MARTIAL_RESOURCE)
-            .setMaxLevel(1)
+            .setMaxLevel(MAX_LEVEL)
             .setCooldownSeconds(10)
             .build();
 
@@ -55,19 +51,46 @@ public final class BarrageSpell extends AbstractSpell implements MartialTechniqu
         manaCostPerLevel = 0;
         baseSpellPower = 0;
         spellPowerPerLevel = 0;
-        castTime = CAST_TIME_TICKS;
+        castTime = getCastTimeTicks(MAX_LEVEL);
     }
 
     @Override public MartialTechniqueClass getTechniqueClass() { return MartialTechniqueClass.RANGER; }
     @Override public ResourceLocation getSpellResource() { return SPELL_ID; }
     @Override public DefaultConfig getDefaultConfig() { return defaultConfig; }
     @Override public CastType getCastType() { return CastType.LONG; }
-    @Override public int getEffectiveCastTime(int spellLevel, @Nullable LivingEntity entity) { return CAST_TIME_TICKS; }
+    @Override public int getEffectiveCastTime(int spellLevel, @Nullable LivingEntity entity) { return getCastTimeTicks(spellLevel); }
     @Override public boolean allowLooting() { return false; }
     @Override public Optional<SoundEvent> getCastStartSound() { return Optional.empty(); }
     @Override public Optional<SoundEvent> getCastFinishSound() { return Optional.empty(); }
     @Override public AnimationHolder getCastStartAnimation() { return AnimationHolder.none(); }
     @Override public AnimationHolder getCastFinishAnimation() { return AnimationHolder.none(); }
+
+    public static int getProjectileCount(int spellLevel) {
+        return switch (clampLevel(spellLevel)) {
+            case 1 -> 2;
+            case 2, 3 -> 3;
+            case 4 -> 4;
+            default -> 5;
+        };
+    }
+
+    public static float getDamageMultiplier(int spellLevel) {
+        return switch (clampLevel(spellLevel)) {
+            case 1 -> 0.50F;
+            case 2 -> 0.625F;
+            case 3 -> 0.75F;
+            case 4 -> 0.875F;
+            default -> 1.00F;
+        };
+    }
+
+    public static int getCastTimeTicks(int spellLevel) {
+        return PREPARE_TICKS + (getProjectileCount(spellLevel) - 1) * SHOT_INTERVAL_TICKS + 1;
+    }
+
+    private static int clampLevel(int spellLevel) {
+        return Mth.clamp(spellLevel, 1, MAX_LEVEL);
+    }
 
     @Override
     public CastResult canBeCastedBy(int spellLevel, CastSource source, MagicData magicData, Player player) {
@@ -84,8 +107,9 @@ public final class BarrageSpell extends AbstractSpell implements MartialTechniqu
     @Override
     public List<MutableComponent> getUniqueInfo(int spellLevel, LivingEntity caster) {
         return List.of(
-                Component.translatable("ui.martial_spells.barrage_projectiles", PROJECTILE_COUNT),
-                Component.translatable("ui.martial_spells.barrage_damage_per_arrow", 75),
+                Component.translatable("ui.martial_spells.barrage_projectiles", getProjectileCount(spellLevel)),
+                Component.translatable("ui.martial_spells.barrage_damage_per_arrow",
+                        Math.round(getDamageMultiplier(spellLevel) * 100.0F)),
                 Component.translatable("ui.martial_spells.barrage_interval", SHOT_INTERVAL_TICKS),
                 Component.translatable("ui.martial_spells.scales_with_martial_power")
         );
@@ -97,19 +121,24 @@ public final class BarrageSpell extends AbstractSpell implements MartialTechniqu
         if (level.isClientSide || !(caster instanceof ServerPlayer player) || magicData == null) return;
 
         int remaining = magicData.getCastDurationRemaining();
-        if (remaining == FIRST_SHOT_REMAINING
-                || remaining == SECOND_SHOT_REMAINING
-                || remaining == THIRD_SHOT_REMAINING) {
-            fireShot(player);
+        int castTime = getCastTimeTicks(spellLevel);
+        int firstShotRemaining = castTime - PREPARE_TICKS;
+        int projectileCount = getProjectileCount(spellLevel);
+
+        for (int shotIndex = 0; shotIndex < projectileCount; shotIndex++) {
+            if (remaining == firstShotRemaining - shotIndex * SHOT_INTERVAL_TICKS) {
+                fireShot(player, getDamageMultiplier(spellLevel));
+                break;
+            }
         }
     }
 
-    private static void fireShot(ServerPlayer player) {
+    private static void fireShot(ServerPlayer player, float damageMultiplier) {
         ItemStack weapon = RangedTechniqueHelper.findHeldRangedWeapon(player);
         if (weapon.isEmpty()) return;
 
         BarrageArrow arrow = RangedTechniqueHelper.createBarrageArrow(
-                player.level(), player, weapon, DAMAGE_MULTIPLIER);
+                player.level(), player, weapon, damageMultiplier);
         float velocity = RangedTechniqueHelper.getProjectileVelocity(weapon);
         arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, velocity, INACCURACY);
         player.level().addFreshEntity(arrow);
