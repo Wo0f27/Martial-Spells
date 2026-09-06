@@ -65,18 +65,37 @@ public abstract class ItemPropertiesMixin {
                     entity,
                     stack
             )) {
-                if (PULLING.equals(propertyId)) {
-                    return 1.0F;
+                if (bow) {
+                    if (PULLING.equals(propertyId)) {
+                        return 1.0F;
+                    }
+
+                    if (PULL.equals(propertyId)) {
+                        return MagicArrowClientVisuals
+                                .getCastProgress(entity);
+                    }
                 }
 
-                if (PULL.equals(propertyId)) {
-                    return MagicArrowClientVisuals
-                            .getCastProgress(entity);
-                }
+                if (crossbow) {
+                    boolean ready =
+                            MagicArrowClientVisuals.isCrossbowReady(entity);
 
-                if (crossbow && (CHARGED.equals(propertyId)
-                        || FIREWORK.equals(propertyId))) {
-                    return 0.0F;
+                    if (PULLING.equals(propertyId)) {
+                        return ready ? 0.0F : 1.0F;
+                    }
+
+                    if (PULL.equals(propertyId)) {
+                        return MagicArrowClientVisuals
+                                .getCrossbowChargeProgress(entity);
+                    }
+
+                    if (CHARGED.equals(propertyId)) {
+                        return ready ? 1.0F : 0.0F;
+                    }
+
+                    if (FIREWORK.equals(propertyId)) {
+                        return 0.0F;
+                    }
                 }
             }
 
