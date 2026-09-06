@@ -17,62 +17,209 @@ import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 
-public final class BarrageArrowRenderer extends EntityRenderer<BarrageArrow> {
-    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(
-            MartialSpells.MOD_ID, "textures/entity/barrage_arrow.png");
+/**
+ * Renders Barrage's physical projectile with the same crossed-quad
+ * silhouette used by Iron's Magic Arrow, but with Martial Spells' own
+ * recolored texture.
+ */
+public final class BarrageArrowRenderer
+        extends EntityRenderer<BarrageArrow> {
 
-    public BarrageArrowRenderer(EntityRendererProvider.Context context) {
+    private static final ResourceLocation TEXTURE =
+            ResourceLocation.fromNamespaceAndPath(
+                    MartialSpells.MOD_ID,
+                    "textures/entity/barrage_arrow.png"
+            );
+
+    private static final float MODEL_SCALE = 0.13F;
+
+    public BarrageArrowRenderer(
+            EntityRendererProvider.Context context
+    ) {
         super(context);
     }
 
     @Override
-    public void render(BarrageArrow entity, float yaw, float partialTicks,
-                       PoseStack poseStack, MultiBufferSource bufferSource, int light) {
+    public void render(
+            BarrageArrow entity,
+            float yaw,
+            float partialTicks,
+            PoseStack poseStack,
+            MultiBufferSource bufferSource,
+            int light
+    ) {
         poseStack.pushPose();
+
         Vec3 motion = entity.getDeltaMovement();
         if (motion.lengthSqr() > 1.0E-7D) {
-            float xRot = -((float)(Mth.atan2(motion.horizontalDistance(), motion.y)
-                    * (180.0D / Math.PI)) - 90.0F);
-            float yRot = -((float)(Mth.atan2(motion.z, motion.x)
-                    * (180.0D / Math.PI)) + 90.0F);
-            poseStack.mulPose(Axis.YP.rotationDegrees(yRot));
-            poseStack.mulPose(Axis.XP.rotationDegrees(xRot));
+            float xRot = -(
+                    (float) (
+                            Mth.atan2(
+                                    motion.horizontalDistance(),
+                                    motion.y
+                            ) * (180.0D / Math.PI)
+                    ) - 90.0F
+            );
+
+            float yRot = -(
+                    (float) (
+                            Mth.atan2(
+                                    motion.z,
+                                    motion.x
+                            ) * (180.0D / Math.PI)
+                    ) + 90.0F
+            );
+
+            poseStack.mulPose(
+                    Axis.YP.rotationDegrees(yRot)
+            );
+            poseStack.mulPose(
+                    Axis.XP.rotationDegrees(xRot)
+            );
         }
 
-        poseStack.scale(0.13F, 0.13F, 0.13F);
-        VertexConsumer consumer = bufferSource.getBuffer(
-                RenderHelper.CustomerRenderType.magic(TEXTURE));
-        poseStack.mulPose(Axis.YP.rotationDegrees(90.0F));
-        poseStack.translate(-2.0D, 0.0D, 0.0D);
-
-        for (int j = 0; j < 4; ++j) {
-            poseStack.mulPose(Axis.XP.rotationDegrees(90.0F));
-            PoseStack.Pose pose = poseStack.last();
-            Matrix4f matrix = pose.pose();
-            Matrix3f normal = pose.normal();
-            vertex(matrix, normal, consumer, -8, -2, 0, 0.0F, 0.0F);
-            vertex(matrix, normal, consumer, 8, -2, 0, 0.5F, 0.0F);
-            vertex(matrix, normal, consumer, 8, 2, 0, 0.5F, 0.15625F);
-            vertex(matrix, normal, consumer, -8, 2, 0, 0.0F, 0.15625F);
-        }
+        renderModel(
+                poseStack,
+                bufferSource
+        );
 
         poseStack.popPose();
-        super.render(entity, yaw, partialTicks, poseStack, bufferSource, light);
+
+        super.render(
+                entity,
+                yaw,
+                partialTicks,
+                poseStack,
+                bufferSource,
+                light
+        );
     }
 
-    private static void vertex(Matrix4f matrix, Matrix3f normal, VertexConsumer consumer,
-                               int x, int y, int z, float u, float v) {
-        consumer.vertex(matrix, x, y, z)
-                .color(255, 255, 255, 255)
+    /**
+     * Mirrors Iron's 1.20.1 MagicArrowRenderer geometry. The only
+     * deliberate rendering difference is NO_CULL: Barrage's crossed
+     * quads must remain visible from either face while the projectile
+     * rotates rapidly between consecutive shots.
+     */
+    private static void renderModel(
+            PoseStack poseStack,
+            MultiBufferSource bufferSource
+    ) {
+        poseStack.scale(
+                MODEL_SCALE,
+                MODEL_SCALE,
+                MODEL_SCALE
+        );
+
+        PoseStack.Pose pose = poseStack.last();
+        Matrix4f poseMatrix = pose.pose();
+        Matrix3f normalMatrix = pose.normal();
+
+        VertexConsumer consumer =
+                bufferSource.getBuffer(
+                        RenderHelper.CustomerRenderType
+                                .magicNoCull(TEXTURE)
+                );
+
+        poseStack.mulPose(
+                Axis.YP.rotationDegrees(90.0F)
+        );
+        poseStack.translate(
+                -2.0D,
+                0.0D,
+                0.0D
+        );
+
+        for (int j = 0; j < 4; ++j) {
+            poseStack.mulPose(
+                    Axis.XP.rotationDegrees(90.0F)
+            );
+
+            vertex(
+                    poseMatrix,
+                    normalMatrix,
+                    consumer,
+                    -8,
+                    -2,
+                    0,
+                    0.0F,
+                    0.0F
+            );
+            vertex(
+                    poseMatrix,
+                    normalMatrix,
+                    consumer,
+                    8,
+                    -2,
+                    0,
+                    0.5F,
+                    0.0F
+            );
+            vertex(
+                    poseMatrix,
+                    normalMatrix,
+                    consumer,
+                    8,
+                    2,
+                    0,
+                    0.5F,
+                    0.15625F
+            );
+            vertex(
+                    poseMatrix,
+                    normalMatrix,
+                    consumer,
+                    -8,
+                    2,
+                    0,
+                    0.0F,
+                    0.15625F
+            );
+        }
+    }
+
+    private static void vertex(
+            Matrix4f matrix,
+            Matrix3f normal,
+            VertexConsumer consumer,
+            int x,
+            int y,
+            int z,
+            float u,
+            float v
+    ) {
+        consumer.vertex(
+                        matrix,
+                        x,
+                        y,
+                        z
+                )
+                .color(
+                        200,
+                        200,
+                        200,
+                        255
+                )
                 .uv(u, v)
-                .overlayCoords(OverlayTexture.NO_OVERLAY)
-                .uv2(LightTexture.FULL_BRIGHT)
-                .normal(normal, 0.0F, 0.0F, 1.0F)
+                .overlayCoords(
+                        OverlayTexture.NO_OVERLAY
+                )
+                .uv2(
+                        LightTexture.FULL_BRIGHT
+                )
+                .normal(
+                        normal,
+                        0.0F,
+                        0.0F,
+                        1.0F
+                )
                 .endVertex();
     }
 
     @Override
-    public ResourceLocation getTextureLocation(BarrageArrow entity) {
+    public ResourceLocation getTextureLocation(
+            BarrageArrow entity
+    ) {
         return TEXTURE;
     }
 }
