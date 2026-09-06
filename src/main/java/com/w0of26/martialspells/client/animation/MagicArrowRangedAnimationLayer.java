@@ -12,8 +12,9 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
 /**
- * High-priority arm-only layer used to replace Iron's bow-charge arm
- * pose with a loaded-crossbow hold during Magic Arrow.
+ * High-priority PlayerAnimator layer that owns Magic Arrow's ranged
+ * casting pose. Bow casts use the imported bow-pulling body animation;
+ * crossbow casts use the loaded-crossbow hold.
  */
 @Mod.EventBusSubscriber(
         modid = MartialSpells.MOD_ID,
