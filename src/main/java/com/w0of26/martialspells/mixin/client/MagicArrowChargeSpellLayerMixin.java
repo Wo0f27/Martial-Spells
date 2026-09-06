@@ -19,32 +19,28 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  * the real released projectile untouched.
  */
 @Mixin(
-        value = ChargeSpellLayer.Vanilla.class,
+        value = ChargeSpellLayer.class,
         remap = false
 )
 public abstract class MagicArrowChargeSpellLayerMixin {
 
     @Inject(
-            method = "render",
+            method = "handleRender",
             at = @At("HEAD"),
             cancellable = true,
             remap = false
     )
-    private void martialSpells$hideMagicArrowChargePreview(
+    private static void martialSpells$hideMagicArrowChargePreview(
             PoseStack poseStack,
             MultiBufferSource bufferSource,
             int packedLight,
             LivingEntity entity,
-            float limbSwing,
-            float limbSwingAmount,
-            float partialTick,
-            float ageInTicks,
-            float netHeadYaw,
-            float headPitch,
+            String spellId,
+            boolean offhand,
             CallbackInfo ci
     ) {
         if (entity instanceof Player
-                && MagicArrowClientVisuals.isMagicArrowCasting(entity)) {
+                && MagicArrowClientVisuals.MAGIC_ARROW_ID.equals(spellId)) {
             ci.cancel();
         }
     }
