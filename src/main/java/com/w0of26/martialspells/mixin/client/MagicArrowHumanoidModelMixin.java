@@ -17,16 +17,19 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
- * Replays vanilla's crossbow-charge arm math using Magic Arrow cast
- * progress instead of real item-use ticks.
+ * Applies Magic Arrow's final ranged pose at the end of HumanoidModel
+ * setup. This is intentionally later than the ordinary arm-pose pass so
+ * Better Combat weapon poses (notably Archers longbows) cannot leave the
+ * weapon in their idle two-handed pose while the spell is aiming.
  */
 @Mixin(HumanoidModel.class)
 public abstract class MagicArrowHumanoidModelMixin {
+    @Shadow @Final public ModelPart head;
     @Shadow @Final public ModelPart rightArm;
     @Shadow @Final public ModelPart leftArm;
 
     @Inject(method = "setupAnim", at = @At("TAIL"))
-    private void martialSpells$magicArrowCrossbowCharge(
+    private void martialSpells$magicArrowRangedPose(
             LivingEntity entity,
             float limbSwing,
             float limbSwingAmount,
@@ -36,18 +39,66 @@ public abstract class MagicArrowHumanoidModelMixin {
             CallbackInfo ci
     ) {
         if (!(entity instanceof Player player)
-                || !MagicArrowClientVisuals.isMagicArrowCasting(player)
-                || MagicArrowClientVisuals.getSelectedRangedType(player)
-                != RangedWeaponClassifier.Type.CROSSBOW) {
+                || !MagicArrowClientVisuals.isMagicArrowCasting(player)) {
             return;
         }
 
+        RangedWeaponClassifier.Type type =
+                MagicArrowClientVisuals.getSelectedRangedType(player);
         HumanoidArm arm = MagicArrowClientVisuals.getSelectedRangedArm(player);
-        if (arm == null) {
+
+        if (arm == null || type == RangedWeaponClassifier.Type.NONE) {
             return;
         }
 
         boolean right = arm == HumanoidArm.RIGHT;
+
+        if (type == RangedWeaponClassifier.Type.BOW) {
+            applyBowAim(right);
+        } else if (type == RangedWeaponClassifier.Type.CROSSBOW) {
+            if (MagicArrowClientVisuals.isCrossbowReady(player)) {
+                AnimationUtils.animateCrossbowHold(
+                        rightArm,
+                        leftArm,
+                        head,
+                        right
+                );
+            } else {
+                applyCrossbowCharge(
+                        right,
+                        MagicArrowClientVisuals
+                                .getCrossbowChargeProgress(player)
+                );
+            }
+        }
+
+        AnimationUtils.bobModelPart(rightArm, ageInTicks, 1.0F);
+        AnimationUtils.bobModelPart(leftArm, ageInTicks, -1.0F);
+    }
+
+    /**
+     * Exact vanilla BOW_AND_ARROW arm math, applied explicitly after
+     * external weapon-pose animation layers have run.
+     */
+    private void applyBowAim(boolean right) {
+        if (right) {
+            rightArm.yRot = -0.1F + head.yRot;
+            leftArm.yRot = 0.1F + head.yRot + 0.4F;
+        } else {
+            rightArm.yRot = -0.1F + head.yRot - 0.4F;
+            leftArm.yRot = 0.1F + head.yRot;
+        }
+
+        rightArm.xRot = -((float) Math.PI / 2.0F) + head.xRot;
+        leftArm.xRot = -((float) Math.PI / 2.0F) + head.xRot;
+    }
+
+    /**
+     * Vanilla crossbow-charge arm math with spell progress substituted
+     * for getTicksUsingItem(), because Magic Arrow deliberately never
+     * enters real crossbow item-use state.
+     */
+    private void applyCrossbowCharge(boolean right, float progress) {
         ModelPart holdingArm = right ? rightArm : leftArm;
         ModelPart pullingArm = right ? leftArm : rightArm;
 
@@ -55,7 +106,6 @@ public abstract class MagicArrowHumanoidModelMixin {
         holdingArm.xRot = -0.97079635F;
         pullingArm.xRot = holdingArm.xRot;
 
-        float progress = MagicArrowClientVisuals.getCastProgress(player);
         pullingArm.yRot = Mth.lerp(progress, 0.4F, 0.85F)
                 * (right ? 1.0F : -1.0F);
         pullingArm.xRot = Mth.lerp(
@@ -63,8 +113,5 @@ public abstract class MagicArrowHumanoidModelMixin {
                 pullingArm.xRot,
                 -((float) Math.PI / 2.0F)
         );
-
-        AnimationUtils.bobModelPart(rightArm, ageInTicks, 1.0F);
-        AnimationUtils.bobModelPart(leftArm, ageInTicks, -1.0F);
     }
 }
