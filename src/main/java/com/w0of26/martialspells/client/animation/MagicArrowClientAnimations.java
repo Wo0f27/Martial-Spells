@@ -217,12 +217,12 @@ public final class MagicArrowClientAnimations {
     }
 
     private enum Pose {
-        BOW_PULL(BOW_PULL),
-        BOW_IDLE(BOW_IDLE),
-        BOW_CROUCH_PULL(BOW_CROUCH_PULL),
-        BOW_CROUCH_IDLE(BOW_CROUCH_IDLE),
-        CROSSBOW_RIGHT(CROSSBOW_HOLD_RIGHT),
-        CROSSBOW_LEFT(CROSSBOW_HOLD_LEFT);
+        BOW_PULL(MagicArrowClientAnimations.BOW_PULL),
+        BOW_IDLE(MagicArrowClientAnimations.BOW_IDLE),
+        BOW_CROUCH_PULL(MagicArrowClientAnimations.BOW_CROUCH_PULL),
+        BOW_CROUCH_IDLE(MagicArrowClientAnimations.BOW_CROUCH_IDLE),
+        CROSSBOW_RIGHT(MagicArrowClientAnimations.CROSSBOW_HOLD_RIGHT),
+        CROSSBOW_LEFT(MagicArrowClientAnimations.CROSSBOW_HOLD_LEFT);
 
         private final ResourceLocation animationId;
 
