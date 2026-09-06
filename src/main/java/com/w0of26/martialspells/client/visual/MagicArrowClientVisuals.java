@@ -18,8 +18,6 @@ public final class MagicArrowClientVisuals {
     public static final String BARRAGE_ID = "martial_spells:barrage";
     public static final String ENTANGLING_ARROW_ID = "martial_spells:entangling_arrow";
     private static final float MAGIC_ARROW_CROSSBOW_CHARGE_END_PROGRESS = 2.0F / 3.0F;
-    private static final float BARRAGE_PREPARE_END_PROGRESS =
-            (float) BarrageSpell.PREPARE_TICKS / (float) BarrageSpell.CAST_TIME_TICKS;
 
     private MagicArrowClientVisuals() {}
 
@@ -43,6 +41,15 @@ public final class MagicArrowClientVisuals {
         }
         SyncedSpellData synced = ClientMagicData.getSyncedSpellData(player);
         return synced.isCasting() ? synced.getCastingSpellId() : "";
+    }
+
+    private static int getCastingSpellLevel(Player player) {
+        Minecraft minecraft = Minecraft.getInstance();
+        if (minecraft.player == player) {
+            return ClientMagicData.isCasting() ? ClientMagicData.getCastingSpellLevel() : 1;
+        }
+        SyncedSpellData synced = ClientMagicData.getSyncedSpellData(player);
+        return synced.isCasting() ? synced.getCastingSpellLevel() : 1;
     }
 
     @Nullable
@@ -93,9 +100,12 @@ public final class MagicArrowClientVisuals {
 
     public static float getWeaponPreparationProgress(@Nullable LivingEntity entity) {
         float raw = getCastProgress(entity);
-        return isBarrageCasting(entity)
-                ? Mth.clamp(raw / BARRAGE_PREPARE_END_PROGRESS, 0.0F, 1.0F)
-                : raw;
+        if (isBarrageCasting(entity) && entity instanceof Player player) {
+            int castTime = BarrageSpell.getCastTimeTicks(getCastingSpellLevel(player));
+            float prepareEndProgress = (float) BarrageSpell.PREPARE_TICKS / (float) castTime;
+            return Mth.clamp(raw / prepareEndProgress, 0.0F, 1.0F);
+        }
+        return raw;
     }
 
     public static float getCrossbowChargeProgress(@Nullable LivingEntity entity) {
