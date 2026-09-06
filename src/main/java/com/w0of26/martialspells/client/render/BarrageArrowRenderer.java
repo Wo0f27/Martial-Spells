@@ -5,7 +5,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import com.w0of26.martialspells.MartialSpells;
 import com.w0of26.martialspells.entity.BarrageArrow;
-import io.redspace.ironsspellbooks.entity.spells.magic_arrow.MagicArrowRenderer;
+import io.redspace.ironsspellbooks.render.RenderHelper;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
@@ -41,7 +41,7 @@ public final class BarrageArrowRenderer extends EntityRenderer<BarrageArrow> {
 
         poseStack.scale(0.13F, 0.13F, 0.13F);
         VertexConsumer consumer = bufferSource.getBuffer(
-                MagicArrowRenderer.CustomRenderType.magic(TEXTURE));
+                RenderHelper.CustomerRenderType.magic(TEXTURE));
         poseStack.mulPose(Axis.YP.rotationDegrees(90.0F));
         poseStack.translate(-2.0D, 0.0D, 0.0D);
 
