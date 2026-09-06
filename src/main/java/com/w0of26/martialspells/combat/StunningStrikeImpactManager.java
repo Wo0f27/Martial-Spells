@@ -3,26 +3,19 @@ package com.w0of26.martialspells.combat;
 import com.w0of26.martialspells.MartialSpells;
 import com.w0of26.martialspells.damage.MartialDamageTypes;
 import com.w0of26.martialspells.spells.StunningStrikeSpell;
-import net.minecraft.resources.ResourceLocation;
+import io.redspace.ironsspellbooks.registries.MobEffectRegistry;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.registries.ForgeRegistries;
-import io.redspace.ironsspellbooks.registries.MobEffectRegistry;
-import com.w0of26.martialspells.registry.MartialEntityTypeTags;
-
-
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 
 @Mod.EventBusSubscriber(
         modid = MartialSpells.MOD_ID,
@@ -63,16 +56,6 @@ public final class StunningStrikeImpactManager {
      */
     private static final int REND_DURATION_TICKS = 100;
     private static final int REND_AMPLIFIER = 1;
-
-    /*
-     * Verified in the Forge 1.20.1 runtime:
-     * /effect give ... turtlecore:stunned works.
-     */
-    private static final ResourceLocation STUNNED_EFFECT_ID =
-            new ResourceLocation(
-                    "turtlecore",
-                    "stunned"
-            );
 
     private static final Map<UUID, PendingImpact>
             PENDING_IMPACTS =
@@ -223,68 +206,10 @@ public final class StunningStrikeImpactManager {
             ServerPlayer player,
             int spellLevel
     ) {
-        /*
-         * Martial Spells-level stun immunity takes priority.
-         *
-         * This does not prevent Stunning Strike damage or Rend.
-         */
-        if (target.getType().is(
-                MartialEntityTypeTags.STUN_IMMUNE
-        )) {
-            return;
-        }
-
-        MobEffect stunnedEffect =
-                ForgeRegistries.MOB_EFFECTS
-                        .getValue(
-                                STUNNED_EFFECT_ID
-                        );
-
-        if (stunnedEffect == null) {
-            MartialSpells.LOGGER.warn(
-                    "Could not find TurtleCore Stunned effect: {}",
-                    STUNNED_EFFECT_ID
-            );
-
-            return;
-        }
-
-        int duration =
-                getStunDurationTicks(
-                        spellLevel
-                );
-
-        /*
-         * Stun-resistant entities receive half duration.
-         *
-         * Math.round is used because durations must be whole
-         * Minecraft ticks.
-         */
-        if (target.getType().is(
-                MartialEntityTypeTags.STUN_RESISTANT
-        )) {
-            duration =
-                    Math.round(
-                            duration * 0.50F
-                    );
-        }
-
-        /*
-         * Normal addEffect is intentional.
-         *
-         * TurtleCore/entity-specific immunity is still respected
-         * even if the entity is not in our own immunity tag.
-         */
-        target.addEffect(
-                new MobEffectInstance(
-                        stunnedEffect,
-                        duration,
-                        0,
-                        false,
-                        true,
-                        true
-                ),
-                player
+        StunService.apply(
+                target,
+                player,
+                getStunDurationTicks(spellLevel)
         );
     }
 
