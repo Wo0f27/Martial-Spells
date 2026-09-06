@@ -22,6 +22,14 @@ public final class MagicArrowClientVisuals {
     public static final String MAGIC_ARROW_ID =
             "irons_spellbooks:magic_arrow";
 
+    /*
+     * Magic Arrow channels for 30 ticks. Give crossbows the first 20
+     * ticks to visually load, then leave the final 10 ticks in their
+     * normal loaded/aimed pose before the spell releases.
+     */
+    private static final float CROSSBOW_CHARGE_END_PROGRESS =
+            2.0F / 3.0F;
+
     private MagicArrowClientVisuals() {
     }
 
@@ -155,5 +163,27 @@ public final class MagicArrowClientVisuals {
         }
 
         return 1.0F;
+    }
+
+    /**
+     * Crossbow loading progress normalized to the first two thirds of
+     * the Magic Arrow channel. This reaches 1.0 when the visual weapon
+     * should become loaded and transition to its aim/hold pose.
+     */
+    public static float getCrossbowChargeProgress(
+            @Nullable LivingEntity entity
+    ) {
+        return Mth.clamp(
+                getCastProgress(entity) / CROSSBOW_CHARGE_END_PROGRESS,
+                0.0F,
+                1.0F
+        );
+    }
+
+    public static boolean isCrossbowReady(
+            @Nullable LivingEntity entity
+    ) {
+        return getCastProgress(entity)
+                >= CROSSBOW_CHARGE_END_PROGRESS;
     }
 }
