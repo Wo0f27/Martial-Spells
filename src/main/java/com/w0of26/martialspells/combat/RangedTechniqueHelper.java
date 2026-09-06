@@ -1,11 +1,13 @@
 package com.w0of26.martialspells.combat;
 
 import com.w0of26.martialspells.entity.BarrageArrow;
+import com.w0of26.martialspells.entity.EntanglingArrow;
 import com.w0of26.martialspells.ranged.RangedWeaponClassifier;
 import net.fabric_extras.ranged_weapon.api.CustomRangedWeapon;
 import net.fabric_extras.ranged_weapon.api.RangedConfig;
 import net.fabric_extras.ranged_weapon.internal.ScalingUtil;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
@@ -21,12 +23,17 @@ public final class RangedTechniqueHelper {
     }
 
     public static BarrageArrow createBarrageArrow(Level level, Player player, ItemStack weapon, float techniqueMultiplier) {
-        RangedWeaponClassifier.Type type = RangedWeaponClassifier.classify(weapon);
-        if (type == RangedWeaponClassifier.Type.NONE) {
-            throw new IllegalArgumentException("Barrage requires a classified bow or crossbow.");
-        }
-
+        RangedWeaponClassifier.Type type = requireRangedType(weapon, "Barrage");
         BarrageArrow arrow = new BarrageArrow(level, player);
+        applyEnchantments(arrow, weapon, type);
+        applyScaling(arrow, player, weapon, type, techniqueMultiplier);
+        return arrow;
+    }
+
+    public static EntanglingArrow createEntanglingArrow(Level level, Player player, ItemStack weapon,
+                                                        float techniqueMultiplier) {
+        RangedWeaponClassifier.Type type = requireRangedType(weapon, "Entangling Arrow");
+        EntanglingArrow arrow = new EntanglingArrow(level, player);
         applyEnchantments(arrow, weapon, type);
         applyScaling(arrow, player, weapon, type, techniqueMultiplier);
         return arrow;
@@ -41,7 +48,16 @@ public final class RangedTechniqueHelper {
                 : (float) baseline.velocity();
     }
 
-    private static void applyEnchantments(BarrageArrow arrow, ItemStack weapon, RangedWeaponClassifier.Type type) {
+    private static RangedWeaponClassifier.Type requireRangedType(ItemStack weapon, String techniqueName) {
+        RangedWeaponClassifier.Type type = RangedWeaponClassifier.classify(weapon);
+        if (type == RangedWeaponClassifier.Type.NONE) {
+            throw new IllegalArgumentException(techniqueName + " requires a classified bow or crossbow.");
+        }
+        return type;
+    }
+
+    private static void applyEnchantments(AbstractArrow arrow, ItemStack weapon,
+                                          RangedWeaponClassifier.Type type) {
         if (type == RangedWeaponClassifier.Type.BOW) {
             int power = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, weapon);
             if (power > 0) arrow.setBaseDamage(arrow.getBaseDamage() + power * 0.5D + 0.5D);
@@ -59,7 +75,7 @@ public final class RangedTechniqueHelper {
         if (piercing > 0) arrow.setPierceLevel((byte) piercing);
     }
 
-    private static void applyScaling(BarrageArrow arrow, Player player, ItemStack weapon,
+    private static void applyScaling(AbstractArrow arrow, Player player, ItemStack weapon,
                                      RangedWeaponClassifier.Type type, float techniqueMultiplier) {
         ScalingUtil.Scaling baseline = baseline(type);
         RangedConfig config = customConfig(weapon);
