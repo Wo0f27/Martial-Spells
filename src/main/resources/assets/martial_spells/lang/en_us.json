@@ -129,6 +129,14 @@
   "ui.martial_spells.heavenfall_stun_duration": "Stun Duration: %s seconds; halved against resistant enemies",
   "ui.martial_spells.heavenfall_debuffs": "Rend %s / Blight %s: %s seconds",
 
+  "spell.martial_spells.barrage": "Barrage",
+  "spell.martial_spells.barrage.description": "Loose three consecutive martial arrows in rapid succession, each empowered by your ranged weapon and Martial Spell Power.",
+  "spell.martial_spells.barrage.guide": "Requires a bow or crossbow. After a brief preparation, Barrage fires three physical arrows in rapid succession. Each shot follows your current aim independently, allowing you to track a moving target or switch targets between shots. Each arrow deals 75% weapon damage before Martial Spell Power and other ranged modifiers are applied.",
+  "ui.martial_spells.barrage_requires_ranged_weapon": "Barrage requires a bow or crossbow.",
+  "ui.martial_spells.barrage_projectiles": "Projectiles: %s",
+  "ui.martial_spells.barrage_damage_per_arrow": "Damage per Arrow: %s%% weapon damage",
+  "ui.martial_spells.barrage_interval": "Shot Interval: %s ticks",
+
   "effect.martial_spells.stillness_of_mind": "Stillness of Mind",
   "spell.martial_spells.stillness_of_mind": "Stillness of Mind",
   "spell.martial_spells.stillness_of_mind.description": "Transcend the limits of Ki for a brief moment, allowing martial techniques to be used without consuming Ki.",
