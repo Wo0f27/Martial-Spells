@@ -173,7 +173,7 @@ public final class CaltropBundleProjectile
     }
 
     @Override
-    protected void addAdditionalSaveData(
+    public void addAdditionalSaveData(
             CompoundTag tag
     ) {
         super.addAdditionalSaveData(tag);
@@ -181,7 +181,7 @@ public final class CaltropBundleProjectile
     }
 
     @Override
-    protected void readAdditionalSaveData(
+    public void readAdditionalSaveData(
             CompoundTag tag
     ) {
         super.readAdditionalSaveData(tag);
