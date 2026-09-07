@@ -24,6 +24,7 @@ public final class MartialSpellRegistry {
     public static final RegistryObject<AbstractSpell> STILLNESS_OF_MIND = SPELLS.register("stillness_of_mind", StillnessOfMindSpell::new);
     public static final RegistryObject<AbstractSpell> BARRAGE = SPELLS.register("barrage", BarrageSpell::new);
     public static final RegistryObject<AbstractSpell> ENTANGLING_ARROW = SPELLS.register("entangling_arrow", EntanglingArrowSpell::new);
+    public static final RegistryObject<AbstractSpell> CALTROPS = SPELLS.register("caltrops", CaltropsSpell::new);
 
     private MartialSpellRegistry() {}
 

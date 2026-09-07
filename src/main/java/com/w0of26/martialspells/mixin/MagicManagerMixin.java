@@ -1,6 +1,7 @@
 package com.w0of26.martialspells.mixin;
 
 import com.w0of26.martialspells.spells.AbstractMonkTechniqueSpell;
+import com.w0of26.martialspells.spells.FixedCooldownSpell;
 import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
 import io.redspace.ironsspellbooks.api.spells.CastSource;
 import io.redspace.ironsspellbooks.capabilities.magic.MagicManager;
@@ -12,10 +13,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /**
  * Prevents Iron's generic spell cooldown reduction from modifying
- * Monk technique cooldowns.
+ * cooldowns that Martial Spells explicitly marks as fixed.
  *
- * Monk techniques use their configured cooldown as the final
- * authoritative cooldown.
+ * Monk techniques retain their established fixed-cooldown behavior,
+ * while non-Monk techniques can opt in through FixedCooldownSpell.
  */
 @Mixin(
         value = MagicManager.class,
@@ -28,14 +29,14 @@ public abstract class MagicManagerMixin {
             at = @At("HEAD"),
             cancellable = true
     )
-    private static void martialSpells$useFixedMonkCooldown(
+    private static void martialSpells$useFixedCooldown(
             AbstractSpell spell,
             Player player,
             CastSource castSource,
             CallbackInfoReturnable<Integer> cir
     ) {
-        if (!(spell
-                instanceof AbstractMonkTechniqueSpell)) {
+        if (!(spell instanceof AbstractMonkTechniqueSpell)
+                && !(spell instanceof FixedCooldownSpell)) {
             return;
         }
 

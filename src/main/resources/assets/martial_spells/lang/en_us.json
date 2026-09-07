@@ -8,6 +8,8 @@
 
   "death.attack.martial": "%1$s was defeated by a martial technique",
   "death.attack.martial.player": "%1$s was defeated by %2$s's martial technique",
+  "death.attack.martial_spells.caltrops": "%1$s was cut down by caltrops",
+  "death.attack.martial_spells.caltrops.player": "%1$s was cut down by %2$s's caltrops",
   "ui.martial_spells.scales_with_martial_power": "Scales with Martial Spell Power.",
 
   "spell.martial_spells.guardians_cry": "Guardian's Cry",
@@ -145,6 +147,14 @@
   "ui.martial_spells.entangling_arrow_requires_ranged_weapon": "Entangling Arrow requires a bow or crossbow.",
   "ui.martial_spells.entangling_arrow_damage": "Damage: %s%% weapon damage",
   "ui.martial_spells.entangling_arrow_root_duration": "Root Duration: %s seconds",
+
+  "spell.martial_spells.caltrops": "Caltrops",
+  "spell.martial_spells.caltrops.description": "Throw a bundle of caltrops that spreads into a damaging, slowing ground hazard.",
+  "spell.martial_spells.caltrops.guide": "Instantly throw a bundle that deploys caltrops when it strikes a block. Grounded non-allied creatures inside the field take physical damage every 0.5 seconds and are slowed. The field is 3x3 blocks at Levels I-III, 4x4 at Level IV, and 5x5 at Level V. Damage scales with Martial Spell Power. Caltrops has a fixed 15-second cooldown that is unaffected by Cooldown Reduction.",
+  "ui.martial_spells.caltrops_field_size": "Field: %sx%s blocks",
+  "ui.martial_spells.caltrops_damage_tick": "Damage per Tick: %s every 0.5 seconds",
+  "ui.martial_spells.caltrops_slow": "Slowness %s",
+  "ui.martial_spells.caltrops_duration": "Field Duration: %s seconds",
 
   "effect.martial_spells.stillness_of_mind": "Stillness of Mind",
   "spell.martial_spells.stillness_of_mind": "Stillness of Mind",

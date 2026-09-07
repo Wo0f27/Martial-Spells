@@ -1,6 +1,8 @@
 {
   "replace": false,
   "values": [
-    "martial_spells:barrage"
+    "martial_spells:barrage",
+    "martial_spells:entangling_arrow",
+    "martial_spells:caltrops"
   ]
 }
