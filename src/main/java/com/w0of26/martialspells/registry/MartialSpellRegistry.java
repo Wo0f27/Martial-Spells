@@ -22,6 +22,7 @@ public final class MartialSpellRegistry {
     public static final RegistryObject<AbstractSpell> STEP_OF_THE_WIND = SPELLS.register("step_of_the_wind", StepOfTheWindSpell::new);
     public static final RegistryObject<AbstractSpell> HEAVENFALL_STRIKE = SPELLS.register("heavenfall_strike", HeavenfallStrikeSpell::new);
     public static final RegistryObject<AbstractSpell> STILLNESS_OF_MIND = SPELLS.register("stillness_of_mind", StillnessOfMindSpell::new);
+    public static final RegistryObject<AbstractSpell> QUIVERING_PALM = SPELLS.register("quivering_palm", QuiveringPalmSpell::new);
     public static final RegistryObject<AbstractSpell> BARRAGE = SPELLS.register("barrage", BarrageSpell::new);
     public static final RegistryObject<AbstractSpell> ENTANGLING_ARROW = SPELLS.register("entangling_arrow", EntanglingArrowSpell::new);
     public static final RegistryObject<AbstractSpell> CALTROPS = SPELLS.register("caltrops", CaltropsSpell::new);
