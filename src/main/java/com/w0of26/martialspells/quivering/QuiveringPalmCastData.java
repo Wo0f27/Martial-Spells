@@ -8,6 +8,7 @@ import net.minecraft.network.FriendlyByteBuf;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -27,11 +28,21 @@ public final class QuiveringPalmCastData
     private static final String ACTIVE_GENERATION_TAG =
             "activeGeneration";
     private static final String MARKS_TAG = "marks";
+    private static final String RETIRED_TARGETS_TAG =
+            "retiredTargets";
     private static final String TARGET_TAG = "target";
     private static final String GENERATION_TAG = "generation";
 
     private final Map<UUID, Integer> marks =
             new LinkedHashMap<>();
+
+    /*
+     * Targets from earlier generations are retired permanently for the
+     * current chain. This prevents Quivering Palm from bouncing back to
+     * an entity that was already part of an earlier generation.
+     */
+    private final Set<UUID> retiredTargets =
+            new LinkedHashSet<>();
 
     private int activeGeneration;
 
@@ -52,6 +63,15 @@ public final class QuiveringPalmCastData
                 && generation == activeGeneration;
     }
 
+    public boolean hasEverBeenMarked(UUID targetUuid) {
+        if (targetUuid == null) {
+            return false;
+        }
+
+        return marks.containsKey(targetUuid)
+                || retiredTargets.contains(targetUuid);
+    }
+
     public int getGeneration(UUID targetUuid) {
         return marks.getOrDefault(targetUuid, -1);
     }
@@ -62,10 +82,7 @@ public final class QuiveringPalmCastData
 
     /**
      * Replaces the currently selectable mark set with a new generation.
-     *
-     * Checkpoint 1 uses this with the same target while the native
-     * recast lifecycle is validated. The detonation checkpoint will
-     * replace that target with the actual AOE propagation candidates.
+     * Used for the initial Generation 0 mark.
      */
     public void replaceMarks(
             Collection<UUID> targetUuids,
@@ -79,15 +96,42 @@ public final class QuiveringPalmCastData
         }
 
         for (UUID targetUuid : targetUuids) {
-            if (targetUuid != null) {
+            if (targetUuid != null
+                    && !retiredTargets.contains(targetUuid)) {
                 marks.put(targetUuid, activeGeneration);
             }
         }
     }
 
+    /**
+     * Advances the chain to the next selectable generation.
+     *
+     * Every candidate from the previous generation is retired, not only
+     * the chosen detonation target. This deliberately makes each
+     * generation a single branch choice and prevents exponential or
+     * ping-pong chains.
+     */
+    public void advanceMarks(
+            Collection<UUID> targetUuids,
+            int generation
+    ) {
+        retiredTargets.addAll(marks.keySet());
+        replaceMarks(targetUuids, generation);
+    }
+
+    /**
+     * Retires the final active generation when no further propagation is
+     * allowed.
+     */
+    public void retireCurrentMarks() {
+        retiredTargets.addAll(marks.keySet());
+        marks.clear();
+    }
+
     @Override
     public void reset() {
         marks.clear();
+        retiredTargets.clear();
         activeGeneration = 0;
     }
 
@@ -101,11 +145,17 @@ public final class QuiveringPalmCastData
             buffer.writeUUID(entry.getKey());
             buffer.writeVarInt(entry.getValue());
         }
+
+        buffer.writeVarInt(retiredTargets.size());
+        for (UUID targetUuid : retiredTargets) {
+            buffer.writeUUID(targetUuid);
+        }
     }
 
     @Override
     public void readFromBuffer(FriendlyByteBuf buffer) {
         marks.clear();
+        retiredTargets.clear();
         activeGeneration = buffer.readVarInt();
 
         int markCount = buffer.readVarInt();
@@ -113,6 +163,11 @@ public final class QuiveringPalmCastData
             UUID targetUuid = buffer.readUUID();
             int generation = buffer.readVarInt();
             marks.put(targetUuid, generation);
+        }
+
+        int retiredCount = buffer.readVarInt();
+        for (int i = 0; i < retiredCount; i++) {
+            retiredTargets.add(buffer.readUUID());
         }
     }
 
@@ -142,6 +197,25 @@ public final class QuiveringPalmCastData
         }
 
         result.put(MARKS_TAG, serializedMarks);
+
+        ListTag serializedRetiredTargets =
+                new ListTag();
+        for (UUID targetUuid : retiredTargets) {
+            CompoundTag serializedTarget =
+                    new CompoundTag();
+            serializedTarget.putUUID(
+                    TARGET_TAG,
+                    targetUuid
+            );
+            serializedRetiredTargets.add(
+                    serializedTarget
+            );
+        }
+
+        result.put(
+                RETIRED_TARGETS_TAG,
+                serializedRetiredTargets
+        );
         return result;
     }
 
@@ -183,6 +257,27 @@ public final class QuiveringPalmCastData
                             )
                     )
             );
+        }
+
+        ListTag serializedRetiredTargets =
+                nbt.getList(
+                        RETIRED_TARGETS_TAG,
+                        Tag.TAG_COMPOUND
+                );
+
+        for (Tag rawTag : serializedRetiredTargets) {
+            if (!(rawTag
+                    instanceof CompoundTag serializedTarget)) {
+                continue;
+            }
+
+            if (serializedTarget.hasUUID(TARGET_TAG)) {
+                retiredTargets.add(
+                        serializedTarget.getUUID(
+                                TARGET_TAG
+                        )
+                );
+            }
         }
     }
 }
