@@ -62,6 +62,16 @@ public final class MartialDamageTypes {
                     )
             );
 
+    public static final ResourceKey<DamageType>
+            QUIVERING_PALM =
+            ResourceKey.create(
+                    Registries.DAMAGE_TYPE,
+                    new ResourceLocation(
+                            MartialSpells.MOD_ID,
+                            "quivering_palm"
+                    )
+            );
+
     private MartialDamageTypes() {
     }
 
@@ -163,6 +173,26 @@ public final class MartialDamageTypes {
         return new DamageSource(
                 damageType,
                 directEntity,
+                player
+        );
+    }
+
+    public static DamageSource quiveringPalm(
+            ServerPlayer player
+    ) {
+        Holder<DamageType> damageType =
+                player.level()
+                        .registryAccess()
+                        .registryOrThrow(
+                                Registries.DAMAGE_TYPE
+                        )
+                        .getHolderOrThrow(
+                                QUIVERING_PALM
+                        );
+
+        return new DamageSource(
+                damageType,
+                player,
                 player
         );
     }

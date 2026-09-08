@@ -30,6 +30,17 @@ public final class MartialEntityTypeTags {
                     "stun_immune"
             );
 
+    /*
+     * Quivering Palm bosses use capped percentage-health damage
+     * plus a fixed Martial component instead of unrestricted scaling.
+     * Datapacks and modpack integrations may extend this tag.
+     */
+    public static final TagKey<EntityType<?>>
+            QUIVERING_PALM_BOSS =
+            create(
+                    "quivering_palm_bosses"
+            );
+
     private MartialEntityTypeTags() {
     }
 

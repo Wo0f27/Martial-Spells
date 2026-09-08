@@ -2,6 +2,7 @@ package com.w0of26.martialspells.spells;
 
 import com.w0of26.martialspells.MartialSpells;
 import com.w0of26.martialspells.quivering.QuiveringPalmCastData;
+import com.w0of26.martialspells.quivering.QuiveringPalmCombatHelper;
 import com.w0of26.martialspells.registry.MartialSchoolRegistry;
 import io.redspace.ironsspellbooks.api.config.DefaultConfig;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
@@ -28,16 +29,14 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 /**
- * Quivering Palm mark/recast foundation.
+ * Quivering Palm mark/detonation technique.
  *
  * The initial cast places a Generation 0 mark. Each successful recast
- * selects one currently marked target and advances the chain to the
- * next generation by marking nearby valid enemies. Iron's native
- * recast system owns the visible timer/count and starts the configured
- * cooldown when the four detonation recasts are exhausted or time out.
- *
- * Damage is intentionally deferred to the next checkpoint so the
- * bounded propagation behavior can be validated independently.
+ * detonates one currently marked target, damages nearby enemies, and
+ * turns surviving valid AOE victims into the next generation of marks.
+ * Iron's native recast system owns the visible timer/count and starts
+ * the configured cooldown when the chain is exhausted, times out, or
+ * can no longer propagate.
  */
 public final class QuiveringPalmSpell
         extends AbstractMonkTechniqueSpell {
@@ -329,6 +328,18 @@ public final class QuiveringPalmSpell
             int currentGeneration =
                     castData.getActiveGeneration();
 
+            QuiveringPalmCombatHelper.DetonationResult
+                    detonationResult =
+                    QuiveringPalmCombatHelper.detonate(
+                            player,
+                            target,
+                            spellLevel,
+                            currentGeneration,
+                            getPropagationRadius(
+                                    spellLevel
+                            )
+                    );
+
             spawnDetonationPreview(
                     serverLevel,
                     target
@@ -340,14 +351,15 @@ public final class QuiveringPalmSpell
                         currentGeneration + 1;
 
                 List<LivingEntity> propagatedTargets =
-                        findPropagationTargets(
-                                player,
-                                target,
-                                castData,
-                                getPropagationRadius(
-                                        spellLevel
+                        detonationResult
+                                .survivingSecondaryHits()
+                                .stream()
+                                .filter(candidate ->
+                                        !castData.hasEverBeenMarked(
+                                                candidate.getUUID()
+                                        )
                                 )
-                        );
+                                .toList();
 
                 castData.advanceMarks(
                         propagatedTargets
@@ -364,8 +376,19 @@ public final class QuiveringPalmSpell
                             propagatedTarget
                     );
                 }
+
+                if (propagatedTargets.isEmpty()) {
+                    finishChainAfterCurrentCast(
+                            magicData,
+                            recastInstance
+                    );
+                }
             } else {
                 castData.retireCurrentMarks();
+                finishChainAfterCurrentCast(
+                        magicData,
+                        recastInstance
+                );
             }
         }
 
@@ -379,44 +402,31 @@ public final class QuiveringPalmSpell
     }
 
     /**
-     * Finds the next generation around the chosen detonation target.
-     *
-     * Current and retired marks are excluded, so unused candidates from
-     * the previous generation cannot be recycled into the next one.
+     * Collapses Iron's remaining recast count to one without removing
+     * the recast inside onCast. AbstractSpell will perform the normal
+     * final decrement immediately after this method returns, producing
+     * exactly one normal recast-finished/cooldown transition.
      */
-    private static List<LivingEntity>
-    findPropagationTargets(
-            ServerPlayer player,
-            LivingEntity origin,
-            QuiveringPalmCastData castData,
-            float radius
+    private void finishChainAfterCurrentCast(
+            MagicData magicData,
+            RecastInstance recastInstance
     ) {
-        ServerLevel level =
-                (ServerLevel) player.level();
+        var recasts = magicData.getPlayerRecasts();
 
-        double radiusSquared = radius * radius;
-
-        return level.getEntitiesOfClass(
-                LivingEntity.class,
-                origin.getBoundingBox().inflate(radius),
-                candidate ->
-                        candidate.isAlive()
-                                && !candidate.isSpectator()
-                                && candidate != player
-                                && candidate != origin
-                                && !player.isAlliedTo(candidate)
-                                && !castData.hasEverBeenMarked(
-                                candidate.getUUID()
-                        )
-                                && candidate.distanceToSqr(origin)
-                                <= radiusSquared
-        );
+        while (recastInstance.getRemainingRecasts() > 1
+                && recasts.hasRecastForSpell(
+                getSpellId()
+        )) {
+            recasts.decrementRecastCount(
+                    getSpellId()
+            );
+        }
     }
 
     /*
-     * Temporary, intentionally simple checkpoint VFX. These make mark
-     * propagation observable during testing without committing us to the
-     * final Quivering Palm visual language.
+     * Temporary checkpoint VFX. These make mark propagation and
+     * detonation observable while final Quivering Palm presentation is
+     * deferred to the polish pass.
      */
     private static void spawnMarkPreview(
             ServerLevel level,
@@ -462,12 +472,6 @@ public final class QuiveringPalmSpell
             RecastResult recastResult,
             ICastDataSerializable castDataSerializable
     ) {
-        /*
-         * Iron's owns timeout/exhaustion cleanup and begins the
-         * configured cooldown here. Our mark state lives inside the
-         * removed RecastInstance, so no separate global cleanup is
-         * required.
-         */
         super.onRecastFinished(
                 serverPlayer,
                 recastInstance,
