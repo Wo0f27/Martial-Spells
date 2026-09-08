@@ -63,12 +63,17 @@ public final class QuiveringPalmSpell
 
     private static final int MAX_PROPAGATION_GENERATION = 3;
 
+    /*
+     * Tier V Monk Codex caps stored Ki at 10, so Quivering Palm must
+     * remain castable at every technique level without requiring
+     * Stillness of Mind. Recasts remain free after the initial mark.
+     */
     private static final int[] KI_COSTS = {
+            6,
+            7,
             8,
-            10,
-            12,
-            14,
-            16
+            9,
+            10
     };
 
     private final DefaultConfig defaultConfig =
