@@ -14,7 +14,9 @@ import io.redspace.ironsspellbooks.api.util.AnimationHolder;
 import io.redspace.ironsspellbooks.api.util.RaycastBuilder;
 import io.redspace.ironsspellbooks.capabilities.magic.RecastInstance;
 import io.redspace.ironsspellbooks.capabilities.magic.RecastResult;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -26,13 +28,16 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 /**
- * Quivering Palm foundation.
+ * Quivering Palm mark/recast foundation.
  *
- * Checkpoint 1 intentionally implements the mark and native Iron's
- * recast lifecycle before damage/propagation. The initial cast places
- * a Generation 0 mark. Four subsequent casts are provided by Iron's
- * recast system, which also owns the visible recast bar and starts the
- * normal spell cooldown when the chain is exhausted or times out.
+ * The initial cast places a Generation 0 mark. Each successful recast
+ * selects one currently marked target and advances the chain to the
+ * next generation by marking nearby valid enemies. Iron's native
+ * recast system owns the visible timer/count and starts the configured
+ * cooldown when the four detonation recasts are exhausted or time out.
+ *
+ * Damage is intentionally deferred to the next checkpoint so the
+ * bounded propagation behavior can be validated independently.
  */
 public final class QuiveringPalmSpell
         extends AbstractMonkTechniqueSpell {
@@ -62,6 +67,14 @@ public final class QuiveringPalmSpell
     private static final float RAYCAST_INFLATION = 0.30F;
 
     private static final int MAX_PROPAGATION_GENERATION = 3;
+
+    private static final float[] PROPAGATION_RADII = {
+            4.0F,
+            4.5F,
+            5.0F,
+            5.5F,
+            6.0F
+    };
 
     /*
      * Tier V Monk Codex caps stored Ki at 10, so Quivering Palm must
@@ -130,6 +143,19 @@ public final class QuiveringPalmSpell
 
     public static float getTargetRange() {
         return TARGET_RANGE;
+    }
+
+    public static float getPropagationRadius(
+            int spellLevel
+    ) {
+        int index = Math.max(
+                0,
+                Math.min(
+                        spellLevel - 1,
+                        PROPAGATION_RADII.length - 1
+                )
+        );
+        return PROPAGATION_RADII[index];
     }
 
     private int getBaseKiCost(int spellLevel) {
@@ -277,6 +303,11 @@ public final class QuiveringPalmSpell
                     ),
                     magicData
             );
+
+            spawnMarkPreview(
+                    (ServerLevel) level,
+                    target
+            );
         } else {
             RecastInstance recastInstance =
                     recasts.getRecastInstance(
@@ -292,21 +323,50 @@ public final class QuiveringPalmSpell
                 return;
             }
 
-            /*
-             * Temporary Checkpoint 1 advancement:
-             * keep the same target selectable while proving all four
-             * native recasts. Checkpoint 2 replaces this with the real
-             * detonation AOE and propagated candidate marks.
-             */
-            int nextGeneration = Math.min(
-                    MAX_PROPAGATION_GENERATION,
-                    castData.getActiveGeneration() + 1
+            ServerLevel serverLevel =
+                    (ServerLevel) level;
+
+            int currentGeneration =
+                    castData.getActiveGeneration();
+
+            spawnDetonationPreview(
+                    serverLevel,
+                    target
             );
 
-            castData.replaceMarks(
-                    List.of(target.getUUID()),
-                    nextGeneration
-            );
+            if (currentGeneration
+                    < MAX_PROPAGATION_GENERATION) {
+                int nextGeneration =
+                        currentGeneration + 1;
+
+                List<LivingEntity> propagatedTargets =
+                        findPropagationTargets(
+                                player,
+                                target,
+                                castData,
+                                getPropagationRadius(
+                                        spellLevel
+                                )
+                        );
+
+                castData.advanceMarks(
+                        propagatedTargets
+                                .stream()
+                                .map(LivingEntity::getUUID)
+                                .toList(),
+                        nextGeneration
+                );
+
+                for (LivingEntity propagatedTarget
+                        : propagatedTargets) {
+                    spawnMarkPreview(
+                            serverLevel,
+                            propagatedTarget
+                    );
+                }
+            } else {
+                castData.retireCurrentMarks();
+            }
         }
 
         super.onCast(
@@ -315,6 +375,83 @@ public final class QuiveringPalmSpell
                 caster,
                 castSource,
                 magicData
+        );
+    }
+
+    /**
+     * Finds the next generation around the chosen detonation target.
+     *
+     * Current and retired marks are excluded, so unused candidates from
+     * the previous generation cannot be recycled into the next one.
+     */
+    private static List<LivingEntity>
+    findPropagationTargets(
+            ServerPlayer player,
+            LivingEntity origin,
+            QuiveringPalmCastData castData,
+            float radius
+    ) {
+        ServerLevel level =
+                (ServerLevel) player.level();
+
+        double radiusSquared = radius * radius;
+
+        return level.getEntitiesOfClass(
+                LivingEntity.class,
+                origin.getBoundingBox().inflate(radius),
+                candidate ->
+                        candidate.isAlive()
+                                && !candidate.isSpectator()
+                                && candidate != player
+                                && candidate != origin
+                                && !player.isAlliedTo(candidate)
+                                && !castData.hasEverBeenMarked(
+                                candidate.getUUID()
+                        )
+                                && candidate.distanceToSqr(origin)
+                                <= radiusSquared
+        );
+    }
+
+    /*
+     * Temporary, intentionally simple checkpoint VFX. These make mark
+     * propagation observable during testing without committing us to the
+     * final Quivering Palm visual language.
+     */
+    private static void spawnMarkPreview(
+            ServerLevel level,
+            LivingEntity target
+    ) {
+        level.sendParticles(
+                ParticleTypes.END_ROD,
+                target.getX(),
+                target.getY()
+                        + target.getBbHeight()
+                        + 0.15D,
+                target.getZ(),
+                8,
+                0.20D,
+                0.08D,
+                0.20D,
+                0.01D
+        );
+    }
+
+    private static void spawnDetonationPreview(
+            ServerLevel level,
+            LivingEntity target
+    ) {
+        level.sendParticles(
+                ParticleTypes.CRIT,
+                target.getX(),
+                target.getY()
+                        + target.getBbHeight() * 0.5D,
+                target.getZ(),
+                24,
+                0.35D,
+                0.35D,
+                0.35D,
+                0.08D
         );
     }
 
@@ -329,7 +466,7 @@ public final class QuiveringPalmSpell
          * Iron's owns timeout/exhaustion cleanup and begins the
          * configured cooldown here. Our mark state lives inside the
          * removed RecastInstance, so no separate global cleanup is
-         * required for this checkpoint.
+         * required.
          */
         super.onRecastFinished(
                 serverPlayer,
