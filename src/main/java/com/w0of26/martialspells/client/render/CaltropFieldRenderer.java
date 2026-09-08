@@ -46,15 +46,28 @@ public final class CaltropFieldRenderer
     ) {
         int size = entity.getFieldSize();
 
-        double startOffset =
-                -(size - 1) / 2.0D;
+        for (int cellX = 0; cellX < size; cellX++) {
+            for (int cellZ = 0; cellZ < size; cellZ++) {
+                double surfaceY =
+                        entity.getCaltropSurfaceY(
+                                cellX,
+                                cellZ
+                        );
 
-        for (int x = 0; x < size; x++) {
-            for (int z = 0; z < size; z++) {
+                /*
+                 * No valid support block in this cell's three-block
+                 * vertical search means no caltrop is rendered here.
+                 */
+                if (Double.isNaN(surfaceY)) {
+                    continue;
+                }
+
                 double offsetX =
-                        startOffset + x;
+                        entity.getCellOffset(cellX);
                 double offsetZ =
-                        startOffset + z;
+                        entity.getCellOffset(cellZ);
+                double offsetY =
+                        surfaceY - entity.getY();
 
                 poseStack.pushPose();
 
@@ -62,7 +75,7 @@ public final class CaltropFieldRenderer
                         offsetX
                                 - PLACEHOLDER_SCALE
                                 / 2.0D,
-                        0.01D,
+                        offsetY,
                         offsetZ
                                 - PLACEHOLDER_SCALE
                                 / 2.0D
