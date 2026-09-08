@@ -4,6 +4,8 @@ import com.w0of26.martialspells.combat.MartialPowerHelper;
 import com.w0of26.martialspells.damage.MartialDamageTypes;
 import com.w0of26.martialspells.registry.MartialEntityRegistry;
 import com.w0of26.martialspells.spells.CaltropsSpell;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
@@ -12,6 +14,7 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
@@ -34,6 +37,18 @@ public final class CaltropFieldEntity extends Entity {
 
     private static final int SLOW_REFRESH_TICKS = 12;
     private static final double EFFECT_HEIGHT = 0.55D;
+    private static final double SURFACE_EPSILON = 0.01D;
+
+    /*
+     * Every horizontal field cell searches exactly three vertical
+     * support layers: one block above the deployment floor, the
+     * deployment floor itself, and one block below it.
+     *
+     * This makes the effective placement volume 3x3x3, 4x3x4, or
+     * 5x3x5 depending on spell level without creating floating
+     * caltrops over uneven terrain.
+     */
+    private static final int VERTICAL_SEARCH_RADIUS = 1;
 
     private UUID ownerUuid;
     private int remainingTicks = 1;
@@ -86,6 +101,78 @@ public final class CaltropFieldEntity extends Entity {
         );
     }
 
+    /**
+     * Returns the local X/Z offset of one field cell from this
+     * entity's center. Even-sized fields remain symmetrically
+     * centered between their four middle cells.
+     */
+    public double getCellOffset(int cellIndex) {
+        return -(
+                getFieldSize() - 1
+        ) / 2.0D + cellIndex;
+    }
+
+    /**
+     * Finds the world-space Y position where a caltrop should sit in
+     * the requested horizontal field cell.
+     *
+     * The search checks three possible support blocks from highest to
+     * lowest. A cell with no sturdy top surface and clear space above
+     * it returns NaN, so neither a visual caltrop nor its hazard cell
+     * exists there.
+     */
+    public double getCaltropSurfaceY(
+            int cellX,
+            int cellZ
+    ) {
+        double worldX =
+                getX() + getCellOffset(cellX);
+        double worldZ =
+                getZ() + getCellOffset(cellZ);
+
+        int baseSupportY =
+                Mth.floor(getY()) - 1;
+
+        for (int yOffset = VERTICAL_SEARCH_RADIUS;
+             yOffset >= -VERTICAL_SEARCH_RADIUS;
+             yOffset--) {
+            BlockPos support =
+                    BlockPos.containing(
+                            worldX,
+                            baseSupportY + yOffset,
+                            worldZ
+                    );
+
+            if (!level()
+                    .getBlockState(support)
+                    .isFaceSturdy(
+                            level(),
+                            support,
+                            Direction.UP
+                    )) {
+                continue;
+            }
+
+            BlockPos above = support.above();
+
+            if (!level()
+                    .getBlockState(above)
+                    .getCollisionShape(
+                            level(),
+                            above
+                    )
+                    .isEmpty()) {
+                continue;
+            }
+
+            return support.getY()
+                    + 1.0D
+                    + SURFACE_EPSILON;
+        }
+
+        return Double.NaN;
+    }
+
     @Override
     public void tick() {
         super.tick();
@@ -122,7 +209,7 @@ public final class CaltropFieldEntity extends Entity {
                         getEffectBox(),
                         target ->
                                 canAffect(owner, target)
-                                        && isFeetInsideField(target)
+                                        && isFeetInsideActiveCell(target)
                 );
 
         int spellLevel = getSpellLevel();
@@ -178,34 +265,62 @@ public final class CaltropFieldEntity extends Entity {
         double halfSize =
                 getFieldSize() / 2.0D;
 
+        /*
+         * Broad-phase box covers the complete three-layer terrain
+         * search. Fine collision is then checked per active caltrop
+         * cell in isFeetInsideActiveCell.
+         */
         return new AABB(
                 getX() - halfSize,
-                getY() - 0.10D,
+                getY() - 1.10D,
                 getZ() - halfSize,
                 getX() + halfSize,
-                getY() + EFFECT_HEIGHT,
+                getY() + 1.0D + EFFECT_HEIGHT,
                 getZ() + halfSize
         );
     }
 
-    private boolean isFeetInsideField(
+    private boolean isFeetInsideActiveCell(
             LivingEntity target
     ) {
-        double halfSize =
-                getFieldSize() / 2.0D;
+        int size = getFieldSize();
 
-        return target.getX()
-                >= getX() - halfSize
-                && target.getX()
-                <= getX() + halfSize
-                && target.getZ()
-                >= getZ() - halfSize
-                && target.getZ()
-                <= getZ() + halfSize
-                && target.getY()
-                >= getY() - 0.10D
-                && target.getY()
-                <= getY() + EFFECT_HEIGHT;
+        for (int cellX = 0; cellX < size; cellX++) {
+            double centerX =
+                    getX() + getCellOffset(cellX);
+
+            if (target.getX() < centerX - 0.5D
+                    || target.getX() > centerX + 0.5D) {
+                continue;
+            }
+
+            for (int cellZ = 0; cellZ < size; cellZ++) {
+                double centerZ =
+                        getZ() + getCellOffset(cellZ);
+
+                if (target.getZ() < centerZ - 0.5D
+                        || target.getZ() > centerZ + 0.5D) {
+                    continue;
+                }
+
+                double surfaceY =
+                        getCaltropSurfaceY(
+                                cellX,
+                                cellZ
+                        );
+
+                if (Double.isNaN(surfaceY)) {
+                    return false;
+                }
+
+                return target.getY()
+                        >= surfaceY - 0.10D
+                        && target.getY()
+                        <= surfaceY + EFFECT_HEIGHT;
+            }
+        }
+
+        return false;
     }
 
     private static boolean canAffect(
