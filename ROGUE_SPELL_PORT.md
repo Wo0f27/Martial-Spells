@@ -138,9 +138,9 @@ The frozen Spell Engine versions charged small vanilla exhaustion/hunger costs. 
 - **R2 — Shock Powder:** PASS — user-confirmed shared stun, exact source range/control cap/cooldown, frozen icon/sounds, and Martial-owned custom smoke/arc VFX.
 - **R3 — Shadowstep:** PASS — user-confirmed required 15-block harmful aim, corrected source-shaped 1.0-block behind-target teleport/ground placement, 30-tick anti-tracking marker, exact departure audio/icon/effect icon and vanilla cloud/poof VFX.
 - **R4 — Slice & Dice:** PASS — user-confirmed ten-second amp-0 start, exact `MULTIPLY_BASE` Attack Damage stacking on successful player melee damage, amp-9 cap, non-refreshing duration, exact icon/effect icon/sound, dependency-free release VFX translation.
-- **R5 — Vanish:** IMPLEMENTED / VALIDATING — 8-second Stealth, movement penalty, true invisibility, 1-block hostile follow distance, source break/removal rules, frozen audio/icons and dependency-free smoke translation.
-- **R6 — Mutilate:** locked until explicit R5 PASS.
-- **R7 — Bear Trap:** three-placement server-owned trap entities, one-shot trigger, root and lifecycle.
+- **R5 — Vanish:** PASS — user-confirmed 8-second Stealth, movement penalty, true invisibility, hostile tracking suppression, source break/removal rules, frozen audio/icons and dependency-free smoke translation.
+- **R6 — Mutilate:** UNLOCKED — next active gameplay checkpoint.
+- **R7 — Bear Trap:** locked until explicit R6 PASS.
 - **R8 — Fidelity/final audit:** remaining assets/descriptions, dedicated-server validation, no Spell Engine/Spell Power leaks.
 
 ## R4 validation — PASS
@@ -161,6 +161,10 @@ Validated behavior:
 
 R4 is locked.
 
-## R5 validation — pending
+## R5 validation — PASS
 
-Run the R5 asset sync and cumulative audit, then validate Vanish in runtime. Do not mark R5 PASS until the user confirms the complete matrix: duration/movement penalty, invisibility and hostile tracking suppression, each break condition, natural expiry/removal presentation, cooldown reduction, multiplayer/dedicated-server behavior, and R2-R4 regression.
+User-confirmed runtime validation on 2026-09-15.
+
+R5 is locked. The validated Vanish implementation remains the frozen baseline for future Rogue checkpoints; any later changes must be treated as explicit regression/fidelity work rather than silently altering R5.
+
+R6 Mutilate is unlocked and may proceed.
