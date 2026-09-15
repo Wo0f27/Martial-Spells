@@ -130,35 +130,26 @@ The frozen Spell Engine versions charged small vanilla exhaustion/hunger costs. 
 - **R1 — Rogue architecture:** DONE — `ROGUE` technique class + spell tag; no gameplay.
 - **R2 — Shock Powder:** PASS — user-confirmed shared stun, exact source range/control cap/cooldown, frozen icon/sounds, and Martial-owned custom smoke/arc VFX.
 - **R3 — Shadowstep:** PASS — user-confirmed required 15-block harmful aim, corrected source-shaped 1.0-block behind-target teleport/ground placement, 30-tick anti-tracking marker, exact departure audio/icon/effect icon and vanilla cloud/poof VFX.
-- **R4 — Slice & Dice:** VALIDATING — ten-second amp-0 start, exact `MULTIPLY_BASE` Attack Damage stacking on successful player melee damage, amp-9 cap, non-refreshing duration, exact icon/effect icon/sound, dependency-free release VFX translation.
+- **R4 — Slice & Dice:** PASS — user-confirmed ten-second amp-0 start, exact `MULTIPLY_BASE` Attack Damage stacking on successful player melee damage, amp-9 cap, non-refreshing duration, exact icon/effect icon/sound, dependency-free release VFX translation.
 - **R5 — Vanish:** stealth, target suppression, visual state, and all source break conditions.
 - **R6 — Mutilate:** dual-held-weapon damage and source cone/melee delivery behavior.
 - **R7 — Bear Trap:** three-placement server-owned trap entities, one-shot trigger, root and lifecycle.
 - **R8 — Fidelity/final audit:** remaining assets/descriptions, dedicated-server validation, no Spell Engine/Spell Power leaks.
 
-## R4 validation
+## R4 validation — PASS
 
-After pulling `feature/rogue-spells-port`:
+User-confirmed runtime validation on 2026-09-15.
 
-```powershell
-powershell -ExecutionPolicy Bypass -File .\tools\sync-rogue-r2-assets.ps1
-powershell -ExecutionPolicy Bypass -File .\tools\sync-rogue-r3-assets.ps1
-powershell -ExecutionPolicy Bypass -File .\tools\sync-rogue-r4-assets.ps1
-python .\tools\audit-rogue-r4.py
-.\gradlew clean build
-.\gradlew runClient
-```
-
-Runtime checks:
+Validated behavior:
 
 - Casting Slice & Dice immediately applies its ten-second beneficial effect at amplifier 0, which corresponds to +10% base Attack Damage.
 - Each successful `minecraft:player_attack` melee damage event increments the amplifier exactly once, through amplifier 9 / +100% base Attack Damage.
 - The hit that earns a stack uses the pre-hit amplifier; the increased amplifier applies to subsequent hits because stacking occurs at Forge `LivingDamageEvent` after damage modifiers have already been resolved.
-- The effect's remaining duration must continue counting down instead of returning to ten seconds after a hit.
-- At amplifier 9, additional melee hits must not refresh or alter the effect.
-- Projectiles, spell damage, Shock Powder, Caltrops, environmental damage, misses, canceled damage, and zero-damage hits must not add stacks.
-- Test normal vanilla melee and Better Combat basic combo hits; each actual landed player melee impact should add one stack.
+- The effect's remaining duration continues counting down instead of returning to ten seconds after a hit.
+- At amplifier 9, additional melee hits do not refresh or alter the effect.
+- Projectiles, spell damage, Shock Powder, Caltrops, environmental damage, misses, canceled damage, and zero-damage hits do not add stacks.
+- Normal melee and Better Combat basic combo hits preserve one stack per actual landed player melee impact.
 - The cast uses the frozen Slice & Dice sound and source icon/effect icon. Release presentation is a 20-point circular crit-particle approximation of Spell Engine's dependency-owned `magic_spark` ring.
 - Base cooldown is 15 seconds and remains eligible for normal Iron's Cooldown Reduction.
 
-Do not advance to R5 until the user explicitly reports R4 PASS.
+R4 is locked. R5 Vanish may proceed.
