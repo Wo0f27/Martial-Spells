@@ -28,7 +28,6 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.ClipContext;
-import net.minecraft.world.level.CollisionContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.AABB;
@@ -281,7 +280,7 @@ public final class ShadowstepSpell extends AbstractSpell implements MartialTechn
                 desired.add(0.0D, -GROUND_SEARCH_DEPTH, 0.0D),
                 ClipContext.Block.COLLIDER,
                 ClipContext.Fluid.NONE,
-                CollisionContext.of(caster)
+                caster
         ));
 
         Vec3 candidate = groundHit.getType() == HitResult.Type.BLOCK
