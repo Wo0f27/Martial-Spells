@@ -7,7 +7,9 @@
   "mixins": [
     "MobProneAiMixin",
     "TargetGoalShadowstepMixin",
-    "LivingEntityStealthMixin"
+    "LivingEntityStealthMixin",
+    "LivingEntityAttackStrengthAccessor",
+    "EntityInvulnerabilityAccessor"
   ],
   "client": [],
   "injectors": {

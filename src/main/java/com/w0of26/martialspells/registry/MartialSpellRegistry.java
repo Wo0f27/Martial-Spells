@@ -29,6 +29,7 @@ public final class MartialSpellRegistry {
     public static final RegistryObject<AbstractSpell> SHADOW_STEP = SPELLS.register("shadow_step", ShadowstepSpell::new);
     public static final RegistryObject<AbstractSpell> SLICE_AND_DICE = SPELLS.register("slice_and_dice", SliceAndDiceSpell::new);
     public static final RegistryObject<AbstractSpell> VANISH = SPELLS.register("vanish", VanishSpell::new);
+    public static final RegistryObject<AbstractSpell> MUTILATE = SPELLS.register("mutilate", MutilateSpell::new);
 
     private MartialSpellRegistry() {}
 

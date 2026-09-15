@@ -189,6 +189,14 @@
   "ui.martial_spells.vanish_movement_penalty": "Movement Speed: -%s%% base",
   "ui.martial_spells.vanish_tracking_range": "Enemy Follow Distance: %s blocks",
 
+  "spell.martial_spells.mutilate": "Mutilate",
+  "spell.martial_spells.mutilate.description": "Cross-cut nearby enemies with both hands in a brutal forward melee strike.",
+  "spell.martial_spells.mutilate.guide": "After half of your current melee attack cycle, Mutilate strikes eligible enemies in a 3-block, 160-degree forward arc. Each selected target receives one fully charged vanilla melee attack using your main-hand damage plus the frozen dual-melee offhand contribution, preserving normal weapon enchantments, critical hits, knockback and other melee hooks. An empty offhand still contributes the source framework's base unarmed Attack Damage. Mutilate has a 12-second base cooldown and is affected by normal Cooldown Reduction.",
+  "ui.martial_spells.mutilate_range": "Melee Range: %s blocks",
+  "ui.martial_spells.mutilate_arc": "Forward Arc: %s degrees",
+  "ui.martial_spells.mutilate_dual_damage": "Damage: main-hand melee + offhand weapon/unarmed contribution",
+  "ui.martial_spells.mutilate_delay": "Contact: %s%% of current melee attack cycle",
+
   "effect.martial_spells.stillness_of_mind": "Stillness of Mind",
   "spell.martial_spells.stillness_of_mind": "Stillness of Mind",
   "spell.martial_spells.stillness_of_mind.description": "Transcend the limits of Ki for a brief moment, allowing martial techniques to be used without consuming Ki.",

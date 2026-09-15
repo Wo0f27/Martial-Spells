@@ -28,5 +28,10 @@
     "sounds": [
       "martial_spells:stealth_leave"
     ]
+  },
+  "mutilate_impact": {
+    "sounds": [
+      "martial_spells:mutilate_impact"
+    ]
   }
 }

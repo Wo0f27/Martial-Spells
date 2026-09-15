@@ -30,6 +30,9 @@ public final class MartialSoundRegistry {
     public static final RegistryObject<SoundEvent> STEALTH_LEAVE =
             register("stealth_leave");
 
+    public static final RegistryObject<SoundEvent> MUTILATE_IMPACT =
+            register("mutilate_impact");
+
     private MartialSoundRegistry() {}
 
     private static RegistryObject<SoundEvent> register(String path) {

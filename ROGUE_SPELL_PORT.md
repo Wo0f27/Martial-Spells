@@ -123,12 +123,23 @@ The frozen Spell Engine versions charged small vanilla exhaustion/hunger costs. 
 - source exhaustion 0.3 (omitted by port contract)
 
 ### Mutilate
-- source tier 4; `rogue_blade`
-- physical dual-melee technique
-- strikes using both held weapons' damage
-- forward melee hitbox: width 0.5, height 0.2, arc 160 degrees
-- source attack delay 0.5 and does not allow additional hits on the same target
-- 12 second cooldown
+- source tier 4 / Epic; `rogue_blade`
+- instant cast with `target.type = NONE`; the melee delivery resolves targets at the delayed contact frame
+- school is exactly `spell_power:physical_melee_dual`
+- root spell range is 0 with `range_mechanic = MELEE`; Spell Engine 1.20.1 therefore resolves the attack to the fixed vanilla 3-block melee range
+- one melee-delivery attack with `delay = 0.5`; this is 50% of the caster's resolved melee attack duration, **not** 0.5 seconds
+- hitbox width factor 0.5, height factor 0.2 and arc 160 degrees; at three-block range the source-oriented box is 1.5 blocks wide, 0.6 blocks high and 3 blocks long, with the additional radial/arc/LOS filters
+- `additional_hits_on_same_target = false`; each selected entity appears once in the direct Mutilate target set
+- Spell Engine's physical dual-melee power is the caster's current main-hand Attack Damage plus an offhand contribution calculated as `(base Attack Damage + flat Attack Damage modifiers on the offhand stack) * current Attack Damage multipliers`
+- the offhand stack's flat modifiers are inspected across equipment slots because ordinary weapon Attack Damage modifiers are authored for `MAINHAND` even while that stack is physically held offhand
+- an empty offhand therefore still contributes the player's base unarmed Attack Damage, matching the frozen dual-melee school exactly
+- Spell Engine expresses the difference between single-hand and dual-hand power as a temporary `MULTIPLY_TOTAL` Attack Damage modifier, then lands each selected target through vanilla `player.attack(...)`
+- before every direct Mutilate target, Spell Engine sets the caster's melee recharge ticker to 100 and temporarily clears that target's post-hit invulnerability timer; both values are restored after the technique finishes
+- using vanilla attack delivery preserves weapon enchantments, critical-hit logic, fire aspect, knockback, sweeping and other normal/modded melee hooks
+- source swing sound is Spell Engine's generic `weapon_sword_swing`; the Forge port translates this to vanilla `PLAYER_ATTACK_SWEEP` instead of importing Spell Engine solely for the generic sound
+- source impact sound is exactly `rogues:mutilate_impact`
+- source animation is Spell Engine's `weapon_dual_slash_cross`; no Spell Engine dependency is added solely for that pose
+- 12 second base cooldown; normal Iron's Cooldown Reduction may reduce it
 - source exhaustion 0.4 (omitted by port contract)
 
 ## Checkpoint plan
@@ -138,8 +149,8 @@ The frozen Spell Engine versions charged small vanilla exhaustion/hunger costs. 
 - **R2 — Shock Powder:** PASS — user-confirmed shared stun, exact source range/control cap/cooldown, frozen icon/sounds, and Martial-owned custom smoke/arc VFX.
 - **R3 — Shadowstep:** PASS — user-confirmed required 15-block harmful aim, corrected source-shaped 1.0-block behind-target teleport/ground placement, 30-tick anti-tracking marker, exact departure audio/icon/effect icon and vanilla cloud/poof VFX.
 - **R4 — Slice & Dice:** PASS — user-confirmed ten-second amp-0 start, exact `MULTIPLY_BASE` Attack Damage stacking on successful player melee damage, amp-9 cap, non-refreshing duration, exact icon/effect icon/sound, dependency-free release VFX translation.
-- **R5 — Vanish:** PASS — user-confirmed 8-second Stealth, movement penalty, true invisibility, hostile tracking suppression, source break/removal rules, frozen audio/icons and dependency-free smoke translation.
-- **R6 — Mutilate:** UNLOCKED — next active gameplay checkpoint.
+- **R5 — Vanish:** PASS — user-confirmed 8-second Stealth, movement penalty, true invisibility, 1-block hostile follow distance, source break/removal rules, frozen audio/icons and dependency-free smoke translation.
+- **R6 — Mutilate:** IMPLEMENTED / VALIDATING — delayed source-shaped 3-block/160-degree dual-melee delivery through fully charged vanilla attacks, exact frozen dual-hand damage calculation and impact sound/icon.
 - **R7 — Bear Trap:** locked until explicit R6 PASS.
 - **R8 — Fidelity/final audit:** remaining assets/descriptions, dedicated-server validation, no Spell Engine/Spell Power leaks.
 
@@ -163,8 +174,8 @@ R4 is locked.
 
 ## R5 validation — PASS
 
-User-confirmed runtime validation on 2026-09-15.
+User-confirmed runtime validation on 2026-09-15. R5 is locked and R6 may proceed.
 
-R5 is locked. The validated Vanish implementation remains the frozen baseline for future Rogue checkpoints; any later changes must be treated as explicit regression/fidelity work rather than silently altering R5.
+## R6 validation — pending
 
-R6 Mutilate is unlocked and may proceed.
+Run the R6 asset sync and cumulative audit, then validate Mutilate in runtime. R6 must verify the delayed contact timing, three-block/160-degree target geometry, one direct hit per selected target, main-plus-offhand damage behavior, empty-offhand base contribution, vanilla enchantment/crit/knockback interaction, target i-frame bypass/restoration, exact impact sound/icon, normal Cooldown Reduction, multiplayer/dedicated-server behavior, and R2-R5 regression before the user can mark R6 PASS.
