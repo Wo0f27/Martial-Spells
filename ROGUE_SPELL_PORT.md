@@ -78,7 +78,7 @@ The frozen Spell Engine versions charged small vanilla exhaustion/hunger costs. 
 - instant cast; requires a harmful aimed target within 15 blocks
 - frozen Spell Engine `BEHIND_TARGET` default is **1.0 block**; the older 1.5-block note was incorrect
 - destination is `target.position + target look vector * -1.0`, followed by a ground search up to 1.5 blocks downward
-- Forge translation additionally rejects collision, world-border and build-height unsafe destinations rather than clipping the caster into terrain
+- R3 currently does **not** reject blocked/world-border/build-height destinations; an earlier safety gate made valid casts trigger inconsistently as the target moved or rotated, so validation is target-only for now
 - source release sound is exactly `shadow_step_depart`; the repository's unused `shadow_step_arrive` sound is not imported
 - source teleport VFX are 20 vanilla `cloud` particles on departure and 10 vanilla `poof` particles on arrival
 - applies the beneficial Shadowstep marker for 1.5 seconds / 30 ticks
@@ -120,7 +120,7 @@ The frozen Spell Engine versions charged small vanilla exhaustion/hunger costs. 
 - **R0 — Archaeology/contract:** DONE — exact six-technique inventory and frozen behavior.
 - **R1 — Rogue architecture:** DONE — `ROGUE` technique class + spell tag; no gameplay.
 - **R2 — Shock Powder:** PASS — user-confirmed shared stun, exact source range/control cap/cooldown, frozen icon/sounds, and Martial-owned custom smoke/arc VFX.
-- **R3 — Shadowstep:** VALIDATING — required 15-block harmful aim, safe source-shaped 1.0-block behind-target teleport, 30-tick anti-tracking marker, exact departure audio/icon/effect icon and vanilla cloud/poof VFX.
+- **R3 — Shadowstep:** VALIDATING — required 15-block harmful aim, source-shaped 1.0-block behind-target teleport without a destination rejection gate, 30-tick anti-tracking marker, exact departure audio/icon/effect icon and vanilla cloud/poof VFX.
 - **R4 — Slice & Dice:** fixed-duration melee-hit stacking and exact attack-damage operation.
 - **R5 — Vanish:** stealth, target suppression, visual state, and all source break conditions.
 - **R6 — Mutilate:** dual-held-weapon damage and source cone/melee delivery behavior.
@@ -143,7 +143,7 @@ Runtime checks:
 
 - Shadowstep requires a non-allied living target under the crosshair within 15 blocks; no valid target means no successful cast.
 - The caster arrives roughly one block behind the target using the target's facing and turns to the target's yaw.
-- The cast is rejected with an action-bar message if the behind-target destination is obstructed or outside safe world bounds.
+- Blocked-destination rejection is intentionally disabled during R3 validation; test normal/uneven terrain first and note any clipping cases separately rather than treating them as cast failures.
 - Departure uses the frozen sound plus 20 vanilla cloud particles; arrival uses 10 vanilla poof particles and no arrival sound.
 - The Shadowstep effect lasts 1.5 seconds / 30 ticks.
 - During that marker, a hostile mob already targeting the caster should stop maintaining that target once the caster is beyond the source-faithful 5-block target-goal follow distance; normal tracking returns when the marker expires.
