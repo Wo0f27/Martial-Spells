@@ -171,6 +171,15 @@
   "ui.martial_spells.shadow_step_untraceable": "Reduced Tracking: %s seconds at %s blocks",
   "ui.martial_spells.shadow_step_blocked": "There is no safe space behind that target.",
 
+  "effect.martial_spells.slice_and_dice": "Slice & Dice",
+  "effect.martial_spells.slice_and_dice.description": "Increases attack damage",
+  "spell.martial_spells.slice_and_dice": "Slice & Dice",
+  "spell.martial_spells.slice_and_dice.description": "Enter a battle trance. Each successful melee hit increases your attack damage for the trance's remaining duration.",
+  "spell.martial_spells.slice_and_dice.guide": "Gain +10% base Attack Damage immediately for 10 seconds. Each successful player melee hit adds another +10% base Attack Damage, up to +100%. Hits do not refresh the original 10-second duration. Slice & Dice has a 15-second base cooldown and is affected by normal Cooldown Reduction.",
+  "ui.martial_spells.slice_and_dice_duration": "Duration: %s seconds",
+  "ui.martial_spells.slice_and_dice_initial_bonus": "Initial Attack Damage: +%s%% base",
+  "ui.martial_spells.slice_and_dice_max_bonus": "Maximum Attack Damage: +%s%% base",
+
   "effect.martial_spells.stillness_of_mind": "Stillness of Mind",
   "spell.martial_spells.stillness_of_mind": "Stillness of Mind",
   "spell.martial_spells.stillness_of_mind.description": "Transcend the limits of Ki for a brief moment, allowing martial techniques to be used without consuming Ki.",

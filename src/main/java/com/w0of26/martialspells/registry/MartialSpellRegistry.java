@@ -27,6 +27,7 @@ public final class MartialSpellRegistry {
     public static final RegistryObject<AbstractSpell> CALTROPS = SPELLS.register("caltrops", CaltropsSpell::new);
     public static final RegistryObject<AbstractSpell> SHOCK_POWDER = SPELLS.register("shock_powder", ShockPowderSpell::new);
     public static final RegistryObject<AbstractSpell> SHADOW_STEP = SPELLS.register("shadow_step", ShadowstepSpell::new);
+    public static final RegistryObject<AbstractSpell> SLICE_AND_DICE = SPELLS.register("slice_and_dice", SliceAndDiceSpell::new);
 
     private MartialSpellRegistry() {}
 

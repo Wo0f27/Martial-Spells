@@ -13,5 +13,10 @@
     "sounds": [
       "martial_spells:shadow_step_depart"
     ]
+  },
+  "slice_and_dice": {
+    "sounds": [
+      "martial_spells:slice_and_dice"
+    ]
   }
 }

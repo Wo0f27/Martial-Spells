@@ -21,6 +21,9 @@ public final class MartialSoundRegistry {
     public static final RegistryObject<SoundEvent> SHADOW_STEP_DEPART =
             register("shadow_step_depart");
 
+    public static final RegistryObject<SoundEvent> SLICE_AND_DICE =
+            register("slice_and_dice");
+
     private MartialSoundRegistry() {}
 
     private static RegistryObject<SoundEvent> register(String path) {

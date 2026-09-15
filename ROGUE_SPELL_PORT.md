@@ -54,10 +54,18 @@ The frozen Spell Engine versions charged small vanilla exhaustion/hunger costs. 
 
 ### Slice & Dice
 - source tier 2; `rogue_blade`
-- 10 second hard-duration battle trance
-- each melee impact adds another +10% base attack-damage stack
-- source cap is amplifier 9 and the duration does not refresh on stacking
-- 15 second cooldown
+- instant self battle trance using a 10 second `STASH_EFFECT`
+- the initial stash is amplifier 0 and therefore immediately grants +10% base Attack Damage
+- each `MELEE_IMPACT` adds one amplifier, so amp 1 is +20%, through amp 9 at +100%
+- the Attack Damage operation is `MULTIPLY_BASE`, exactly 0.1 per amplifier level
+- source amplifier cap is 9
+- impact stacking has `refresh_duration = false`; the original ten-second countdown never resets on hits
+- `consume = 0`; successful hits do not consume the trance
+- initial stash particles are hidden; impact-updated stacks show the normal effect particles
+- source release sound is `rogues:slice_and_dice`
+- source release VFX are 20 Spell Engine `magic_spark` particles in a centered radius-1 circle; Martial Spells translates this dependency-owned effect to a 20-point vanilla crit ring
+- source release animation is Spell Engine's `dual_handed_weapon_charge`; the Forge port does not add Spell Engine solely for that generic pose
+- 15 second base cooldown; normal Iron's Cooldown Reduction may reduce it
 - source exhaustion 0.2 (omitted by port contract)
 
 ### Shock Powder
@@ -78,15 +86,15 @@ The frozen Spell Engine versions charged small vanilla exhaustion/hunger costs. 
 - instant cast; requires a harmful aimed target within 15 blocks
 - frozen Spell Engine `BEHIND_TARGET` default is **1.0 block**; the older 1.5-block note was incorrect
 - destination is `target.position + target look vector * -1.0`, followed by a ground search up to 1.5 blocks downward
+- the Forge ground search starts one block above the requested destination, matching the source helper's boundary-safe ground search and preventing the caster from being placed inside the supporting block
 - R3 does **not** reject blocked/world-border/build-height destinations; an earlier safety gate made valid casts trigger inconsistently as the target moved or rotated, so validation is target-only
-- ground resolution uses the source-style pre-lifted downward ray so the player lands on the supporting collision surface instead of phasing into the block below
 - source release sound is exactly `shadow_step_depart`; the repository's unused `shadow_step_arrive` sound is not imported
 - source teleport VFX are 20 vanilla `cloud` particles on departure and 10 vanilla `poof` particles on arrival
 - applies the beneficial Shadowstep marker for 1.5 seconds / 30 ticks
 - while marked, hostile `TargetGoal` follow distance against the caster becomes 5 blocks
 - 12 second base cooldown; normal Iron's Cooldown Reduction may reduce it
 - source exhaustion 0.4 (omitted by port contract)
-- source `spell_engine:one_handed_area_release` presentation is translated to Iron's native instant-cast animation; no Spell Engine dependency is added
+- source `spell_engine:one_handed_area_release` presentation is translated without adding Spell Engine as a dependency
 
 ### Vanish
 - source tier 4; `rogue_subtlety`
@@ -121,15 +129,36 @@ The frozen Spell Engine versions charged small vanilla exhaustion/hunger costs. 
 - **R0 — Archaeology/contract:** DONE — exact six-technique inventory and frozen behavior.
 - **R1 — Rogue architecture:** DONE — `ROGUE` technique class + spell tag; no gameplay.
 - **R2 — Shock Powder:** PASS — user-confirmed shared stun, exact source range/control cap/cooldown, frozen icon/sounds, and Martial-owned custom smoke/arc VFX.
-- **R3 — Shadowstep:** PASS — user-confirmed 15-block harmful targeting, 1.0-block behind-target teleport with corrected ground placement, 30-tick anti-tracking marker, exact departure audio/icon/effect icon, and upstream vanilla cloud/poof VFX.
-- **R4 — Slice & Dice:** NEXT — fixed-duration melee-hit stacking and exact attack-damage operation.
+- **R3 — Shadowstep:** PASS — user-confirmed required 15-block harmful aim, corrected source-shaped 1.0-block behind-target teleport/ground placement, 30-tick anti-tracking marker, exact departure audio/icon/effect icon and vanilla cloud/poof VFX.
+- **R4 — Slice & Dice:** VALIDATING — ten-second amp-0 start, exact `MULTIPLY_BASE` Attack Damage stacking on successful player melee damage, amp-9 cap, non-refreshing duration, exact icon/effect icon/sound, dependency-free release VFX translation.
 - **R5 — Vanish:** stealth, target suppression, visual state, and all source break conditions.
 - **R6 — Mutilate:** dual-held-weapon damage and source cone/melee delivery behavior.
 - **R7 — Bear Trap:** three-placement server-owned trap entities, one-shot trigger, root and lifecycle.
 - **R8 — Fidelity/final audit:** remaining assets/descriptions, dedicated-server validation, no Spell Engine/Spell Power leaks.
 
-## R3 validation
+## R4 validation
 
-R3 was user-confirmed PASS after correcting the ground-placement ray so Shadowstep consistently lands on the supporting terrain surface. The source-faithful white vanilla `cloud`/`poof` VFX are retained intentionally.
+After pulling `feature/rogue-spells-port`:
 
-R4 is now unlocked.
+```powershell
+powershell -ExecutionPolicy Bypass -File .\tools\sync-rogue-r2-assets.ps1
+powershell -ExecutionPolicy Bypass -File .\tools\sync-rogue-r3-assets.ps1
+powershell -ExecutionPolicy Bypass -File .\tools\sync-rogue-r4-assets.ps1
+python .\tools\audit-rogue-r4.py
+.\gradlew clean build
+.\gradlew runClient
+```
+
+Runtime checks:
+
+- Casting Slice & Dice immediately applies its ten-second beneficial effect at amplifier 0, which corresponds to +10% base Attack Damage.
+- Each successful `minecraft:player_attack` melee damage event increments the amplifier exactly once, through amplifier 9 / +100% base Attack Damage.
+- The hit that earns a stack uses the pre-hit amplifier; the increased amplifier applies to subsequent hits because stacking occurs at Forge `LivingDamageEvent` after damage modifiers have already been resolved.
+- The effect's remaining duration must continue counting down instead of returning to ten seconds after a hit.
+- At amplifier 9, additional melee hits must not refresh or alter the effect.
+- Projectiles, spell damage, Shock Powder, Caltrops, environmental damage, misses, canceled damage, and zero-damage hits must not add stacks.
+- Test normal vanilla melee and Better Combat basic combo hits; each actual landed player melee impact should add one stack.
+- The cast uses the frozen Slice & Dice sound and source icon/effect icon. Release presentation is a 20-point circular crit-particle approximation of Spell Engine's dependency-owned `magic_spark` ring.
+- Base cooldown is 15 seconds and remains eligible for normal Iron's Cooldown Reduction.
+
+Do not advance to R5 until the user explicitly reports R4 PASS.
