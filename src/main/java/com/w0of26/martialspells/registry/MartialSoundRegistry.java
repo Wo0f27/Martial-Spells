@@ -18,6 +18,9 @@ public final class MartialSoundRegistry {
     public static final RegistryObject<SoundEvent> SHOCK_POWDER_IMPACT =
             register("shock_powder_impact");
 
+    public static final RegistryObject<SoundEvent> SHADOW_STEP_DEPART =
+            register("shadow_step_depart");
+
     private MartialSoundRegistry() {}
 
     private static RegistryObject<SoundEvent> register(String path) {

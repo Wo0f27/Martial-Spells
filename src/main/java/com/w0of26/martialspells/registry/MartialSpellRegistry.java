@@ -26,6 +26,7 @@ public final class MartialSpellRegistry {
     public static final RegistryObject<AbstractSpell> ENTANGLING_ARROW = SPELLS.register("entangling_arrow", EntanglingArrowSpell::new);
     public static final RegistryObject<AbstractSpell> CALTROPS = SPELLS.register("caltrops", CaltropsSpell::new);
     public static final RegistryObject<AbstractSpell> SHOCK_POWDER = SPELLS.register("shock_powder", ShockPowderSpell::new);
+    public static final RegistryObject<AbstractSpell> SHADOW_STEP = SPELLS.register("shadow_step", ShadowstepSpell::new);
 
     private MartialSpellRegistry() {}
 

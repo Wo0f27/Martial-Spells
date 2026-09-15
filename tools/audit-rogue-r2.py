@@ -148,7 +148,8 @@ for relative in (
     if values.count("martial_spells:shock_powder") != 1:
         errors.append(f"Shock Powder duplicated in {relative}")
 
-# Sound definitions are deliberately only the two source-owned R2 sounds.
+# R2 owns these two sound definitions. Later Rogue checkpoints may add more
+# sound events to the same sounds.json, so verify the R2 entries as a subset.
 sounds_path = root / "src/main/resources/assets/martial_spells/sounds.json"
 expected_sounds = {
     "shock_powder_release": {"sounds": ["martial_spells:shock_powder_release"]},
@@ -158,8 +159,9 @@ if not sounds_path.is_file():
     errors.append("missing assets/martial_spells/sounds.json")
 else:
     sounds = json.loads(sounds_path.read_text())
-    if sounds != expected_sounds:
-        errors.append(f"R2 sounds.json drifted: {sounds}")
+    for key, expected in expected_sounds.items():
+        if sounds.get(key) != expected:
+            errors.append(f"R2 sound definition drifted for {key}: {sounds.get(key)}")
 
 # Frozen binary identity for Rogues-owned icon/audio. These assets are synced
 # locally and must remain byte-identical to the frozen upstream source.

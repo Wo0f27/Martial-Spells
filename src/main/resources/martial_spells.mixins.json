@@ -5,22 +5,10 @@
   "compatibilityLevel": "JAVA_17",
   "refmap": "martial_spells.refmap.json",
   "mixins": [
-    "MagicManagerMixin",
-    "MagicArrowSpellAnimationMixin",
     "MobProneAiMixin",
-    "MobEffectInstanceAccessor"
+    "TargetGoalShadowstepMixin"
   ],
-  "client": [
-    "client.PlayerItemInHandLayerMixin",
-    "client.ItemInHandLayerMixin",
-    "client.ItemPropertiesMixin",
-    "client.MagicArrowPlayerRendererMixin",
-    "client.MagicArrowHumanoidModelMixin",
-    "client.MagicArrowChargeSpellLayerMixin",
-    "client.compat.bettercombat.BetterCombatMagicArrowCastingMixin",
-    "client.compat.cataclysm.CursedBowPullMixin",
-    "client.compat.cataclysm.WrathOfTheDesertPullMixin"
-  ],
+  "client": [],
   "injectors": {
     "defaultRequire": 1
   }

@@ -8,5 +8,10 @@
     "sounds": [
       "martial_spells:shock_powder_impact"
     ]
+  },
+  "shadow_step_depart": {
+    "sounds": [
+      "martial_spells:shadow_step_depart"
+    ]
   }
 }

@@ -162,6 +162,15 @@
   "ui.martial_spells.shock_powder_stun_duration": "Stun Duration: %s seconds",
   "ui.martial_spells.shock_powder_control_limit": "Control Limit: %s target max health",
 
+  "effect.martial_spells.shadow_step": "Shadowstep",
+  "spell.martial_spells.shadow_step": "Shadowstep",
+  "spell.martial_spells.shadow_step.description": "Step through the shadows to appear behind a targeted enemy, briefly disrupting their ability to track you.",
+  "spell.martial_spells.shadow_step.guide": "Requires a non-allied living target within 15 blocks. Shadowstep teleports you one block behind the target using its facing, then reduces hostile target-goal tracking range against you to 5 blocks for 1.5 seconds. The base cooldown is 12 seconds and can be reduced by Cooldown Reduction.",
+  "ui.martial_spells.shadow_step_range": "Target Range: %s blocks",
+  "ui.martial_spells.shadow_step_distance": "Behind Target: %s blocks",
+  "ui.martial_spells.shadow_step_untraceable": "Reduced Tracking: %s seconds at %s blocks",
+  "ui.martial_spells.shadow_step_blocked": "There is no safe space behind that target.",
+
   "effect.martial_spells.stillness_of_mind": "Stillness of Mind",
   "spell.martial_spells.stillness_of_mind": "Stillness of Mind",
   "spell.martial_spells.stillness_of_mind.description": "Transcend the limits of Ki for a brief moment, allowing martial techniques to be used without consuming Ki.",

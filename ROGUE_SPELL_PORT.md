@@ -75,12 +75,17 @@ The frozen Spell Engine versions charged small vanilla exhaustion/hunger costs. 
 
 ### Shadowstep
 - source tier 3; `rogue_subtlety`
-- required aimed target within 15 blocks
-- teleport 1.5 blocks behind the target
-- applies a 1.5 second untraceable period used by source mob-targeting behavior
-- 12 second cooldown
+- instant cast; requires a harmful aimed target within 15 blocks
+- frozen Spell Engine `BEHIND_TARGET` default is **1.0 block**; the older 1.5-block note was incorrect
+- destination is `target.position + target look vector * -1.0`, followed by a ground search up to 1.5 blocks downward
+- Forge translation additionally rejects collision, world-border and build-height unsafe destinations rather than clipping the caster into terrain
+- source release sound is exactly `shadow_step_depart`; the repository's unused `shadow_step_arrive` sound is not imported
+- source teleport VFX are 20 vanilla `cloud` particles on departure and 10 vanilla `poof` particles on arrival
+- applies the beneficial Shadowstep marker for 1.5 seconds / 30 ticks
+- while marked, hostile `TargetGoal` follow distance against the caster becomes 5 blocks
+- 12 second base cooldown; normal Iron's Cooldown Reduction may reduce it
 - source exhaustion 0.4 (omitted by port contract)
-- Forge port must use safe destination/collision validation rather than force a teleport into blocked space
+- source `spell_engine:one_handed_area_release` presentation is translated to Iron's native instant-cast animation; no Spell Engine dependency is added
 
 ### Vanish
 - source tier 4; `rogue_subtlety`
@@ -115,29 +120,33 @@ The frozen Spell Engine versions charged small vanilla exhaustion/hunger costs. 
 - **R0 — Archaeology/contract:** DONE — exact six-technique inventory and frozen behavior.
 - **R1 — Rogue architecture:** DONE — `ROGUE` technique class + spell tag; no gameplay.
 - **R2 — Shock Powder:** PASS — user-confirmed shared stun, exact source range/control cap/cooldown, frozen icon/sounds, and Martial-owned custom smoke/arc VFX.
-- **R3 — Shadowstep:** NEXT — targeting, safe behind-target teleport, brief untraceable state.
+- **R3 — Shadowstep:** VALIDATING — required 15-block harmful aim, safe source-shaped 1.0-block behind-target teleport, 30-tick anti-tracking marker, exact departure audio/icon/effect icon and vanilla cloud/poof VFX.
 - **R4 — Slice & Dice:** fixed-duration melee-hit stacking and exact attack-damage operation.
 - **R5 — Vanish:** stealth, target suppression, visual state, and all source break conditions.
 - **R6 — Mutilate:** dual-held-weapon damage and source cone/melee delivery behavior.
 - **R7 — Bear Trap:** three-placement server-owned trap entities, one-shot trigger, root and lifecycle.
 - **R8 — Fidelity/final audit:** remaining assets/descriptions, dedicated-server validation, no Spell Engine/Spell Power leaks.
 
-## R2 validation
+## R3 validation
 
 After pulling `feature/rogue-spells-port`:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\tools\sync-rogue-r2-assets.ps1
-python .\tools\audit-rogue-r2.py
+powershell -ExecutionPolicy Bypass -File .\tools\sync-rogue-r3-assets.ps1
+python .\tools\audit-rogue-r3.py
 .\gradlew clean build
 .\gradlew runClient
 ```
 
-Runtime presentation regression:
+Runtime checks:
 
-- Shock Powder still has the frozen icon and release/impact audio.
-- The release now shows Martial-owned gray powder-smoke sprites instead of vanilla smoke/cloud textures.
-- Two short pale-violet electrical sprite variants appear in the source-faithful 6 + 8 arc batches.
-- Stun duration, radius, vertical reach, LOS, control-health cap, ally filtering, zero mana, and 16-second base cooldown are unchanged from the already-tested R2 gameplay implementation.
+- Shadowstep requires a non-allied living target under the crosshair within 15 blocks; no valid target means no successful cast.
+- The caster arrives roughly one block behind the target using the target's facing and turns to the target's yaw.
+- The cast is rejected with an action-bar message if the behind-target destination is obstructed or outside safe world bounds.
+- Departure uses the frozen sound plus 20 vanilla cloud particles; arrival uses 10 vanilla poof particles and no arrival sound.
+- The Shadowstep effect lasts 1.5 seconds / 30 ticks.
+- During that marker, a hostile mob already targeting the caster should stop maintaining that target once the caster is beyond the source-faithful 5-block target-goal follow distance; normal tracking returns when the marker expires.
+- Base cooldown is 12 seconds and remains eligible for normal Iron's Cooldown Reduction.
 
-**Result: PASS — user-confirmed. R3 is unlocked.**
+Do not advance to R4 until the user explicitly reports R3 PASS.

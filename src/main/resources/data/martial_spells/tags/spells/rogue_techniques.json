@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "martial_spells:shock_powder"
+    "martial_spells:shock_powder",
+    "martial_spells:shadow_step"
   ]
 }
