@@ -50,6 +50,7 @@ public final class ShadowstepSpell extends AbstractSpell implements MartialTechn
     public static final float RANGE = 15.0F;
     public static final float BEHIND_TARGET_DISTANCE = 1.0F;
     public static final float GROUND_SEARCH_DEPTH = 1.5F;
+    public static final double GROUND_SEARCH_PRE_LIFT = 1.0D;
     public static final int SHADOWSTEP_DURATION_TICKS = 30;
     public static final double STEALTH_FOLLOW_DISTANCE = 5.0D;
     public static final int BASE_COOLDOWN_SECONDS = 12;
@@ -189,12 +190,12 @@ public final class ShadowstepSpell extends AbstractSpell implements MartialTechn
         serverLevel.sendParticles(
                 ParticleTypes.CLOUD,
                 departure.x,
-                departure.y + caster.getBbHeight() * 0.5D,
+                departure.y + caster.getBbHeight() * 0.1D,
                 departure.z,
                 DEPART_PARTICLES,
-                0.45D,
-                0.55D,
-                0.45D,
+                0.75D,
+                0.75D,
+                0.75D,
                 0.075D
         );
         caster.gameEvent(GameEvent.TELEPORT);
@@ -220,12 +221,12 @@ public final class ShadowstepSpell extends AbstractSpell implements MartialTechn
         serverLevel.sendParticles(
                 ParticleTypes.POOF,
                 destination.x,
-                destination.y + caster.getBbHeight() * 0.5D,
+                destination.y + caster.getBbHeight() * 0.1D,
                 destination.z,
                 ARRIVE_PARTICLES,
-                0.35D,
-                0.45D,
-                0.35D,
+                0.15D,
+                0.15D,
+                0.15D,
                 0.075D
         );
 
@@ -250,9 +251,16 @@ public final class ShadowstepSpell extends AbstractSpell implements MartialTechn
                 target.getLookAngle().scale(-BEHIND_TARGET_DISTANCE)
         );
 
+        // Spell Engine deliberately begins its downward ground search one block
+        // above the requested destination. Starting exactly on a block boundary
+        // can produce an "inside block" ray hit slightly below the surface,
+        // which is what caused the Forge translation to bury the caster by one
+        // block during some Shadowsteps.
+        Vec3 groundSearchStart = desired.add(0.0D, GROUND_SEARCH_PRE_LIFT, 0.0D);
+        Vec3 groundSearchEnd = desired.add(0.0D, -GROUND_SEARCH_DEPTH, 0.0D);
         HitResult groundHit = level.clip(new ClipContext(
-                desired,
-                desired.add(0.0D, -GROUND_SEARCH_DEPTH, 0.0D),
+                groundSearchStart,
+                groundSearchEnd,
                 ClipContext.Block.COLLIDER,
                 ClipContext.Fluid.NONE,
                 caster
