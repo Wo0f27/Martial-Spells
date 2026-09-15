@@ -20,6 +20,7 @@ public final class MartialSpells {
         MartialEffectRegistry.register(modEventBus);
         MartialEntityRegistry.register(modEventBus);
         MartialParticleRegistry.register(modEventBus);
+        MartialSoundRegistry.register(modEventBus);
         MartialSpellRegistry.register(modEventBus);
         MartialItemRegistry.register(modEventBus);
         MartialRecipeRegistry.register(modEventBus);

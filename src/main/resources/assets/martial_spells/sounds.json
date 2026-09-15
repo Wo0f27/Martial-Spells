@@ -1,0 +1,12 @@
+{
+  "shock_powder_release": {
+    "sounds": [
+      "martial_spells:shock_powder_release"
+    ]
+  },
+  "shock_powder_impact": {
+    "sounds": [
+      "martial_spells:shock_powder_impact"
+    ]
+  }
+}

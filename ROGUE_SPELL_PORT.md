@@ -38,6 +38,18 @@ Planned IDs:
 
 Do not import Spell Engine or Spell Power as dependencies. Iron's Spells 'n Spellbooks remains the casting framework.
 
+## Port resource contract
+
+The frozen Spell Engine versions charged small vanilla exhaustion/hunger costs. Martial Spells deliberately omits those legacy costs and keeps its established Iron's technique model instead:
+
+- Martial school;
+- zero mana for the Rogue techniques unless a later design checkpoint explicitly changes that;
+- no legacy Spell Engine exhaustion cost;
+- source base cooldown preserved;
+- normal Iron's Cooldown Reduction remains available where the source cooldown was haste-affected;
+- source targeting/control/damage behavior preserved;
+- single spell level during the fidelity port; level scaling is a separate future design pass, not invented during migration.
+
 ## Frozen source behavior
 
 ### Slice & Dice
@@ -46,16 +58,18 @@ Do not import Spell Engine or Spell Power as dependencies. Iron's Spells 'n Spel
 - each melee impact adds another +10% base attack-damage stack
 - source cap is amplifier 9 and the duration does not refresh on stacking
 - 15 second cooldown
-- source exhaustion 0.2
+- source exhaustion 0.2 (omitted by port contract)
 
 ### Shock Powder
 - source tier 2; `rogue_subtlety`
 - instant 5-block centered area; vertical range multiplier 0.5
 - 2 second true stun
 - source control apply limit: health base 50 + 2x physical-melee spell power
-- 16 second cooldown
-- source exhaustion 0.3
-- Martial Spells must reuse its shared stun service rather than create a second stun implementation
+- frozen physical-melee power is current vanilla Attack Damage, so the Forge translation is `50 + 2x Attack Damage`
+- 16 second base cooldown; normal Iron's Cooldown Reduction may reduce it
+- source exhaustion 0.3 (omitted by port contract)
+- Martial Spells reuses its shared `StunService` rather than creating a second stun implementation
+- exact upstream icon and release/impact sounds are retained; Spell Engine-owned smoke/lightning particles are translated to vanilla smoke/cloud/electric particles
 
 ### Shadowstep
 - source tier 3; `rogue_subtlety`
@@ -63,7 +77,7 @@ Do not import Spell Engine or Spell Power as dependencies. Iron's Spells 'n Spel
 - teleport 1.5 blocks behind the target
 - applies a 1.5 second untraceable period used by source mob-targeting behavior
 - 12 second cooldown
-- source exhaustion 0.4
+- source exhaustion 0.4 (omitted by port contract)
 - Forge port must use safe destination/collision validation rather than force a teleport into blocked space
 
 ### Vanish
@@ -73,7 +87,7 @@ Do not import Spell Engine or Spell Power as dependencies. Iron's Spells 'n Spel
 - stealth breaks on attacking, taking a hit, using an item, or casting another spell
 - stealth affects enemy targeting in addition to visual presentation
 - 30 second cooldown
-- source exhaustion 0.4
+- source exhaustion 0.4 (omitted by port contract)
 
 ### Bear Trap
 - source tier 3; `rogue_blade`
@@ -83,7 +97,7 @@ Do not import Spell Engine or Spell Power as dependencies. Iron's Spells 'n Spel
 - root prevents movement and jumping while still allowing attacks, item use, and casting
 - source control apply limit: health base 100 + 2x physical-melee spell power
 - 15 second cooldown
-- source exhaustion 0.3
+- source exhaustion 0.3 (omitted by port contract)
 
 ### Mutilate
 - source tier 4; `rogue_blade`
@@ -92,20 +106,29 @@ Do not import Spell Engine or Spell Power as dependencies. Iron's Spells 'n Spel
 - forward melee hitbox: width 0.5, height 0.2, arc 160 degrees
 - source attack delay 0.5 and does not allow additional hits on the same target
 - 12 second cooldown
-- source exhaustion 0.4
+- source exhaustion 0.4 (omitted by port contract)
 
 ## Checkpoint plan
 
-- **R0 — Archaeology/contract:** exact six-technique inventory and frozen behavior.
-- **R1 — Rogue architecture:** `ROGUE` technique class + spell tag; no gameplay yet.
-- **R2 — Shock Powder:** shared-stun integration, source radius/control rules, VFX/SFX checkpoint.
+- **R0 — Archaeology/contract:** DONE — exact six-technique inventory and frozen behavior.
+- **R1 — Rogue architecture:** DONE — `ROGUE` technique class + spell tag; no gameplay.
+- **R2 — Shock Powder:** VALIDATING — shared stun, exact source range/control cap/cooldown, frozen icon/sounds, translated dependency-free VFX.
 - **R3 — Shadowstep:** targeting, safe behind-target teleport, brief untraceable state.
 - **R4 — Slice & Dice:** fixed-duration melee-hit stacking and exact attack-damage operation.
 - **R5 — Vanish:** stealth, target suppression, visual state, and all source break conditions.
 - **R6 — Mutilate:** dual-held-weapon damage and source cone/melee delivery behavior.
 - **R7 — Bear Trap:** three-placement server-owned trap entities, one-shot trigger, root and lifecycle.
-- **R8 — Fidelity/final audit:** assets, sounds, descriptions, dedicated-server validation, no Spell Engine/Spell Power leaks.
+- **R8 — Fidelity/final audit:** remaining assets/descriptions, dedicated-server validation, no Spell Engine/Spell Power leaks.
 
-## Open contract item
+## R2 validation
 
-Source Spell Engine techniques charge vanilla exhaustion/hunger (`0.2` to `0.4`). Existing Martial Spells techniques are built around Iron's casting and generally do not reproduce Spell Engine exhaustion. Before gameplay checkpoints are finalized, choose whether Rogue techniques should preserve those hunger/exhaustion costs or deliberately omit them in favor of the established Martial Spells resource/cooldown model.
+After pulling `feature/rogue-spells-port`:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\tools\sync-rogue-r2-assets.ps1
+python .\tools\audit-rogue-r2.py
+.\gradlew clean build
+.\gradlew runClient
+```
+
+Do not advance to R3 until the user explicitly reports R2 PASS.

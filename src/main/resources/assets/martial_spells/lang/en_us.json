@@ -156,6 +156,12 @@
   "ui.martial_spells.caltrops_slow": "Slowness %s",
   "ui.martial_spells.caltrops_duration": "Field Duration: %s seconds",
 
+  "spell.martial_spells.shock_powder": "Shock Powder",
+  "spell.martial_spells.shock_powder.description": "Scatter electrified powder around you, stunning nearby enemies that can be overwhelmed.",
+  "spell.martial_spells.shock_powder.guide": "Instantly releases shock powder in a 5-block area. Eligible non-allied targets are stunned for 2 seconds. Targets whose maximum health exceeds 50 + twice your current Attack Damage resist the control effect. Martial stun resistance and immunity rules still apply.",
+  "ui.martial_spells.shock_powder_stun_duration": "Stun Duration: %s seconds",
+  "ui.martial_spells.shock_powder_control_limit": "Control Limit: %s target max health",
+
   "effect.martial_spells.stillness_of_mind": "Stillness of Mind",
   "spell.martial_spells.stillness_of_mind": "Stillness of Mind",
   "spell.martial_spells.stillness_of_mind.description": "Transcend the limits of Ki for a brief moment, allowing martial techniques to be used without consuming Ki.",
