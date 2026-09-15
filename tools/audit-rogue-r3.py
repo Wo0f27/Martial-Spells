@@ -48,6 +48,7 @@ required_spell_markers = (
     "public static final float RANGE = 15.0F;",
     "public static final float BEHIND_TARGET_DISTANCE = 1.0F;",
     "public static final float GROUND_SEARCH_DEPTH = 1.5F;",
+    "public static final double GROUND_SEARCH_PRE_LIFT = 1.0D;",
     "public static final int SHADOWSTEP_DURATION_TICKS = 30;",
     "public static final double STEALTH_FOLLOW_DISTANCE = 5.0D;",
     "public static final int BASE_COOLDOWN_SECONDS = 12;",
@@ -63,6 +64,8 @@ required_spell_markers = (
     "TargetEntityCastData",
     "!caster.isAlliedTo(target)",
     "target.getLookAngle().scale(-BEHIND_TARGET_DISTANCE)",
+    "Vec3 groundSearchStart = desired.add(0.0D, GROUND_SEARCH_PRE_LIFT, 0.0D);",
+    "Vec3 groundSearchEnd = desired.add(0.0D, -GROUND_SEARCH_DEPTH, 0.0D);",
     "ClipContext.Block.COLLIDER",
     "ClipContext.Fluid.NONE",
     "Vec3 destination = resolveDestination(serverLevel, caster, target);",
@@ -70,6 +73,8 @@ required_spell_markers = (
     "MartialSoundRegistry.SHADOW_STEP_DEPART.get()",
     "ParticleTypes.CLOUD",
     "ParticleTypes.POOF",
+    "departure.y + caster.getBbHeight() * 0.1D",
+    "destination.y + caster.getBbHeight() * 0.1D",
     "MartialEffectRegistry.SHADOW_STEP.get()",
     "SpellAnimations.ANIMATION_INSTANT_CAST",
 )
@@ -201,6 +206,7 @@ if errors:
 
 print("R3 static: Shadowstep registered as a single-level Rogue Martial technique")
 print("Behavior: required 15-block harmful aim / source-shaped 1.0-block behind-target teleport / 30-tick 5-block anti-tracking")
+print("Ground placement: source-shaped 1-block pre-lift + 1.5-block downward search prevents below-surface burial")
 print("Destination gate: disabled for R3 validation; no collision/world-border/build-height rejection")
-print("Fidelity: frozen icon/effect icon + departure sound / 20 cloud depart + 10 poof arrive")
+print("Fidelity: frozen icon/effect icon + departure sound / source vanilla white cloud + poof particle IDs")
 print("R3 STATIC AUDIT PASSED")
