@@ -16,7 +16,6 @@ import io.redspace.ironsspellbooks.api.spells.SpellRarity;
 import io.redspace.ironsspellbooks.api.util.AnimationHolder;
 import io.redspace.ironsspellbooks.api.util.Utils;
 import io.redspace.ironsspellbooks.capabilities.magic.TargetEntityCastData;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -30,7 +29,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.GameEvent;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
@@ -143,7 +141,9 @@ public final class ShadowstepSpell extends AbstractSpell implements MartialTechn
             LivingEntity caster,
             MagicData playerMagicData
     ) {
-        boolean hasTarget = Utils.preCastTargetHelper(
+        // Keep pre-cast validation target-only. Destination collision rejection
+        // made Shadowstep trigger inconsistently as the target moved/rotated.
+        return Utils.preCastTargetHelper(
                 level,
                 caster,
                 playerMagicData,
@@ -153,26 +153,6 @@ public final class ShadowstepSpell extends AbstractSpell implements MartialTechn
                 true,
                 target -> target != caster && !caster.isAlliedTo(target)
         );
-
-        if (!hasTarget) {
-            return false;
-        }
-
-        if (level instanceof ServerLevel serverLevel
-                && playerMagicData.getAdditionalCastData() instanceof TargetEntityCastData targetData) {
-            LivingEntity target = targetData.getTarget(serverLevel);
-            if (target == null || resolveSafeDestination(serverLevel, caster, target).isEmpty()) {
-                if (caster instanceof ServerPlayer serverPlayer) {
-                    serverPlayer.displayClientMessage(
-                            Component.translatable("ui.martial_spells.shadow_step_blocked"),
-                            true
-                    );
-                }
-                return false;
-            }
-        }
-
-        return true;
     }
 
     @Override
@@ -193,13 +173,8 @@ public final class ShadowstepSpell extends AbstractSpell implements MartialTechn
             return;
         }
 
-        Optional<Vec3> destinationResult = resolveSafeDestination(serverLevel, caster, target);
-        if (destinationResult.isEmpty()) {
-            return;
-        }
-
         Vec3 departure = caster.position();
-        Vec3 destination = destinationResult.get();
+        Vec3 destination = resolveDestination(serverLevel, caster, target);
 
         serverLevel.playSound(
                 null,
@@ -266,7 +241,7 @@ public final class ShadowstepSpell extends AbstractSpell implements MartialTechn
         super.onCast(level, spellLevel, caster, castSource, playerMagicData);
     }
 
-    private static Optional<Vec3> resolveSafeDestination(
+    private static Vec3 resolveDestination(
             ServerLevel level,
             LivingEntity caster,
             LivingEntity target
@@ -283,26 +258,8 @@ public final class ShadowstepSpell extends AbstractSpell implements MartialTechn
                 caster
         ));
 
-        Vec3 candidate = groundHit.getType() == HitResult.Type.BLOCK
+        return groundHit.getType() == HitResult.Type.BLOCK
                 ? new Vec3(desired.x, groundHit.getLocation().y, desired.z)
                 : desired;
-
-        if (candidate.y < level.getMinBuildHeight()
-                || candidate.y + caster.getBbHeight() > level.getMaxBuildHeight()) {
-            return Optional.empty();
-        }
-
-        BlockPos candidatePos = BlockPos.containing(candidate);
-        if (!level.getWorldBorder().isWithinBounds(candidatePos)) {
-            return Optional.empty();
-        }
-
-        Vec3 offset = candidate.subtract(caster.position());
-        AABB destinationBox = caster.getBoundingBox().move(offset);
-        if (!level.noCollision(caster, destinationBox)) {
-            return Optional.empty();
-        }
-
-        return Optional.of(candidate);
     }
 }
