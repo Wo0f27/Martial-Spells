@@ -59,14 +59,13 @@ required_spell_markers = (
     "baseManaCost = 0;",
     "manaCostPerLevel = 0;",
     "return CastType.INSTANT;",
-    "Utils.preCastTargetHelper(",
+    "return Utils.preCastTargetHelper(",
     "TargetEntityCastData",
     "!caster.isAlliedTo(target)",
     "target.getLookAngle().scale(-BEHIND_TARGET_DISTANCE)",
     "ClipContext.Block.COLLIDER",
     "ClipContext.Fluid.NONE",
-    "level.getWorldBorder().isWithinBounds(candidatePos)",
-    "level.noCollision(caster, destinationBox)",
+    "Vec3 destination = resolveDestination(serverLevel, caster, target);",
     "serverPlayer.teleportTo(",
     "MartialSoundRegistry.SHADOW_STEP_DEPART.get()",
     "ParticleTypes.CLOUD",
@@ -83,6 +82,11 @@ for forbidden in (
     "spell_power",
     "shadow_step_arrive",
     "SHADOW_STEP_ARRIVE",
+    "resolveSafeDestination",
+    "level.noCollision",
+    "getWorldBorder",
+    "getMinBuildHeight",
+    "shadow_step_blocked",
 ):
     if forbidden in spell:
         errors.append(f"ShadowstepSpell contains forbidden R3 dependency/behavior: {forbidden}")
@@ -178,7 +182,6 @@ else:
         "ui.martial_spells.shadow_step_range": "Target Range: %s blocks",
         "ui.martial_spells.shadow_step_distance": "Behind Target: %s blocks",
         "ui.martial_spells.shadow_step_untraceable": "Reduced Tracking: %s seconds at %s blocks",
-        "ui.martial_spells.shadow_step_blocked": "There is no safe space behind that target.",
     }
     for key, expected in required_lang.items():
         if lang.get(key) != expected:
@@ -197,6 +200,7 @@ if errors:
     sys.exit(1)
 
 print("R3 static: Shadowstep registered as a single-level Rogue Martial technique")
-print("Behavior: required 15-block harmful aim / safe 1.0-block behind-target teleport / 30-tick 5-block anti-tracking")
+print("Behavior: required 15-block harmful aim / source-shaped 1.0-block behind-target teleport / 30-tick 5-block anti-tracking")
+print("Destination gate: disabled for R3 validation; no collision/world-border/build-height rejection")
 print("Fidelity: frozen icon/effect icon + departure sound / 20 cloud depart + 10 poof arrive")
 print("R3 STATIC AUDIT PASSED")
