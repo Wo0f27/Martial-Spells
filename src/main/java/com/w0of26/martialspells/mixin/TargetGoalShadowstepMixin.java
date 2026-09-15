@@ -10,8 +10,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /**
- * Frozen Rogues Shadowstep behavior: while a mob's current target carries the
- * short Shadowstep marker, that target goal can only follow from five blocks.
+ * Rogue anti-tracking behavior for the frozen Shadowstep and Vanish markers.
  */
 @Mixin(TargetGoal.class)
 public abstract class TargetGoalShadowstepMixin {
@@ -19,9 +18,18 @@ public abstract class TargetGoalShadowstepMixin {
     protected Mob mob;
 
     @Inject(method = "getFollowDistance", at = @At("HEAD"), cancellable = true)
-    private void martialSpells$shadowstepFollowDistance(CallbackInfoReturnable<Double> cir) {
+    private void martialSpells$rogueFollowDistance(CallbackInfoReturnable<Double> cir) {
         var target = mob.getTarget();
-        if (target != null && target.hasEffect(MartialEffectRegistry.SHADOW_STEP.get())) {
+        if (target == null) {
+            return;
+        }
+
+        // Vanish source default: hostile target goals only follow a stealthed
+        // target from one block away. Keep R3's already-validated 5-block
+        // Shadowstep contract unchanged.
+        if (target.hasEffect(MartialEffectRegistry.STEALTH.get())) {
+            cir.setReturnValue(1.0D);
+        } else if (target.hasEffect(MartialEffectRegistry.SHADOW_STEP.get())) {
             cir.setReturnValue(5.0D);
         }
     }

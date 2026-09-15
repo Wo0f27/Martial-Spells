@@ -10,6 +10,7 @@ import com.w0of26.martialspells.effects.GuardiansCryEffect;
 import com.w0of26.martialspells.effects.ProneEffect;
 import com.w0of26.martialspells.effects.ShadowstepEffect;
 import com.w0of26.martialspells.effects.SliceAndDiceEffect;
+import com.w0of26.martialspells.effects.StealthEffect;
 import com.w0of26.martialspells.effects.StillnessOfMindEffect;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -89,6 +90,13 @@ public final class MartialEffectRegistry {
             MOB_EFFECTS.register(
                     "slice_and_dice",
                     SliceAndDiceEffect::new
+            );
+
+    public static final RegistryObject<MobEffect>
+            STEALTH =
+            MOB_EFFECTS.register(
+                    "stealth",
+                    StealthEffect::new
             );
 
     private MartialEffectRegistry() {

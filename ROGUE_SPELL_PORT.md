@@ -97,12 +97,19 @@ The frozen Spell Engine versions charged small vanilla exhaustion/hunger costs. 
 - source `spell_engine:one_handed_area_release` presentation is translated without adding Spell Engine as a dependency
 
 ### Vanish
-- source tier 4; `rogue_subtlety`
-- 8 second stealth
-- source stealth reduces movement speed by 50%
-- stealth breaks on attacking, taking a hit, using an item, or casting another spell
-- stealth affects enemy targeting in addition to visual presentation
-- 30 second cooldown
+- source tier 4 / Epic; `rogue_subtlety`
+- instant self cast; applies Stealth for exactly 8 seconds / 160 ticks
+- source Stealth applies -50% base Movement Speed using `MULTIPLY_BASE`
+- Stealth participates in the entity's real invisibility state rather than being a cosmetic-only marker
+- hostile `TargetGoal` follow distance against a stealthed target becomes 1 block; R3's already-validated Shadowstep range remains 5 blocks
+- Stealth breaks on a direct player melee attack, taking a non-cancelled incoming hit, timed or instant item use, or casting any other Iron's spell
+- source `ENTITY_ANY_ATTACK` is a direct LivingEntity attack hook, so a projectile fired earlier does not break the shooter's Stealth when it later lands
+- source release sound is exactly `vanish_combined`; the repository's separate `vanish_release` file is not referenced by the frozen spell and is not imported
+- leaving Stealth for any reason plays `stealth_leave`
+- frozen release VFX are 20 `smoke_medium` sphere + 20 `smoke_medium` feet-circle + 10 vanilla `poof` + 10 vanilla `campfire_cosy_smoke`; the two dependency-owned smoke batches are translated to vanilla smoke while retaining their counts/shapes
+- frozen removal VFX are a 20-count `smoke_medium` feet circle; translated to a 20-point vanilla smoke ring
+- source release animation is Spell Engine's `dual_handed_weapon_cross`; the Forge port does not add Spell Engine solely for that pose
+- 30 second base cooldown; normal Iron's Cooldown Reduction may reduce it
 - source exhaustion 0.4 (omitted by port contract)
 
 ### Bear Trap
@@ -131,8 +138,8 @@ The frozen Spell Engine versions charged small vanilla exhaustion/hunger costs. 
 - **R2 — Shock Powder:** PASS — user-confirmed shared stun, exact source range/control cap/cooldown, frozen icon/sounds, and Martial-owned custom smoke/arc VFX.
 - **R3 — Shadowstep:** PASS — user-confirmed required 15-block harmful aim, corrected source-shaped 1.0-block behind-target teleport/ground placement, 30-tick anti-tracking marker, exact departure audio/icon/effect icon and vanilla cloud/poof VFX.
 - **R4 — Slice & Dice:** PASS — user-confirmed ten-second amp-0 start, exact `MULTIPLY_BASE` Attack Damage stacking on successful player melee damage, amp-9 cap, non-refreshing duration, exact icon/effect icon/sound, dependency-free release VFX translation.
-- **R5 — Vanish:** stealth, target suppression, visual state, and all source break conditions.
-- **R6 — Mutilate:** dual-held-weapon damage and source cone/melee delivery behavior.
+- **R5 — Vanish:** IMPLEMENTED / VALIDATING — 8-second Stealth, movement penalty, true invisibility, 1-block hostile follow distance, source break/removal rules, frozen audio/icons and dependency-free smoke translation.
+- **R6 — Mutilate:** locked until explicit R5 PASS.
 - **R7 — Bear Trap:** three-placement server-owned trap entities, one-shot trigger, root and lifecycle.
 - **R8 — Fidelity/final audit:** remaining assets/descriptions, dedicated-server validation, no Spell Engine/Spell Power leaks.
 
@@ -152,4 +159,8 @@ Validated behavior:
 - The cast uses the frozen Slice & Dice sound and source icon/effect icon. Release presentation is a 20-point circular crit-particle approximation of Spell Engine's dependency-owned `magic_spark` ring.
 - Base cooldown is 15 seconds and remains eligible for normal Iron's Cooldown Reduction.
 
-R4 is locked. R5 Vanish may proceed.
+R4 is locked.
+
+## R5 validation — pending
+
+Run the R5 asset sync and cumulative audit, then validate Vanish in runtime. Do not mark R5 PASS until the user confirms the complete matrix: duration/movement penalty, invisibility and hostile tracking suppression, each break condition, natural expiry/removal presentation, cooldown reduction, multiplayer/dedicated-server behavior, and R2-R4 regression.

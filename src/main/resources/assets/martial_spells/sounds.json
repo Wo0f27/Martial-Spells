@@ -18,5 +18,15 @@
     "sounds": [
       "martial_spells:slice_and_dice"
     ]
+  },
+  "vanish_combined": {
+    "sounds": [
+      "martial_spells:vanish_combined"
+    ]
+  },
+  "stealth_leave": {
+    "sounds": [
+      "martial_spells:stealth_leave"
+    ]
   }
 }

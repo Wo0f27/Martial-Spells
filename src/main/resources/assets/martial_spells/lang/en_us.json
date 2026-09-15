@@ -180,6 +180,15 @@
   "ui.martial_spells.slice_and_dice_initial_bonus": "Initial Attack Damage: +%s%% base",
   "ui.martial_spells.slice_and_dice_max_bonus": "Maximum Attack Damage: +%s%% base",
 
+  "effect.martial_spells.stealth": "Stealth",
+  "effect.martial_spells.stealth.description": "Invisible to enemies",
+  "spell.martial_spells.vanish": "Vanish",
+  "spell.martial_spells.vanish.description": "Vanish from sight, entering stealth until you act or are struck.",
+  "spell.martial_spells.vanish.guide": "Enter Stealth for 8 seconds, becoming invisible to enemies while your base movement speed is reduced by 50%. Direct melee attacks, incoming hits, item use, or casting another Iron's spell ends Stealth immediately. Hostile target goals can only follow you from 1 block away while Stealth remains. Vanish has a 30-second base cooldown and is affected by normal Cooldown Reduction.",
+  "ui.martial_spells.vanish_duration": "Stealth Duration: %s seconds",
+  "ui.martial_spells.vanish_movement_penalty": "Movement Speed: -%s%% base",
+  "ui.martial_spells.vanish_tracking_range": "Enemy Follow Distance: %s blocks",
+
   "effect.martial_spells.stillness_of_mind": "Stillness of Mind",
   "spell.martial_spells.stillness_of_mind": "Stillness of Mind",
   "spell.martial_spells.stillness_of_mind.description": "Transcend the limits of Ki for a brief moment, allowing martial techniques to be used without consuming Ki.",

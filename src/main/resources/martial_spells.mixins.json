@@ -6,7 +6,8 @@
   "refmap": "martial_spells.refmap.json",
   "mixins": [
     "MobProneAiMixin",
-    "TargetGoalShadowstepMixin"
+    "TargetGoalShadowstepMixin",
+    "LivingEntityStealthMixin"
   ],
   "client": [],
   "injectors": {

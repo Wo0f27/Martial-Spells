@@ -24,6 +24,12 @@ public final class MartialSoundRegistry {
     public static final RegistryObject<SoundEvent> SLICE_AND_DICE =
             register("slice_and_dice");
 
+    public static final RegistryObject<SoundEvent> VANISH_COMBINED =
+            register("vanish_combined");
+
+    public static final RegistryObject<SoundEvent> STEALTH_LEAVE =
+            register("stealth_leave");
+
     private MartialSoundRegistry() {}
 
     private static RegistryObject<SoundEvent> register(String path) {
