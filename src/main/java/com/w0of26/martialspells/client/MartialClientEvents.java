@@ -2,6 +2,8 @@ package com.w0of26.martialspells.client;
 
 import com.w0of26.martialspells.MartialSpells;
 import com.w0of26.martialspells.client.particle.BarrageTrailParticle;
+import com.w0of26.martialspells.client.particle.ShockPowderArcParticle;
+import com.w0of26.martialspells.client.particle.ShockPowderSmokeParticle;
 import com.w0of26.martialspells.client.render.BarrageArrowRenderer;
 import com.w0of26.martialspells.client.render.CaltropFieldRenderer;
 import com.w0of26.martialspells.client.render.DiamondBodyShieldLayer;
@@ -31,6 +33,8 @@ public final class MartialClientEvents {
     @SubscribeEvent
     public static void registerParticleProviders(RegisterParticleProvidersEvent event) {
         event.registerSpriteSet(MartialParticleRegistry.BARRAGE_TRAIL.get(), BarrageTrailParticle.Provider::new);
+        event.registerSpriteSet(MartialParticleRegistry.SHOCK_POWDER_SMOKE.get(), ShockPowderSmokeParticle.Provider::new);
+        event.registerSpriteSet(MartialParticleRegistry.SHOCK_POWDER_ARC.get(), ShockPowderArcParticle.Provider::new);
     }
 
     @SubscribeEvent

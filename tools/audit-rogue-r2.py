@@ -9,15 +9,33 @@ errors = []
 spell_path = root / "src/main/java/com/w0of26/martialspells/spells/ShockPowderSpell.java"
 registry_path = root / "src/main/java/com/w0of26/martialspells/registry/MartialSpellRegistry.java"
 sound_registry_path = root / "src/main/java/com/w0of26/martialspells/registry/MartialSoundRegistry.java"
+particle_registry_path = root / "src/main/java/com/w0of26/martialspells/registry/MartialParticleRegistry.java"
+client_events_path = root / "src/main/java/com/w0of26/martialspells/client/MartialClientEvents.java"
+smoke_particle_path = root / "src/main/java/com/w0of26/martialspells/client/particle/ShockPowderSmokeParticle.java"
+arc_particle_path = root / "src/main/java/com/w0of26/martialspells/client/particle/ShockPowderArcParticle.java"
 mod_path = root / "src/main/java/com/w0of26/martialspells/MartialSpells.java"
 
-for path in (spell_path, registry_path, sound_registry_path, mod_path):
+required_sources = (
+    spell_path,
+    registry_path,
+    sound_registry_path,
+    particle_registry_path,
+    client_events_path,
+    smoke_particle_path,
+    arc_particle_path,
+    mod_path,
+)
+for path in required_sources:
     if not path.is_file():
         errors.append(f"missing required R2 source: {path.relative_to(root)}")
 
 spell = spell_path.read_text() if spell_path.is_file() else ""
 registry = registry_path.read_text() if registry_path.is_file() else ""
 sound_registry = sound_registry_path.read_text() if sound_registry_path.is_file() else ""
+particle_registry = particle_registry_path.read_text() if particle_registry_path.is_file() else ""
+client_events = client_events_path.read_text() if client_events_path.is_file() else ""
+smoke_particle = smoke_particle_path.read_text() if smoke_particle_path.is_file() else ""
+arc_particle = arc_particle_path.read_text() if arc_particle_path.is_file() else ""
 mod_java = mod_path.read_text() if mod_path.is_file() else ""
 
 required_spell_markers = (
@@ -46,11 +64,21 @@ required_spell_markers = (
     "target.getMaxHealth() > controlHealthLimit",
     "MartialSoundRegistry.SHOCK_POWDER_RELEASE.get()",
     "MartialSoundRegistry.SHOCK_POWDER_IMPACT.get()",
-    "ParticleTypes.ELECTRIC_SPARK",
+    "MartialParticleRegistry.SHOCK_POWDER_SMOKE.get()",
+    "MartialParticleRegistry.SHOCK_POWDER_ARC.get()",
 )
 for marker in required_spell_markers:
     if marker not in spell:
         errors.append(f"ShockPowderSpell missing required behavior: {marker}")
+
+# Source batch identity: three smoke groups 50/60/50 and two arc groups 6/8.
+for count_marker in ("\n                50,", "\n                60,", "\n                6,", "\n                8,"):
+    if count_marker not in spell:
+        errors.append(f"Shock Powder VFX missing source-shaped batch count: {count_marker.strip()}")
+if spell.count("MartialParticleRegistry.SHOCK_POWDER_SMOKE.get()") != 3:
+    errors.append("Shock Powder must emit exactly three custom smoke batches")
+if spell.count("MartialParticleRegistry.SHOCK_POWDER_ARC.get()") != 2:
+    errors.append("Shock Powder must emit exactly two custom arc batches")
 
 for forbidden in (
     "FixedCooldownSpell",
@@ -58,6 +86,9 @@ for forbidden in (
     "spell_power",
     "MartialPowerHelper",
     "getMartialPower",
+    "ParticleTypes.SMOKE",
+    "ParticleTypes.CLOUD",
+    "ParticleTypes.ELECTRIC_SPARK",
 ):
     if forbidden in spell:
         errors.append(f"ShockPowderSpell contains forbidden R2 dependency/behavior: {forbidden}")
@@ -73,8 +104,33 @@ for marker in (
     if marker not in sound_registry:
         errors.append(f"MartialSoundRegistry missing: {marker}")
 
+for marker in (
+    'PARTICLES.register("shock_powder_smoke", () -> new SimpleParticleType(false))',
+    'PARTICLES.register("shock_powder_arc", () -> new SimpleParticleType(false))',
+):
+    if marker not in particle_registry:
+        errors.append(f"MartialParticleRegistry missing: {marker}")
+
+for marker in (
+    "MartialParticleRegistry.SHOCK_POWDER_SMOKE.get(), ShockPowderSmokeParticle.Provider::new",
+    "MartialParticleRegistry.SHOCK_POWDER_ARC.get(), ShockPowderArcParticle.Provider::new",
+):
+    if marker not in client_events:
+        errors.append(f"client particle provider missing: {marker}")
+
+for name, source in (("smoke", smoke_particle), ("arc", arc_particle)):
+    for marker in (
+        "extends TextureSheetParticle",
+        "implements ParticleProvider<SimpleParticleType>",
+        "ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT",
+    ):
+        if marker not in source:
+            errors.append(f"Shock Powder {name} particle missing: {marker}")
+
 if "MartialSoundRegistry.register(modEventBus);" not in mod_java:
     errors.append("MartialSpells does not register MartialSoundRegistry")
+if "MartialParticleRegistry.register(modEventBus);" not in mod_java:
+    errors.append("MartialSpells does not register MartialParticleRegistry")
 
 # Spell tags: R2 must be both a generic Martial technique and specifically Rogue.
 for relative in (
@@ -92,7 +148,7 @@ for relative in (
     if values.count("martial_spells:shock_powder") != 1:
         errors.append(f"Shock Powder duplicated in {relative}")
 
-# Sound definitions are deliberately only the two R2 source-owned sounds.
+# Sound definitions are deliberately only the two source-owned R2 sounds.
 sounds_path = root / "src/main/resources/assets/martial_spells/sounds.json"
 expected_sounds = {
     "shock_powder_release": {"sounds": ["martial_spells:shock_powder_release"]},
@@ -105,14 +161,14 @@ else:
     if sounds != expected_sounds:
         errors.append(f"R2 sounds.json drifted: {sounds}")
 
-# Frozen binary identity. The assets are intentionally synchronized locally
-# rather than approximated or re-encoded in this checkpoint.
+# Frozen binary identity for Rogues-owned icon/audio. These assets are synced
+# locally and must remain byte-identical to the frozen upstream source.
 def git_blob_sha(path: Path) -> str:
     data = path.read_bytes()
     header = b"blob " + str(len(data)).encode("ascii") + b"\0"
     return hashlib.sha1(header + data).hexdigest()
 
-assets = {
+frozen_assets = {
     "src/main/resources/assets/martial_spells/sounds/shock_powder_release.ogg":
         "92f7f6172ac4860190311a9249d86c90da2fdd22",
     "src/main/resources/assets/martial_spells/sounds/shock_powder_impact.ogg":
@@ -120,7 +176,7 @@ assets = {
     "src/main/resources/assets/martial_spells/textures/gui/spell_icons/shock_powder.png":
         "af728d73e743688872022d9a43c8ba00ae238c30",
 }
-for relative, expected in assets.items():
+for relative, expected in frozen_assets.items():
     path = root / relative
     if not path.is_file():
         errors.append(f"missing frozen asset {relative}; run tools/sync-rogue-r2-assets.ps1")
@@ -128,6 +184,46 @@ for relative, expected in assets.items():
     actual = git_blob_sha(path)
     if actual != expected:
         errors.append(f"wrong frozen asset for {relative}: expected {expected}, got {actual}")
+
+# Martial-owned particle resources must be real PNGs and their particle JSONs
+# must point only at Martial Spells textures, never Spell Engine assets.
+particle_jsons = {
+    "src/main/resources/assets/martial_spells/particles/shock_powder_smoke.json": [
+        "martial_spells:shock_powder_smoke_0",
+        "martial_spells:shock_powder_smoke_1",
+        "martial_spells:shock_powder_smoke_2",
+        "martial_spells:shock_powder_smoke_3",
+    ],
+    "src/main/resources/assets/martial_spells/particles/shock_powder_arc.json": [
+        "martial_spells:shock_powder_arc_0",
+        "martial_spells:shock_powder_arc_1",
+    ],
+}
+for relative, expected_textures in particle_jsons.items():
+    path = root / relative
+    if not path.is_file():
+        errors.append(f"missing custom particle definition: {relative}")
+        continue
+    data = json.loads(path.read_text())
+    if data.get("textures") != expected_textures:
+        errors.append(f"custom particle texture list drifted for {relative}: {data}")
+    if "spell_engine:" in path.read_text():
+        errors.append(f"Spell Engine particle namespace leaked into {relative}")
+
+original_particle_pngs = [
+    f"src/main/resources/assets/martial_spells/textures/particle/shock_powder_smoke_{i}.png"
+    for i in range(4)
+] + [
+    f"src/main/resources/assets/martial_spells/textures/particle/shock_powder_arc_{i}.png"
+    for i in range(2)
+]
+for relative in original_particle_pngs:
+    path = root / relative
+    if not path.is_file():
+        errors.append(f"missing Martial-owned particle texture: {relative}")
+        continue
+    if path.read_bytes()[:8] != b"\x89PNG\r\n\x1a\n":
+        errors.append(f"particle texture is not a binary PNG: {relative}")
 
 # Localization is a required R2 presentation surface.
 lang_path = root / "src/main/resources/assets/martial_spells/lang/en_us.json"
@@ -156,5 +252,5 @@ if errors:
 
 print("R2 static: Shock Powder registered as a single-level Rogue Martial technique")
 print("Behavior: 5-block / 0.5Y area, 2s shared stun, 50 + 2x Attack Damage control cap, base CD 16")
-print("Fidelity: frozen icon + release/impact sounds verified")
+print("Fidelity: frozen icon/sounds + Martial-owned custom smoke/arc particle textures verified")
 print("R2 STATIC AUDIT PASSED")

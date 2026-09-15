@@ -15,6 +15,12 @@ public final class MartialParticleRegistry {
     public static final RegistryObject<SimpleParticleType> BARRAGE_TRAIL =
             PARTICLES.register("barrage_trail", () -> new SimpleParticleType(false));
 
+    public static final RegistryObject<SimpleParticleType> SHOCK_POWDER_SMOKE =
+            PARTICLES.register("shock_powder_smoke", () -> new SimpleParticleType(false));
+
+    public static final RegistryObject<SimpleParticleType> SHOCK_POWDER_ARC =
+            PARTICLES.register("shock_powder_arc", () -> new SimpleParticleType(false));
+
     private MartialParticleRegistry() {}
 
     public static void register(IEventBus modEventBus) {

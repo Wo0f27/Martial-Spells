@@ -69,7 +69,9 @@ The frozen Spell Engine versions charged small vanilla exhaustion/hunger costs. 
 - 16 second base cooldown; normal Iron's Cooldown Reduction may reduce it
 - source exhaustion 0.3 (omitted by port contract)
 - Martial Spells reuses its shared `StunService` rather than creating a second stun implementation
-- exact upstream icon and release/impact sounds are retained; Spell Engine-owned smoke/lightning particles are translated to vanilla smoke/cloud/electric particles
+- exact upstream icon and release/impact sounds are retained
+- frozen release presentation used three `smoke_medium` batches plus `lightning_arc_a` and `lightning_arc_b`; those particle assets belong to Spell Engine and are not copied into Martial Spells
+- Martial Spells instead registers original `martial_spells:shock_powder_smoke` and `martial_spells:shock_powder_arc` sprite particles to reproduce the same powder-cloud/electrical silhouette without a Spell Engine dependency
 
 ### Shadowstep
 - source tier 3; `rogue_subtlety`
@@ -112,7 +114,7 @@ The frozen Spell Engine versions charged small vanilla exhaustion/hunger costs. 
 
 - **R0 — Archaeology/contract:** DONE — exact six-technique inventory and frozen behavior.
 - **R1 — Rogue architecture:** DONE — `ROGUE` technique class + spell tag; no gameplay.
-- **R2 — Shock Powder:** VALIDATING — shared stun, exact source range/control cap/cooldown, frozen icon/sounds, translated dependency-free VFX.
+- **R2 — Shock Powder:** VALIDATING — shared stun, exact source range/control cap/cooldown, frozen icon/sounds, Martial-owned custom smoke/arc VFX.
 - **R3 — Shadowstep:** targeting, safe behind-target teleport, brief untraceable state.
 - **R4 — Slice & Dice:** fixed-duration melee-hit stacking and exact attack-damage operation.
 - **R5 — Vanish:** stealth, target suppression, visual state, and all source break conditions.
@@ -130,5 +132,12 @@ python .\tools\audit-rogue-r2.py
 .\gradlew clean build
 .\gradlew runClient
 ```
+
+Runtime presentation regression:
+
+- Shock Powder still has the frozen icon and release/impact audio.
+- The release now shows Martial-owned gray powder-smoke sprites instead of vanilla smoke/cloud textures.
+- Two short pale-violet electrical sprite variants appear in the source-faithful 6 + 8 arc batches.
+- Stun duration, radius, vertical reach, LOS, control-health cap, ally filtering, zero mana, and 16-second base cooldown are unchanged from the already-tested R2 gameplay implementation.
 
 Do not advance to R3 until the user explicitly reports R2 PASS.

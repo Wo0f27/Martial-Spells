@@ -2,6 +2,7 @@ package com.w0of26.martialspells.spells;
 
 import com.w0of26.martialspells.MartialSpells;
 import com.w0of26.martialspells.combat.StunService;
+import com.w0of26.martialspells.registry.MartialParticleRegistry;
 import com.w0of26.martialspells.registry.MartialSchoolRegistry;
 import com.w0of26.martialspells.registry.MartialSoundRegistry;
 import com.w0of26.martialspells.technique.MartialTechnique;
@@ -13,7 +14,6 @@ import io.redspace.ironsspellbooks.api.spells.CastSource;
 import io.redspace.ironsspellbooks.api.spells.CastType;
 import io.redspace.ironsspellbooks.api.spells.SpellRarity;
 import io.redspace.ironsspellbooks.api.util.AnimationHolder;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -280,35 +280,42 @@ public final class ShockPowderSpell extends AbstractSpell implements MartialTech
                 1.0F
         );
 
-        // Spell Engine's original smoke_medium/lightning_arc particles are not
-        // dependencies of Martial Spells. Keep the same dense smoke/electric
-        // silhouette with vanilla server-synchronized particles.
+        // The frozen source used three smoke batches and two lightning-arc
+        // batches. Martial Spells recreates that silhouette with its own
+        // registered sprite particles instead of importing Spell Engine assets.
         level.sendParticles(
-                ParticleTypes.SMOKE,
+                MartialParticleRegistry.SHOCK_POWDER_SMOKE.get(),
                 caster.getX(), caster.getY() + 0.2D, caster.getZ(),
                 50,
                 2.3D, 0.15D, 2.3D,
                 0.03D
         );
         level.sendParticles(
-                ParticleTypes.CLOUD,
+                MartialParticleRegistry.SHOCK_POWDER_SMOKE.get(),
                 caster.getX(), caster.getY() + 0.3D, caster.getZ(),
                 60,
                 3.3D, 0.18D, 3.3D,
                 0.025D
         );
         level.sendParticles(
-                ParticleTypes.SMOKE,
+                MartialParticleRegistry.SHOCK_POWDER_SMOKE.get(),
                 caster.getX(), caster.getY() + caster.getBbHeight() * 0.45D, caster.getZ(),
                 50,
                 1.8D, 0.9D, 1.8D,
                 0.02D
         );
         level.sendParticles(
-                ParticleTypes.ELECTRIC_SPARK,
-                caster.getX(), caster.getY() + 0.2D, caster.getZ(),
-                14,
-                2.5D, 1.5D, 2.5D,
+                MartialParticleRegistry.SHOCK_POWDER_ARC.get(),
+                caster.getX(), caster.getY() + 1.5D, caster.getZ(),
+                6,
+                0.75D, 1.5D, 0.75D,
+                0.02D
+        );
+        level.sendParticles(
+                MartialParticleRegistry.SHOCK_POWDER_ARC.get(),
+                caster.getX(), caster.getY() + 2.5D, caster.getZ(),
+                8,
+                1.0D, 2.5D, 1.0D,
                 0.03D
         );
     }
