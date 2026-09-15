@@ -114,8 +114,8 @@ The frozen Spell Engine versions charged small vanilla exhaustion/hunger costs. 
 
 - **R0 — Archaeology/contract:** DONE — exact six-technique inventory and frozen behavior.
 - **R1 — Rogue architecture:** DONE — `ROGUE` technique class + spell tag; no gameplay.
-- **R2 — Shock Powder:** VALIDATING — shared stun, exact source range/control cap/cooldown, frozen icon/sounds, Martial-owned custom smoke/arc VFX.
-- **R3 — Shadowstep:** targeting, safe behind-target teleport, brief untraceable state.
+- **R2 — Shock Powder:** PASS — user-confirmed shared stun, exact source range/control cap/cooldown, frozen icon/sounds, and Martial-owned custom smoke/arc VFX.
+- **R3 — Shadowstep:** NEXT — targeting, safe behind-target teleport, brief untraceable state.
 - **R4 — Slice & Dice:** fixed-duration melee-hit stacking and exact attack-damage operation.
 - **R5 — Vanish:** stealth, target suppression, visual state, and all source break conditions.
 - **R6 — Mutilate:** dual-held-weapon damage and source cone/melee delivery behavior.
@@ -140,4 +140,4 @@ Runtime presentation regression:
 - Two short pale-violet electrical sprite variants appear in the source-faithful 6 + 8 arc batches.
 - Stun duration, radius, vertical reach, LOS, control-health cap, ally filtering, zero mana, and 16-second base cooldown are unchanged from the already-tested R2 gameplay implementation.
 
-Do not advance to R3 until the user explicitly reports R2 PASS.
+**Result: PASS — user-confirmed. R3 is unlocked.**
