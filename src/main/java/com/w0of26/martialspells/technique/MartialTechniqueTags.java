@@ -10,5 +10,6 @@ public final class MartialTechniqueTags {
     public static final TagKey<AbstractSpell> FIGHTER_TECHNIQUES = MartialSpellRegistry.SPELLS.createTagKey("fighter_techniques");
     public static final TagKey<AbstractSpell> BARBARIAN_TECHNIQUES = MartialSpellRegistry.SPELLS.createTagKey("barbarian_techniques");
     public static final TagKey<AbstractSpell> RANGER_TECHNIQUES = MartialSpellRegistry.SPELLS.createTagKey("ranger_techniques");
+    public static final TagKey<AbstractSpell> ROGUE_TECHNIQUES = MartialSpellRegistry.SPELLS.createTagKey("rogue_techniques");
     private MartialTechniqueTags() {}
 }
