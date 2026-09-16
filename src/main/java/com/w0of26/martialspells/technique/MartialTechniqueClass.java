@@ -5,5 +5,6 @@ public enum MartialTechniqueClass {
     FIGHTER,
     BARBARIAN,
     RANGER,
-    ROGUE
+    ROGUE,
+    WARRIOR
 }
