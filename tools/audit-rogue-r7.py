@@ -41,6 +41,7 @@ effect = text("src/main/java/com/w0of26/martialspells/effects/TrappedEffect.java
 mixin = text("src/main/java/com/w0of26/martialspells/mixin/LivingEntityTrappedMixin.java")
 renderer = text("src/main/java/com/w0of26/martialspells/client/render/BearTrapRenderer.java")
 client_anim = text("src/main/java/com/w0of26/martialspells/client/animation/BearTrapClientAnimations.java")
+lang = text("src/main/resources/assets/martial_spells/lang/en_us.json")
 
 for needle, label in [
     ("TRAP_COUNT = 3", "three-trap count"),
@@ -81,8 +82,16 @@ require(renderer, "BearTrapModel", "Bear Trap renderer")
 require(client_anim, "BearTrapSpell.RELEASE_ANIMATION", "Bear Trap client release animation lookup")
 require(client_anim, "PlayerAnimationRegistry.getAnimation", "PlayerAnimator registry lookup")
 
+require(lang, '"spell.martial_spells.bear_trap": "Bear Trap"', "Bear Trap spell localization")
+require(lang, '"spell.martial_spells.bear_trap.description"', "Bear Trap description localization")
+require(lang, '"spell.martial_spells.bear_trap.guide"', "Bear Trap guide localization")
+require(lang, '"effect.martial_spells.bear_trap": "Trapped"', "Trapped effect localization")
+require(lang, '"ui.martial_spells.bear_trap_count"', "Bear Trap count localization")
+require(lang, '"ui.martial_spells.bear_trap_duration"', "Bear Trap duration localization")
+require(lang, '"ui.martial_spells.bear_trap_root"', "Bear Trap root localization")
+
 assets = [
-    "src/main/resources/assets/martial_spells/textures/spell/bear_trap.png",
+    "src/main/resources/assets/martial_spells/textures/gui/spell_icons/bear_trap.png",
     "src/main/resources/assets/martial_spells/textures/entity/bear_trap.png",
     "src/main/resources/assets/martial_spells/sounds/bear_trap_release.ogg",
     "src/main/resources/assets/martial_spells/sounds/bear_trap_impact.ogg",
@@ -120,5 +129,6 @@ print("R7 static: Bear Trap registered as a single-level Rare Rogue Martial tech
 print("Placement: three traps / 2-block radial offset / 0-3-6 tick cadence / 120-degree spacing / local terrain grounding")
 print("Entity: 20-tick spawn / 20-second active lifetime / one impact / 15-tick normal or 30-tick sprung despawn")
 print("Impact: zero-knockback physical damage / 3-second movement+jump-only root / 100 + 2x dual-melee control cap")
-print("Presentation: exact frozen Rogues icon, entity texture and sounds + exact dual_handed_ground_release PlayerAnimator JSON")
+print("Presentation: exact frozen Rogues icon in Iron's spell-icon path, entity texture and sounds + exact dual_handed_ground_release PlayerAnimator JSON")
+print("Localization: Bear Trap spell/description/guide, Trapped effect, and tooltip fields verified")
 print("R7 STATIC AUDIT PASSED")
