@@ -33,6 +33,18 @@ public final class MartialSoundRegistry {
     public static final RegistryObject<SoundEvent> MUTILATE_IMPACT =
             register("mutilate_impact");
 
+    public static final RegistryObject<SoundEvent> BEAR_TRAP_RELEASE =
+            register("bear_trap_release");
+
+    public static final RegistryObject<SoundEvent> BEAR_TRAP_SPAWN =
+            register("bear_trap_spawn");
+
+    public static final RegistryObject<SoundEvent> BEAR_TRAP_IMPACT =
+            register("bear_trap_impact");
+
+    public static final RegistryObject<SoundEvent> BEAR_TRAP_DESPAWN =
+            register("bear_trap_despawn");
+
     private MartialSoundRegistry() {}
 
     private static RegistryObject<SoundEvent> register(String path) {
