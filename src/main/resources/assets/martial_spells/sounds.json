@@ -33,5 +33,10 @@
     "sounds": [
       "martial_spells:mutilate_impact"
     ]
+  },
+  "charge_activate": {
+    "sounds": [
+      "martial_spells:charge_activate"
+    ]
   }
 }

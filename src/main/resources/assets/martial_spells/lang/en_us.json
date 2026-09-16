@@ -157,7 +157,6 @@
   "ui.martial_spells.caltrops_damage_tick": "Damage per Tick: %s every 0.5 seconds",
   "ui.martial_spells.caltrops_slow": "Slowness %s",
   "ui.martial_spells.caltrops_duration": "Field Duration: %s seconds",
-
   "spell.martial_spells.shock_powder": "Shock Powder",
   "spell.martial_spells.shock_powder.description": "Scatter electrified powder around you, stunning nearby enemies that can be overwhelmed.",
   "spell.martial_spells.shock_powder.guide": "Instantly releases shock powder in a 5-block area. Eligible non-allied targets are stunned for 2 seconds. Targets whose maximum health exceeds 50 + twice your current Attack Damage resist the control effect. Martial stun resistance and immunity rules still apply.",
@@ -217,5 +216,13 @@
   "ui.martial_spells.stillness_preserves_ki": "Stored Ki is not consumed while active",
   "ui.martial_spells.stillness_already_active": "Stillness of Mind is already active.",
   "ui.martial_spells.stillness_aftereffect": "Aftereffect: Weakness I for 60 seconds",
-  "ui.martial_spells.stillness_requires_codex_active": "Unequipping the Monk Codex ends Stillness immediately"
+  "ui.martial_spells.stillness_requires_codex_active": "Unequipping the Monk Codex ends Stillness immediately",
+
+  "effect.martial_spells.charge": "Charge",
+  "effect.martial_spells.charge.description": "Increases movement speed and knockback resistance.",
+  "spell.martial_spells.charge": "Charge",
+  "spell.martial_spells.charge.description": "Surge into battle with increased movement speed and resistance to knockback.",
+  "spell.martial_spells.charge.guide": "Instantly grants +50% base Movement Speed and +50% base Knockback Resistance for 2 seconds. Recasting refreshes Charge instead of stacking another copy. Charge has a 12-second base cooldown and is affected by normal Cooldown Reduction.",
+  "ui.martial_spells.charge_movement_speed": "Movement Speed: +%s%% base",
+  "ui.martial_spells.charge_knockback_resistance": "Knockback Resistance: +%s%% base"
 }

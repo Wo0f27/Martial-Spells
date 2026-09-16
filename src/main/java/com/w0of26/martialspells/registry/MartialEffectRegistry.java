@@ -1,6 +1,7 @@
 package com.w0of26.martialspells.registry;
 
 import com.w0of26.martialspells.MartialSpells;
+import com.w0of26.martialspells.effects.ChargeEffect;
 import com.w0of26.martialspells.effects.DiamondBodyEffect;
 import com.w0of26.martialspells.effects.DiamondHeartEffect;
 import com.w0of26.martialspells.effects.GuardiansCovenantLinkedEffect;
@@ -106,6 +107,14 @@ public final class MartialEffectRegistry {
             MOB_EFFECTS.register(
                     "bear_trap",
                     TrappedEffect::new
+            );
+
+    /** Frozen Warrior Charge self-buff. */
+    public static final RegistryObject<MobEffect>
+            CHARGE =
+            MOB_EFFECTS.register(
+                    "charge",
+                    ChargeEffect::new
             );
 
     private MartialEffectRegistry() {

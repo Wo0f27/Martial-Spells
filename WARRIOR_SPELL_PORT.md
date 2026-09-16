@@ -156,9 +156,9 @@ W1 does not introduce a generic charged-technique runtime yet. The first charged
 
 ## Checkpoint plan
 
-- **W0 — Archaeology/contract:** APPROVED — exact six-technique inventory and frozen behavior.
-- **W1 — Shared Warrior architecture:** IMPLEMENTED / VALIDATING — Warrior technique class/tag + single-hand physical-melee adapter; no Warrior gameplay.
-- **W2 — Charge:** locked until explicit W1 PASS.
+- **W0 — Archaeology/contract:** PASS — exact six-technique inventory and frozen behavior approved.
+- **W1 — Shared Warrior architecture:** PASS — Warrior technique class/tag + single-hand physical-melee adapter; no Warrior gameplay.
+- **W2 — Charge:** IMPLEMENTED / VALIDATING — frozen two-second self-buff vertical slice.
 - **W3 — Demoralizing Shout:** locked until explicit W2 PASS.
 - **W4 — Throw Net:** locked until explicit W3 PASS.
 - **W5 — Shattering Throw:** locked until explicit W4 PASS.
@@ -168,9 +168,11 @@ W1 does not introduce a generic charged-technique runtime yet. The first charged
 
 ## W1 acceptance criteria
 
+W1 has been explicitly accepted by the user. Its frozen gate was:
+
 - `MartialTechniqueClass.WARRIOR` exists.
 - `MartialTechniqueTags.WARRIOR_TECHNIQUES` resolves `martial_spells:warrior_techniques`.
-- an empty `warrior_techniques.json` tag exists, because W1 registers no Warrior spell.
+- an empty `warrior_techniques.json` tag exists at W1, because W1 registers no Warrior spell.
 - `PhysicalMeleePower` reads only vanilla Attack Damage and safely returns zero if the attribute is absent.
 - no Warrior spell is registered and no Warrior runtime mechanic activates in W1.
 - no Spell Engine or Spell Power dependency is introduced.
@@ -178,4 +180,24 @@ W1 does not introduce a generic charged-technique runtime yet. The first charged
 - clean build passes.
 - `runClient` boots successfully.
 
-W1 is not PASS until the user explicitly validates the build/runtime gate.
+## W2 acceptance criteria
+
+W2 is restricted to `martial_spells:charge` and remains **VALIDATING** until the user explicitly passes it.
+
+- Charge is classified as `MartialTechniqueClass.WARRIOR` and is the only value in the Warrior technique tag.
+- source tier 3 is mapped to Iron's `RARE` with one spell level and zero mana.
+- Charge is instant and self-targeted.
+- Charge lasts exactly 40 ticks / 2 seconds.
+- Movement Speed receives +0.5 `MULTIPLY_BASE`.
+- Knockback Resistance receives +0.5 `MULTIPLY_BASE`.
+- reapplication uses amplifier 0 / SET-style refresh semantics rather than stacking.
+- base cooldown is exactly 12 seconds and uses normal Iron's Cooldown Reduction behavior.
+- the upstream Charge icon/effect icon is retained exactly.
+- `charge_activate.ogg` is synced from the frozen source commit and verified against Git blob `77ec5f2f81300f268e686c9fe2c1800127f2936f`.
+- Spell Engine's release presentation is translated without introducing Spell Engine as a dependency.
+- Improved Charge skill-tree behavior is not imported.
+- W3+ Warrior spell classes remain absent.
+- clean build passes.
+- `runClient` boots successfully and runtime attribute behavior matches the frozen values.
+
+Run `tools/sync-warrior-w2-assets.ps1` before `tools/audit-warrior-w2.py`, then build and run the client. W2 is not PASS until the user explicitly validates the gate.
