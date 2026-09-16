@@ -27,7 +27,10 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
 /** Forge/Iron's translation of frozen Rogues Bear Trap. */
@@ -37,10 +40,7 @@ public final class BearTrapSpell extends AbstractSpell implements MartialTechniq
 
     /** PlayerAnimator registers by the authored internal name, not file name. */
     public static final ResourceLocation RELEASE_ANIMATION =
-            ResourceLocation.fromNamespaceAndPath(
-                    MartialSpells.MOD_ID,
-                    "dual_handed_ground_release"
-            );
+            ResourceLocation.fromNamespaceAndPath(MartialSpells.MOD_ID, "dual_handed_ground_release");
 
     public static final int MAX_LEVEL = 1;
     public static final int TRAP_COUNT = 3;
@@ -50,6 +50,8 @@ public final class BearTrapSpell extends AbstractSpell implements MartialTechniq
     public static final int BASE_COOLDOWN_SECONDS = 15;
     public static final float CONTROL_HEALTH_BASE = 100.0F;
     public static final float CONTROL_POWER_MULTIPLIER = 2.0F;
+    private static final double GROUND_SEARCH_UP = 2.0D;
+    private static final double GROUND_SEARCH_DOWN = 3.0D;
 
     private final DefaultConfig defaultConfig = new DefaultConfig()
             .setMinRarity(SpellRarity.RARE)
@@ -112,8 +114,7 @@ public final class BearTrapSpell extends AbstractSpell implements MartialTechniq
     }
 
     public static float getControlHealthLimit(ServerPlayer player) {
-        return CONTROL_HEALTH_BASE
-                + CONTROL_POWER_MULTIPLIER * DualMeleePower.calculate(player);
+        return CONTROL_HEALTH_BASE + CONTROL_POWER_MULTIPLIER * DualMeleePower.calculate(player);
     }
 
     @Override
@@ -127,15 +128,8 @@ public final class BearTrapSpell extends AbstractSpell implements MartialTechniq
     }
 
     @Override
-    public void onCast(
-            Level level,
-            int spellLevel,
-            LivingEntity caster,
-            CastSource castSource,
-            MagicData magicData
-    ) {
-        if (!(level instanceof ServerLevel serverLevel)
-                || !(caster instanceof ServerPlayer player)) {
+    public void onCast(Level level, int spellLevel, LivingEntity caster, CastSource castSource, MagicData magicData) {
+        if (!(level instanceof ServerLevel serverLevel) || !(caster instanceof ServerPlayer player)) {
             return;
         }
 
@@ -148,15 +142,13 @@ public final class BearTrapSpell extends AbstractSpell implements MartialTechniq
             float yaw = baseYaw + index * PLACEMENT_YAW_STEP;
             Vec3 offset = new Vec3(0.0D, 0.0D, PLACEMENT_DISTANCE)
                     .yRot((float) Math.toRadians(-yaw));
-            Vec3 position = castOrigin.add(offset);
+            Vec3 requested = castOrigin.add(offset);
+            Vec3 grounded = groundTrapPosition(serverLevel, player, requested);
 
-            BearTrapEntity trap = new BearTrapEntity(
-                    MartialEntityRegistry.BEAR_TRAP.get(),
-                    serverLevel
-            );
+            BearTrapEntity trap = new BearTrapEntity(MartialEntityRegistry.BEAR_TRAP.get(), serverLevel);
             trap.configure(
                     player,
-                    position,
+                    grounded,
                     yaw,
                     index * PLACEMENT_DELAY_STEP_TICKS,
                     power,
@@ -175,11 +167,24 @@ public final class BearTrapSpell extends AbstractSpell implements MartialTechniq
                 1.0F
         );
 
-        MartialNetwork.sendToTrackingAndSelf(
-                new SyncBearTrapAnimationPacket(player.getUUID()),
-                player
-        );
-
+        MartialNetwork.sendToTrackingAndSelf(new SyncBearTrapAnimationPacket(player.getUUID()), player);
         super.onCast(level, spellLevel, caster, castSource, magicData);
+    }
+
+    /**
+     * Resolve each radial placement against its own local collision surface. This keeps all three
+     * traps sitting on slabs, stairs and uneven terrain instead of inheriting the caster's Y value.
+     */
+    private static Vec3 groundTrapPosition(ServerLevel level, ServerPlayer player, Vec3 requested) {
+        Vec3 start = requested.add(0.0D, GROUND_SEARCH_UP, 0.0D);
+        Vec3 end = requested.add(0.0D, -GROUND_SEARCH_DOWN, 0.0D);
+        BlockHitResult hit = level.clip(new ClipContext(
+                start,
+                end,
+                ClipContext.Block.COLLIDER,
+                ClipContext.Fluid.NONE,
+                player
+        ));
+        return hit.getType() == HitResult.Type.MISS ? requested : hit.getLocation();
     }
 }
