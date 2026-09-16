@@ -10,6 +10,8 @@
   "death.attack.martial.player": "%1$s was defeated by %2$s's martial technique",
   "death.attack.martial_spells.caltrops": "%1$s was cut down by caltrops",
   "death.attack.martial_spells.caltrops.player": "%1$s was cut down by %2$s's caltrops",
+  "death.attack.martial_spells.bear_trap": "%1$s was caught in a bear trap",
+  "death.attack.martial_spells.bear_trap.player": "%1$s was caught in %2$s's bear trap",
   "ui.martial_spells.scales_with_martial_power": "Scales with Martial Spell Power.",
 
   "spell.martial_spells.guardians_cry": "Guardian's Cry",
@@ -188,6 +190,15 @@
   "ui.martial_spells.vanish_duration": "Stealth Duration: %s seconds",
   "ui.martial_spells.vanish_movement_penalty": "Movement Speed: -%s%% base",
   "ui.martial_spells.vanish_tracking_range": "Enemy Follow Distance: %s blocks",
+
+  "effect.martial_spells.bear_trap": "Trapped",
+  "effect.martial_spells.bear_trap.description": "Unable to move or jump.",
+  "spell.martial_spells.bear_trap": "Bear Trap",
+  "spell.martial_spells.bear_trap.description": "Deploy three concealed traps around you that damage and root enemies who step on them.",
+  "spell.martial_spells.bear_trap.guide": "Instantly deploys three traps 2 blocks from you at 120-degree intervals. Each trap arms after its deployment animation, lasts 20 seconds, and can trigger once. A triggered trap deals physical dual-melee damage with no added knockback and roots eligible targets for 3 seconds. Targets whose maximum health exceeds 100 + twice your translated dual-melee power resist the root. Bear Trap has a 15-second base cooldown and is affected by normal Cooldown Reduction.",
+  "ui.martial_spells.bear_trap_count": "Traps: %s",
+  "ui.martial_spells.bear_trap_duration": "Trap Duration: %s seconds",
+  "ui.martial_spells.bear_trap_root": "Root Duration: %s seconds",
 
   "spell.martial_spells.mutilate": "Mutilate",
   "spell.martial_spells.mutilate.description": "Cross-cut nearby enemies with both hands in a brutal forward melee strike.",
