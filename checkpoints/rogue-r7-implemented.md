@@ -1,6 +1,6 @@
 # Rogue R7 — Bear Trap
 
-Status: **IMPLEMENTED / VALIDATING**
+Status: **PASS / FROZEN**
 
 Frozen source: `ZsoltMolnarrr/Rogues` commit `89ba33ad29adc42d7306660f5b74f28bd17b8ffa`.
 
@@ -19,8 +19,9 @@ R7 preserves the source contract:
 - caster, allies, spectators and invalid/dead targets are excluded;
 - exact Rogues spell icon, Bear Trap entity texture, release/impact/spawn/despawn audio are synchronized by `tools/sync-rogue-r7-assets.ps1`;
 - exact Spell Engine `dual_handed_ground_release` PlayerAnimator JSON is synchronized as a text presentation asset without adding Spell Engine as a runtime dependency;
-- source Spell Engine `magic_spark` impact particles remain dependency-free through the existing vanilla particle translation.
+- source Spell Engine `magic_spark` impact particles remain dependency-free through the existing vanilla particle translation;
+- Bear Trap localization and the corrected Iron's spell-icon path were runtime-validated before PASS.
 
-R7 is not PASS until local clean build, runClient, focused runtime tests, presentation checks and regression tests are user-confirmed.
+User-confirmed runtime validation: **2026-09-16**.
 
-R8 remains locked.
+R7 is frozen. R8 — Fidelity / final audit is unlocked.
