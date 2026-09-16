@@ -1,9 +1,12 @@
 from pathlib import Path
+import json
+import re
 import subprocess
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 errors = []
+
 
 def text(path: str) -> str:
     p = ROOT / path
@@ -12,9 +15,16 @@ def text(path: str) -> str:
         return ""
     return p.read_text(encoding="utf-8")
 
+
 def require(haystack: str, needle: str, label: str):
     if needle not in haystack:
         errors.append(f"missing {label}: {needle}")
+
+
+def require_regex(haystack: str, pattern: str, label: str):
+    if re.search(pattern, haystack, re.MULTILINE) is None:
+        errors.append(f"missing {label}: /{pattern}/")
+
 
 # Keep the previous accepted Rogue checkpoints in the cumulative gate.
 r6 = ROOT / "tools" / "audit-rogue-r6.py"
@@ -45,17 +55,20 @@ for needle, label in [
 ]:
     require(spell, needle, label)
 
-for needle, label in [
-    ("SPAWN_TICKS = 20", "20-tick spawn"),
-    ("ACTIVE_TICKS = 400", "20-second active lifetime"),
-    ("NORMAL_DESPAWN_TICKS = 15", "15-tick normal despawn"),
-    ("ATTACK_TICKS = 30", "30-tick sprung despawn"),
-    ("IMPACT_INTERVAL_TICKS = 2", "two-tick impact scan"),
-    ("ROOT_DURATION_TICKS = 60", "three-second root"),
-    ("TRIGGER_RADIUS = 0.6", "0.6 trigger radius"),
-    ("setDeltaMovement(beforeVelocity)", "zero-knockback restoration"),
+# Accept the source's intentionally readable arithmetic constants rather than requiring
+# their precomputed decimal equivalents. These checks verify the actual implementation
+# currently present in BearTrapEntity instead of brittle spelling choices.
+for pattern, label in [
+    (r"SPAWN_TICKS\s*=\s*20\s*;", "20-tick spawn"),
+    (r"ACTIVE_TICKS\s*=\s*20\s*\*\s*20\s*;", "20-second active lifetime"),
+    (r"NORMAL_DESPAWN_TICKS\s*=\s*15\s*;", "15-tick normal despawn"),
+    (r"ATTACK_TICKS\s*=\s*30\s*;", "30-tick sprung despawn"),
+    (r"IMPACT_INTERVAL_TICKS\s*=\s*2\s*;", "two-tick impact scan"),
+    (r"ROOT_DURATION_TICKS\s*=\s*3\s*\*\s*20\s*;", "three-second root"),
+    (r"RADIUS\s*=\s*0\.6F\s*;", "0.6 trigger radius"),
+    (r"setDeltaMovement\(originalVelocity\)", "zero-knockback restoration"),
 ]:
-    require(entity, needle, label)
+    require_regex(entity, pattern, label)
 
 require(effect, "-2.0D", "source movement-speed modifier")
 require(effect, "MULTIPLY_BASE", "source movement operation")
@@ -63,8 +76,10 @@ require(mixin, 'method = "travel"', "movement-only root hook")
 require(mixin, 'method = "jumpFromGround"', "jump root hook")
 if 'method = "isImmobile"' in mixin:
     errors.append("root still uses global isImmobile and may block non-movement actions")
+
 require(renderer, "BearTrapModel", "Bear Trap renderer")
-require(client_anim, "dual_handed_ground_release", "Bear Trap client release animation")
+require(client_anim, "BearTrapSpell.RELEASE_ANIMATION", "Bear Trap client release animation lookup")
+require(client_anim, "PlayerAnimationRegistry.getAnimation", "PlayerAnimator registry lookup")
 
 assets = [
     "src/main/resources/assets/martial_spells/textures/spell/bear_trap.png",
@@ -82,6 +97,18 @@ assets = [
 for asset in assets:
     if not (ROOT / asset).is_file():
         errors.append(f"missing synchronized R7 asset: {asset}")
+
+animation_path = ROOT / "src/main/resources/assets/martial_spells/player_animation/dual_handed_ground_release.json"
+if animation_path.is_file():
+    try:
+        animation = json.loads(animation_path.read_text(encoding="utf-8-sig"))
+        if animation.get("name") != "dual_handed_ground_release":
+            errors.append(
+                "Bear Trap PlayerAnimator JSON has wrong internal name: "
+                f"{animation.get('name')!r}"
+            )
+    except Exception as exc:
+        errors.append(f"could not parse Bear Trap PlayerAnimator JSON: {exc}")
 
 if errors:
     print("R7 STATIC AUDIT FAILED")
