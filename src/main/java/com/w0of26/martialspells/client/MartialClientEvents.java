@@ -1,10 +1,12 @@
 package com.w0of26.martialspells.client;
 
 import com.w0of26.martialspells.MartialSpells;
+import com.w0of26.martialspells.client.model.BearTrapModel;
 import com.w0of26.martialspells.client.particle.BarrageTrailParticle;
 import com.w0of26.martialspells.client.particle.ShockPowderArcParticle;
 import com.w0of26.martialspells.client.particle.ShockPowderSmokeParticle;
 import com.w0of26.martialspells.client.render.BarrageArrowRenderer;
+import com.w0of26.martialspells.client.render.BearTrapRenderer;
 import com.w0of26.martialspells.client.render.CaltropFieldRenderer;
 import com.w0of26.martialspells.client.render.DiamondBodyShieldLayer;
 import com.w0of26.martialspells.client.render.EntanglingArrowRenderer;
@@ -28,6 +30,12 @@ public final class MartialClientEvents {
         event.registerEntityRenderer(MartialEntityRegistry.ENTANGLING_ARROW.get(), EntanglingArrowRenderer::new);
         event.registerEntityRenderer(MartialEntityRegistry.CALTROP_BUNDLE.get(), ThrownItemRenderer::new);
         event.registerEntityRenderer(MartialEntityRegistry.CALTROP_FIELD.get(), CaltropFieldRenderer::new);
+        event.registerEntityRenderer(MartialEntityRegistry.BEAR_TRAP.get(), BearTrapRenderer::new);
+    }
+
+    @SubscribeEvent
+    public static void registerLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {
+        event.registerLayerDefinition(BearTrapModel.LAYER, BearTrapModel::createBodyLayer);
     }
 
     @SubscribeEvent
