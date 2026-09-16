@@ -12,6 +12,7 @@ import com.w0of26.martialspells.effects.ShadowstepEffect;
 import com.w0of26.martialspells.effects.SliceAndDiceEffect;
 import com.w0of26.martialspells.effects.StealthEffect;
 import com.w0of26.martialspells.effects.StillnessOfMindEffect;
+import com.w0of26.martialspells.effects.TrappedEffect;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
@@ -97,6 +98,14 @@ public final class MartialEffectRegistry {
             MOB_EFFECTS.register(
                     "stealth",
                     StealthEffect::new
+            );
+
+    /** Frozen Rogues bear_trap status effect, displayed as "Trapped". */
+    public static final RegistryObject<MobEffect>
+            BEAR_TRAP =
+            MOB_EFFECTS.register(
+                    "bear_trap",
+                    TrappedEffect::new
             );
 
     private MartialEffectRegistry() {
