@@ -305,7 +305,11 @@ public final class BearTrapEntity extends Entity {
 
     private ServerPlayer getOwnerPlayer(ServerLevel level) {
         Optional<UUID> ownerId = entityData.get(OWNER_ID);
-        return ownerId.map(level::getPlayerByUUID).orElse(null);
+        if (ownerId.isEmpty()) {
+            return null;
+        }
+        var player = level.getPlayerByUUID(ownerId.get());
+        return player instanceof ServerPlayer serverPlayer ? serverPlayer : null;
     }
 
     private void playSoundAtSelf(SoundEvent sound) {
