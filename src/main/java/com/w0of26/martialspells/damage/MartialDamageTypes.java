@@ -62,6 +62,16 @@ public final class MartialDamageTypes {
                     )
             );
 
+    public static final ResourceKey<DamageType>
+            BEAR_TRAP =
+            ResourceKey.create(
+                    Registries.DAMAGE_TYPE,
+                    new ResourceLocation(
+                            MartialSpells.MOD_ID,
+                            "bear_trap"
+                    )
+            );
+
     private MartialDamageTypes() {
     }
 
@@ -159,6 +169,25 @@ public final class MartialDamageTypes {
                                 Registries.DAMAGE_TYPE
                         )
                         .getHolderOrThrow(CALTROPS);
+
+        return new DamageSource(
+                damageType,
+                directEntity,
+                player
+        );
+    }
+
+    public static DamageSource bearTrap(
+            ServerPlayer player,
+            Entity directEntity
+    ) {
+        Holder<DamageType> damageType =
+                player.level()
+                        .registryAccess()
+                        .registryOrThrow(
+                                Registries.DAMAGE_TYPE
+                        )
+                        .getHolderOrThrow(BEAR_TRAP);
 
         return new DamageSource(
                 damageType,
