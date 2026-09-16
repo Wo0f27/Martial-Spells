@@ -41,11 +41,16 @@ public final class MutilateSpell extends AbstractSpell implements MartialTechniq
      * Exact PlayerAnimator pose used by frozen Rogues/Spell Engine, copied into
      * the Martial Spells namespace by the R6 asset sync script so Spell Engine
      * itself does not become a runtime dependency.
+     *
+     * <p>PlayerAnimator registers PAL animations by the animation's internal
+     * JSON name, not by the copied filename. The exact frozen file is stored as
+     * "mutilate_dual_slash_cross" locally, but its authored name is
+     * "weapon_dual_slash_cross" and therefore that is the registry key.</p>
      */
     public static final ResourceLocation MUTILATE_ANIMATION =
             ResourceLocation.fromNamespaceAndPath(
                     MartialSpells.MOD_ID,
-                    "mutilate_dual_slash_cross"
+                    "weapon_dual_slash_cross"
             );
 
     public static final int MAX_LEVEL = 1;
