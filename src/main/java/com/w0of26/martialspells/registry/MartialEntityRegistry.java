@@ -2,6 +2,7 @@ package com.w0of26.martialspells.registry;
 
 import com.w0of26.martialspells.MartialSpells;
 import com.w0of26.martialspells.entity.BarrageArrow;
+import com.w0of26.martialspells.entity.BearTrapEntity;
 import com.w0of26.martialspells.entity.CaltropBundleProjectile;
 import com.w0of26.martialspells.entity.CaltropFieldEntity;
 import com.w0of26.martialspells.entity.EntanglingArrow;
@@ -47,6 +48,20 @@ public final class MartialEntityRegistry {
                     .clientTrackingRange(10)
                     .updateInterval(20)
                     .build(MartialSpells.MOD_ID + ":caltrop_field"));
+
+    /**
+     * Frozen Rogues Bear Trap dimensions/tracking translated from its custom
+     * SpellCloud entity type: 1x0.5, fire immune, 128-block tracking range,
+     * 20-tick update interval.
+     */
+    public static final RegistryObject<EntityType<BearTrapEntity>> BEAR_TRAP =
+            ENTITY_TYPES.register("bear_trap", () -> EntityType.Builder
+                    .<BearTrapEntity>of(BearTrapEntity::new, MobCategory.MISC)
+                    .sized(1.0F, 0.5F)
+                    .fireImmune()
+                    .clientTrackingRange(128)
+                    .updateInterval(20)
+                    .build(MartialSpells.MOD_ID + ":bear_trap"));
 
     private MartialEntityRegistry() {}
 
