@@ -2,6 +2,8 @@ package com.w0of26.martialspells.spells;
 
 import com.w0of26.martialspells.MartialSpells;
 import com.w0of26.martialspells.combat.MutilateAttackManager;
+import com.w0of26.martialspells.network.MartialNetwork;
+import com.w0of26.martialspells.network.SyncMutilateAnimationPacket;
 import com.w0of26.martialspells.registry.MartialSchoolRegistry;
 import com.w0of26.martialspells.technique.MartialTechnique;
 import com.w0of26.martialspells.technique.MartialTechniqueClass;
@@ -112,10 +114,11 @@ public final class MutilateSpell extends AbstractSpell implements MartialTechniq
     @Override
     public AnimationHolder getCastFinishAnimation() {
         /*
-         * Iron's already owns the synchronized PlayerAnimator casting layer.
-         * Returning the Martial-namespaced copy here gives both the caster and
-         * tracking clients the exact frozen dual-cross-slash pose without a
-         * Spell Engine runtime dependency.
+         * Retain the native Iron's finish-animation declaration as a fallback.
+         * The authoritative R6 visual path is additionally synchronized by
+         * SyncMutilateAnimationPacket because this instant spell was observed
+         * to complete mechanically without Iron's finish callback producing a
+         * visible PlayerAnimator pose.
          */
         return new AnimationHolder(MUTILATE_ANIMATION, true, false);
     }
@@ -146,6 +149,16 @@ public final class MutilateSpell extends AbstractSpell implements MartialTechniq
             MagicData magicData
     ) {
         if (!level.isClientSide && caster instanceof ServerPlayer player) {
+            /*
+             * Use the same explicit server -> tracking-client animation route
+             * that already works for Stunning Strike. This guarantees that the
+             * authored Mutilate pose is requested even when Iron's instant
+             * spell finish-animation path does not visibly fire.
+             */
+            MartialNetwork.sendToTrackingAndSelf(
+                    new SyncMutilateAnimationPacket(player.getUUID()),
+                    player
+            );
             MutilateAttackManager.begin(player);
         }
 

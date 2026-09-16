@@ -8,15 +8,10 @@ import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 
-/**
- * Registers and sends Martial Spells network packets.
- */
+/** Registers and sends Martial Spells network packets. */
 public final class MartialNetwork {
-
-    /*
-     * Increment whenever the packet protocol changes.
-     */
-    private static final String PROTOCOL_VERSION = "10";
+    /* Increment whenever the packet protocol changes. */
+    private static final String PROTOCOL_VERSION = "11";
 
     private static SimpleChannel instance;
     private static int packetId;
@@ -25,339 +20,170 @@ public final class MartialNetwork {
     }
 
     public static void register() {
-        instance =
-                NetworkRegistry.ChannelBuilder
-                        .named(
-                                ResourceLocation
-                                        .fromNamespaceAndPath(
-                                                MartialSpells.MOD_ID,
-                                                "messages"
-                                        )
-                        )
-                        .networkProtocolVersion(
-                                () -> PROTOCOL_VERSION
-                        )
-                        .clientAcceptedVersions(
-                                PROTOCOL_VERSION::equals
-                        )
-                        .serverAcceptedVersions(
-                                PROTOCOL_VERSION::equals
-                        )
-                        .simpleChannel();
+        instance = NetworkRegistry.ChannelBuilder
+                .named(ResourceLocation.fromNamespaceAndPath(MartialSpells.MOD_ID, "messages"))
+                .networkProtocolVersion(() -> PROTOCOL_VERSION)
+                .clientAcceptedVersions(PROTOCOL_VERSION::equals)
+                .serverAcceptedVersions(PROTOCOL_VERSION::equals)
+                .simpleChannel();
 
-        /*
-         * Ki synchronization.
-         */
         instance.messageBuilder(
                         SyncKiPacket.class,
                         nextPacketId(),
                         NetworkDirection.PLAY_TO_CLIENT
                 )
-                .decoder(
-                        SyncKiPacket::new
-                )
-                .encoder(
-                        SyncKiPacket::toBytes
-                )
-                .consumerMainThread(
-                        SyncKiPacket::handle
-                )
+                .decoder(SyncKiPacket::new)
+                .encoder(SyncKiPacket::toBytes)
+                .consumerMainThread(SyncKiPacket::handle)
                 .add();
 
-        /*
-         * Flurry of Blows visuals.
-         */
         instance.messageBuilder(
                         SyncFlurryVisualPacket.class,
                         nextPacketId(),
                         NetworkDirection.PLAY_TO_CLIENT
                 )
-                .decoder(
-                        SyncFlurryVisualPacket::new
-                )
-                .encoder(
-                        SyncFlurryVisualPacket::toBytes
-                )
-                .consumerMainThread(
-                        SyncFlurryVisualPacket::handle
-                )
+                .decoder(SyncFlurryVisualPacket::new)
+                .encoder(SyncFlurryVisualPacket::toBytes)
+                .consumerMainThread(SyncFlurryVisualPacket::handle)
                 .add();
 
-        /*
-         * Stunning Strike animation.
-         */
         instance.messageBuilder(
                         SyncStunningStrikeAnimationPacket.class,
                         nextPacketId(),
                         NetworkDirection.PLAY_TO_CLIENT
                 )
-                .decoder(
-                        SyncStunningStrikeAnimationPacket::new
-                )
-                .encoder(
-                        SyncStunningStrikeAnimationPacket::toBytes
-                )
-                .consumerMainThread(
-                        SyncStunningStrikeAnimationPacket::handle
-                )
+                .decoder(SyncStunningStrikeAnimationPacket::new)
+                .encoder(SyncStunningStrikeAnimationPacket::toBytes)
+                .consumerMainThread(SyncStunningStrikeAnimationPacket::handle)
                 .add();
 
-        /*
-         * Deflect Missiles impact animation.
-         *
-         * The server sends:
-         *
-         * - the defending player's UUID
-         * - whether the base or mirrored swipe was chosen
-         *
-         * Only empty-hand and gauntlet Deflect Missiles
-         * interceptions send this packet.
-         */
+        /* Explicit Mutilate animation synchronization. */
+        instance.messageBuilder(
+                        SyncMutilateAnimationPacket.class,
+                        nextPacketId(),
+                        NetworkDirection.PLAY_TO_CLIENT
+                )
+                .decoder(SyncMutilateAnimationPacket::new)
+                .encoder(SyncMutilateAnimationPacket::toBytes)
+                .consumerMainThread(SyncMutilateAnimationPacket::handle)
+                .add();
+
         instance.messageBuilder(
                         SyncDeflectMissilesAnimationPacket.class,
                         nextPacketId(),
                         NetworkDirection.PLAY_TO_CLIENT
                 )
-                .decoder(
-                        SyncDeflectMissilesAnimationPacket::new
-                )
-                .encoder(
-                        SyncDeflectMissilesAnimationPacket::toBytes
-                )
-                .consumerMainThread(
-                        SyncDeflectMissilesAnimationPacket::handle
-                )
+                .decoder(SyncDeflectMissilesAnimationPacket::new)
+                .encoder(SyncDeflectMissilesAnimationPacket::toBytes)
+                .consumerMainThread(SyncDeflectMissilesAnimationPacket::handle)
                 .add();
 
-        /*
-         * Step of the Wind surface orientation.
-         */
         instance.messageBuilder(
                         SyncStepOfWindSurfacePacket.class,
                         nextPacketId(),
                         NetworkDirection.PLAY_TO_CLIENT
                 )
-                .decoder(
-                        SyncStepOfWindSurfacePacket::new
-                )
-                .encoder(
-                        SyncStepOfWindSurfacePacket::toBytes
-                )
-                .consumerMainThread(
-                        SyncStepOfWindSurfacePacket::handle
-                )
+                .decoder(SyncStepOfWindSurfacePacket::new)
+                .encoder(SyncStepOfWindSurfacePacket::toBytes)
+                .consumerMainThread(SyncStepOfWindSurfacePacket::handle)
                 .add();
 
-        /*
-         * Step of the Wind wall-jump request.
-         *
-         * The client only reports the jump input.
-         * All movement validation remains server-side.
-         */
         instance.messageBuilder(
                         RequestStepOfWindWallJumpPacket.class,
                         nextPacketId(),
                         NetworkDirection.PLAY_TO_SERVER
                 )
-                .decoder(
-                        RequestStepOfWindWallJumpPacket::new
-                )
-                .encoder(
-                        RequestStepOfWindWallJumpPacket::toBytes
-                )
-                .consumerMainThread(
-                        RequestStepOfWindWallJumpPacket::handle
-                )
+                .decoder(RequestStepOfWindWallJumpPacket::new)
+                .encoder(RequestStepOfWindWallJumpPacket::toBytes)
+                .consumerMainThread(RequestStepOfWindWallJumpPacket::handle)
                 .add();
 
-        /*
-         * Heavenfall Strike target selection.
-         *
-         * Server chooses the currently valid target.
-         * Client receives only the selected entity ID
-         * for rendering.
-         */
         instance.messageBuilder(
                         SyncHeavenfallTargetPacket.class,
                         nextPacketId(),
                         NetworkDirection.PLAY_TO_CLIENT
                 )
-                .decoder(
-                        SyncHeavenfallTargetPacket::new
-                )
-                .encoder(
-                        SyncHeavenfallTargetPacket::toBytes
-                )
-                .consumerMainThread(
-                        SyncHeavenfallTargetPacket::handle
-                )
+                .decoder(SyncHeavenfallTargetPacket::new)
+                .encoder(SyncHeavenfallTargetPacket::toBytes)
+                .consumerMainThread(SyncHeavenfallTargetPacket::handle)
                 .add();
 
-        /*
-         * Heavenfall Strike dive confirmation.
-         *
-         * The client reports only that Attack was pressed while
-         * Heavenfall had a selectable target.
-         *
-         * Target identity and validity remain server-authoritative.
-         */
         instance.messageBuilder(
                         RequestHeavenfallDivePacket.class,
                         nextPacketId(),
                         NetworkDirection.PLAY_TO_SERVER
                 )
-                .decoder(
-                        RequestHeavenfallDivePacket::new
-                )
-                .encoder(
-                        RequestHeavenfallDivePacket::toBytes
-                )
-                .consumerMainThread(
-                        RequestHeavenfallDivePacket::handle
-                )
+                .decoder(RequestHeavenfallDivePacket::new)
+                .encoder(RequestHeavenfallDivePacket::toBytes)
+                .consumerMainThread(RequestHeavenfallDivePacket::handle)
                 .add();
 
-        /*
-         * Heavenfall Strike player animations.
-         *
-         * Server synchronizes animation phases to the caster
-         * and every client currently tracking them.
-         */
         instance.messageBuilder(
                         SyncHeavenfallAnimationPacket.class,
                         nextPacketId(),
                         NetworkDirection.PLAY_TO_CLIENT
                 )
-                .decoder(
-                        SyncHeavenfallAnimationPacket::new
-                )
-                .encoder(
-                        SyncHeavenfallAnimationPacket::toBytes
-                )
-                .consumerMainThread(
-                        SyncHeavenfallAnimationPacket::handle
-                )
+                .decoder(SyncHeavenfallAnimationPacket::new)
+                .encoder(SyncHeavenfallAnimationPacket::toBytes)
+                .consumerMainThread(SyncHeavenfallAnimationPacket::handle)
                 .add();
 
-        /*
-         * Prone animation state.
-         *
-         * Gameplay remains server-authoritative.
-         * Clients receive only the entity ID and whether
-         * the Prone visual should be active.
-         */
         instance.messageBuilder(
                         SyncProneAnimationPacket.class,
                         nextPacketId(),
                         NetworkDirection.PLAY_TO_CLIENT
                 )
-                .decoder(
-                        SyncProneAnimationPacket::new
-                )
-                .encoder(
-                        SyncProneAnimationPacket::toBytes
-                )
-                .consumerMainThread(
-                        SyncProneAnimationPacket::handle
-                )
+                .decoder(SyncProneAnimationPacket::new)
+                .encoder(SyncProneAnimationPacket::toBytes)
+                .consumerMainThread(SyncProneAnimationPacket::handle)
                 .add();
-
     }
 
-
-    /**
-     * Sends a client-originating packet to the server.
-     */
-    public static <MSG> void sendToServer(
-            MSG message
-    ) {
+    public static <MSG> void sendToServer(MSG message) {
         if (instance == null) {
             throw new IllegalStateException(
                     "Martial Spells network has not been registered."
             );
         }
-
-        instance.sendToServer(
-                message
-        );
+        instance.sendToServer(message);
     }
-
 
     private static int nextPacketId() {
         return packetId++;
     }
 
-    /**
-     * Sends a packet only to one specific player.
-     */
-    public static <MSG> void sendToPlayer(
-            MSG message,
-            ServerPlayer player
-    ) {
+    public static <MSG> void sendToPlayer(MSG message, ServerPlayer player) {
         if (instance == null) {
             throw new IllegalStateException(
                     "Martial Spells network has not been registered."
             );
         }
-
-        instance.send(
-                PacketDistributor.PLAYER.with(
-                        () -> player
-                ),
-                message
-        );
+        instance.send(PacketDistributor.PLAYER.with(() -> player), message);
     }
 
-    /**
-     * Sends a packet to the target player and every client
-     * currently tracking that player.
-     *
-     * This is used for player animations that must appear
-     * consistently in multiplayer.
-     */
-    public static <MSG> void sendToTrackingAndSelf(
-            MSG message,
-            ServerPlayer player
-    ) {
+    public static <MSG> void sendToTrackingAndSelf(MSG message, ServerPlayer player) {
         if (instance == null) {
             throw new IllegalStateException(
-                    "Martial Spells network has not "
-                            + "been registered."
+                    "Martial Spells network has not been registered."
             );
         }
-
         instance.send(
-                PacketDistributor
-                        .TRACKING_ENTITY_AND_SELF
-                        .with(
-                                () -> player
-                        ),
+                PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> player),
                 message
         );
     }
 
-    /**
-     * Sends a packet to every client currently tracking
-     * an entity, and also to the entity itself when the
-     * entity is a player.
-     */
     public static <MSG> void sendToTrackingEntityAndSelf(
             MSG message,
             net.minecraft.world.entity.Entity entity
     ) {
         if (instance == null) {
             throw new IllegalStateException(
-                    "Martial Spells network has not "
-                            + "been registered."
+                    "Martial Spells network has not been registered."
             );
         }
-
         instance.send(
-                PacketDistributor
-                        .TRACKING_ENTITY_AND_SELF
-                        .with(
-                                () -> entity
-                        ),
+                PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> entity),
                 message
         );
     }
