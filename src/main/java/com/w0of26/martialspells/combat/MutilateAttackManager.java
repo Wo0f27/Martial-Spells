@@ -17,7 +17,6 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -72,6 +71,27 @@ public final class MutilateAttackManager {
                         delayTicks
                 )
         );
+
+        /*
+         * Frozen Spell Engine broadcasts the melee animation and swing sound
+         * immediately when the melee attack starts, before the delayed contact
+         * frame. Iron's synchronizes the animation via MutilateSpell's finish
+         * AnimationHolder; this is the dependency-free translation of the
+         * generic Spell Engine weapon_sword_swing audio cue.
+         *
+         * Play it even if the attack ultimately whiffs so the cast always has
+         * immediate audiovisual feedback.
+         */
+        player.serverLevel().playSound(
+                null,
+                player.getX(),
+                player.getY(),
+                player.getZ(),
+                SoundEvents.PLAYER_ATTACK_SWEEP,
+                SoundSource.PLAYERS,
+                0.8F,
+                1.05F
+        );
     }
 
     /**
@@ -124,17 +144,6 @@ public final class MutilateAttackManager {
         ServerLevel level = player.serverLevel();
         Vec3 origin = targetingOrigin(player);
         Vec3 forward = player.getViewVector(1.0F).normalize();
-
-        level.playSound(
-                null,
-                player.getX(),
-                player.getY(),
-                player.getZ(),
-                SoundEvents.PLAYER_ATTACK_SWEEP,
-                SoundSource.PLAYERS,
-                0.8F,
-                1.05F
-        );
 
         List<Entity> targets = findTargets(level, player, origin, forward);
         if (targets.isEmpty()) {

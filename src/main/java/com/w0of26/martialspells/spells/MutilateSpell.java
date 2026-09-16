@@ -35,6 +35,17 @@ public final class MutilateSpell extends AbstractSpell implements MartialTechniq
     public static final ResourceLocation SPELL_ID =
             ResourceLocation.fromNamespaceAndPath(MartialSpells.MOD_ID, "mutilate");
 
+    /**
+     * Exact PlayerAnimator pose used by frozen Rogues/Spell Engine, copied into
+     * the Martial Spells namespace by the R6 asset sync script so Spell Engine
+     * itself does not become a runtime dependency.
+     */
+    public static final ResourceLocation MUTILATE_ANIMATION =
+            ResourceLocation.fromNamespaceAndPath(
+                    MartialSpells.MOD_ID,
+                    "mutilate_dual_slash_cross"
+            );
+
     public static final int MAX_LEVEL = 1;
     public static final float RANGE = 3.0F;
     public static final float ARC_DEGREES = 160.0F;
@@ -100,9 +111,13 @@ public final class MutilateSpell extends AbstractSpell implements MartialTechniq
 
     @Override
     public AnimationHolder getCastFinishAnimation() {
-        // Frozen Rogues uses Spell Engine's weapon_dual_slash_cross animation.
-        // Do not add Spell Engine solely for its generic dual-slash pose.
-        return AnimationHolder.none();
+        /*
+         * Iron's already owns the synchronized PlayerAnimator casting layer.
+         * Returning the Martial-namespaced copy here gives both the caster and
+         * tracking clients the exact frozen dual-cross-slash pose without a
+         * Spell Engine runtime dependency.
+         */
+        return new AnimationHolder(MUTILATE_ANIMATION, true, false);
     }
 
     @Override
