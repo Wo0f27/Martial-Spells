@@ -30,6 +30,7 @@ public final class MartialSpellRegistry {
     public static final RegistryObject<AbstractSpell> SLICE_AND_DICE = SPELLS.register("slice_and_dice", SliceAndDiceSpell::new);
     public static final RegistryObject<AbstractSpell> VANISH = SPELLS.register("vanish", VanishSpell::new);
     public static final RegistryObject<AbstractSpell> MUTILATE = SPELLS.register("mutilate", MutilateSpell::new);
+    public static final RegistryObject<AbstractSpell> BEAR_TRAP = SPELLS.register("bear_trap", BearTrapSpell::new);
 
     private MartialSpellRegistry() {}
 
