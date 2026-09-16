@@ -7,7 +7,7 @@ $roguesBase = "https://raw.githubusercontent.com/ZsoltMolnarrr/Rogues/$roguesCom
 $spellEngineBase = "https://raw.githubusercontent.com/ZsoltMolnarrr/SpellEngine/$spellEngineCommit/common/src/main/resources/assets/spell_engine"
 
 $assets = @(
-    @{ Url = "$roguesBase/textures/spell/bear_trap.png"; Path = 'src/main/resources/assets/martial_spells/textures/spell/bear_trap.png'; Hash = '89ed5f2f123da657d5e5161932b5f6b20deb274e' },
+    @{ Url = "$roguesBase/textures/spell/bear_trap.png"; Path = 'src/main/resources/assets/martial_spells/textures/gui/spell_icons/bear_trap.png'; Hash = '89ed5f2f123da657d5e5161932b5f6b20deb274e' },
     @{ Url = "$roguesBase/textures/entity/bear_trap.png"; Path = 'src/main/resources/assets/martial_spells/textures/entity/bear_trap.png'; Hash = '0501909a687c11bf3d92c879eb8d0640c27b0442' },
     @{ Url = "$roguesBase/sounds/bear_trap_release.ogg"; Path = 'src/main/resources/assets/martial_spells/sounds/bear_trap_release.ogg'; Hash = '457dcedd900201c006c9f196f08ddd291e51e3fb' },
     @{ Url = "$roguesBase/sounds/bear_trap_impact.ogg"; Path = 'src/main/resources/assets/martial_spells/sounds/bear_trap_impact.ogg'; Hash = '6f08efe0749ddd00b58cbadfc445f65874704fd4' },
@@ -28,6 +28,13 @@ foreach ($asset in $assets) {
     if ($actual -ne $asset.Hash) {
         throw "Hash mismatch for $($asset.Path): expected $($asset.Hash), got $actual"
     }
+}
+
+# Remove the obsolete R7 pre-fix location if an earlier sync created it. Iron's
+# looks for spell icons under textures/gui/spell_icons/<spell_id>.png.
+$legacyIcon = Join-Path $root 'src/main/resources/assets/martial_spells/textures/spell/bear_trap.png'
+if (Test-Path $legacyIcon) {
+    Remove-Item -Force $legacyIcon
 }
 
 $animationTarget = Join-Path $root 'src/main/resources/assets/martial_spells/player_animation/dual_handed_ground_release.json'
