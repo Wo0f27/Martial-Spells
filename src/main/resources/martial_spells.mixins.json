@@ -13,7 +13,9 @@
     "LivingEntityNettedMixin",
     "IronsReleaseUsingHelperMixin"
   ],
-  "client": [],
+  "client": [
+    "client.LivingEntityNettedRendererMixin"
+  ],
   "injectors": {
     "defaultRequire": 1
   }

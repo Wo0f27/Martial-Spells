@@ -6,6 +6,7 @@ import com.w0of26.martialspells.MartialSpells;
 import com.w0of26.martialspells.registry.MartialEffectRegistry;
 import com.w0of26.martialspells.spells.ThrowNetSpell;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.BakedModel;
@@ -14,10 +15,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.RenderLivingEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 
 /**
  * Frozen Rogues Netted model-FX translation.
@@ -26,12 +23,11 @@ import net.minecraftforge.fml.common.Mod;
  * blocks over six ticks with EASE_IN_QUAD, and snaps from zero to full scale
  * over eight ticks with EASE_OUT_BACK. Playback is ONCE, so the final net
  * remains around the target until Netted expires.</p>
+ *
+ * <p>Rendering is invoked from the client LivingEntityRenderer tail mixin,
+ * matching Spell Engine's source integration point instead of approximating it
+ * with Forge's RenderLivingEvent.Post.</p>
  */
-@Mod.EventBusSubscriber(
-        modid = MartialSpells.MOD_ID,
-        bus = Mod.EventBusSubscriber.Bus.FORGE,
-        value = Dist.CLIENT
-)
 public final class NettedEffectRenderer {
     public static final ResourceLocation MODEL =
             ResourceLocation.fromNamespaceAndPath(
@@ -51,9 +47,13 @@ public final class NettedEffectRenderer {
 
     private NettedEffectRenderer() {}
 
-    @SubscribeEvent
-    public static void renderNetted(RenderLivingEvent.Post<?, ?> event) {
-        LivingEntity entity = event.getEntity();
+    public static void render(
+            LivingEntity entity,
+            float partialTick,
+            PoseStack poseStack,
+            MultiBufferSource bufferSource,
+            int packedLight
+    ) {
         MobEffectInstance netted =
                 entity.getEffect(MartialEffectRegistry.NET_TRAP.get());
         if (netted == null) {
@@ -64,7 +64,7 @@ public final class NettedEffectRenderer {
                 0.0F,
                 ThrowNetSpell.NETTED_DURATION_TICKS
                         - netted.getDuration()
-                        + event.getPartialTick()
+                        + partialTick
         );
 
         float dropT = Mth.clamp(age / DROP_END_TICK, 0.0F, 1.0F);
@@ -82,13 +82,12 @@ public final class NettedEffectRenderer {
                 ENTITY_SCALE_MAX
         );
 
-        PoseStack poseStack = event.getPoseStack();
         poseStack.pushPose();
 
         // ModelFxEffectRenderer.entityScaling(WIDTH, 0.5F).
         poseStack.scale(entityScale, entityScale, entityScale);
 
-        // Initial + animated source transforms.
+        // Frozen source initial + animated transforms.
         poseStack.translate(
                 0.0D,
                 INITIAL_TRANSLATE_Y + DROP_Y * dropProgress,
@@ -99,7 +98,7 @@ public final class NettedEffectRenderer {
         BakedModel model = Minecraft.getInstance()
                 .getModelManager()
                 .getModel(MODEL);
-        VertexConsumer vertices = event.getMultiBufferSource()
+        VertexConsumer vertices = bufferSource
                 .getBuffer(Sheets.translucentCullBlockSheet());
 
         // Spell Engine CustomModels.renderModel raw-model centering.
@@ -109,7 +108,7 @@ public final class NettedEffectRenderer {
                 .renderModelLists(
                         model,
                         ItemStack.EMPTY,
-                        event.getPackedLight(),
+                        packedLight,
                         OverlayTexture.NO_OVERLAY,
                         poseStack,
                         vertices

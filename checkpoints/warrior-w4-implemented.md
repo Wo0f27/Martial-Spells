@@ -61,6 +61,8 @@ The root cause of the texture failure is part of Spell Engine's 1.20.1 resource 
 
 Forge 47's own `ModelBakery` additional-model patch stores these models under plain `ResourceLocation` keys, so W4 deliberately uses the same plain IDs rather than newer NeoForge `#standalone` semantics. The repair also mirrors Spell Engine's `TOWARDS_MOTION` projectile orientation and raw-model `-0.5/-0.5/-0.5` centering, and ports the frozen persistent Netted model-FX animation. A model-bake diagnostic logs an explicit error if either model still resolves to Minecraft's missing model.
 
+A subsequent runtime pass showed the projectile correctly textured but the target-bound Netted model still absent while the status effect itself was visibly active. The event-based target renderer has therefore been replaced with a client mixin at the exact tail of `LivingEntityRenderer.render`, matching Spell Engine's source `CustomModelStatusEffect` integration point rather than approximating it with `RenderLivingEvent.Post`.
+
 ## Validation gate
 
 Run:

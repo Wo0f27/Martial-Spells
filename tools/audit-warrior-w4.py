@@ -167,8 +167,20 @@ require("translucentCullBlockSheet" in projectile_renderer,
 netted_renderer = read("src/main/java/com/w0of26/martialspells/client/render/NettedEffectRenderer.java")
 require("ModelResourceLocation" not in netted_renderer,
         "Netted effect must use Forge 1.20.1 plain ResourceLocation lookup")
+require("RenderLivingEvent" not in netted_renderer,
+        "Netted renderer must not fall back to the Forge Post-event approximation")
+
+netted_render_mixin = read("src/main/java/com/w0of26/martialspells/mixin/client/LivingEntityNettedRendererMixin.java")
+require('at = @At("TAIL")' in netted_render_mixin,
+        "Netted model FX must render at LivingEntityRenderer tail")
+require("NettedEffectRenderer.render(" in netted_render_mixin,
+        "Netted renderer-tail mixin is not invoking the model renderer")
+require(
+    "client.LivingEntityNettedRendererMixin" in mixins.get("client", []),
+    "Netted renderer-tail mixin missing from client mixin config"
+)
 for token, message in (
-    ("RenderLivingEvent.Post", "Netted persistent model render hook missing"),
+    ("public static void render(", "Netted persistent model render entrypoint missing"),
     ('"spell_effect/net_trap"', "Netted effect model id missing"),
     ("INITIAL_TRANSLATE_Y = 1.1F", "Netted initial drop height drifted"),
     ("DROP_Y = -0.6F", "Netted drop distance drifted"),
