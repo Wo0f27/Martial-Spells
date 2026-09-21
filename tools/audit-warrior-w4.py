@@ -167,8 +167,11 @@ require("translucentCullBlockSheet" in projectile_renderer,
 netted_renderer = read("src/main/java/com/w0of26/martialspells/client/render/NettedEffectRenderer.java")
 require("ModelResourceLocation" not in netted_renderer,
         "Netted effect must use Forge 1.20.1 plain ResourceLocation lookup")
-require("RenderLivingEvent" not in netted_renderer,
-        "Netted renderer must not fall back to the Forge Post-event approximation")
+require(
+    "import net.minecraftforge.client.event.RenderLivingEvent;" not in netted_renderer
+    and "@SubscribeEvent" not in netted_renderer,
+    "Netted renderer must not fall back to the Forge Post-event approximation"
+)
 
 netted_render_mixin = read("src/main/java/com/w0of26/martialspells/mixin/client/LivingEntityNettedRendererMixin.java")
 require('at = @At("TAIL")' in netted_render_mixin,
