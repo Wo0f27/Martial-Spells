@@ -7,11 +7,14 @@ import com.w0of26.martialspells.registry.MartialEffectRegistry;
 import com.w0of26.martialspells.spells.ThrowNetSpell;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.Sheets;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
@@ -44,6 +47,18 @@ public final class NettedEffectRenderer {
     private static final float SNAP_END_TICK = 8.0F;
     private static final float BACK_C1 = 1.70158F;
     private static final float BACK_C3 = BACK_C1 + 1.0F;
+
+    /*
+     * Spell Engine LightEmission.NONE uses its spell_object_cull layer:
+     * entity-translucent-cull shader + block atlas + transparency + culling +
+     * lightmap/overlay. Vanilla's entityTranslucentCull(block atlas) is the
+     * closest Forge 1.20.1 equivalent and, unlike a Sheets convenience layer,
+     * exactly expresses the entity render path needed here.
+     */
+    private static final RenderType NETTED_RENDER_TYPE =
+            RenderType.entityTranslucentCull(TextureAtlas.LOCATION_BLOCKS);
+
+    private static boolean diagnosticLogged;
 
     private NettedEffectRenderer() {}
 
@@ -82,6 +97,24 @@ public final class NettedEffectRenderer {
                 ENTITY_SCALE_MAX
         );
 
+        Minecraft minecraft = Minecraft.getInstance();
+        BakedModel model = minecraft
+                .getModelManager()
+                .getModel(MODEL);
+
+        if (!diagnosticLogged) {
+            diagnosticLogged = true;
+            MartialSpells.LOGGER.info(
+                    "W4 Netted VFX render hook active: entity={} id={} duration={} age={} modelMissing={} bakedQuads={}",
+                    entity.getType(),
+                    entity.getId(),
+                    netted.getDuration(),
+                    age,
+                    model == minecraft.getModelManager().getMissingModel(),
+                    countBakedQuads(model)
+            );
+        }
+
         poseStack.pushPose();
 
         // ModelFxEffectRenderer.entityScaling(WIDTH, 0.5F).
@@ -95,15 +128,12 @@ public final class NettedEffectRenderer {
         );
         poseStack.scale(snapProgress, snapProgress, snapProgress);
 
-        BakedModel model = Minecraft.getInstance()
-                .getModelManager()
-                .getModel(MODEL);
-        VertexConsumer vertices = bufferSource
-                .getBuffer(Sheets.translucentCullBlockSheet());
+        VertexConsumer vertices =
+                bufferSource.getBuffer(NETTED_RENDER_TYPE);
 
         // Spell Engine CustomModels.renderModel raw-model centering.
         poseStack.translate(-0.5D, -0.5D, -0.5D);
-        Minecraft.getInstance()
+        minecraft
                 .getItemRenderer()
                 .renderModelLists(
                         model,
@@ -115,6 +145,18 @@ public final class NettedEffectRenderer {
                 );
 
         poseStack.popPose();
+    }
+
+    private static int countBakedQuads(BakedModel model) {
+        int count = 0;
+        RandomSource random = RandomSource.create(42L);
+
+        count += model.getQuads(null, null, random).size();
+        for (Direction direction : Direction.values()) {
+            random.setSeed(42L);
+            count += model.getQuads(null, direction, random).size();
+        }
+        return count;
     }
 
     private static float easeOutBack(float x) {

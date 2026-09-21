@@ -167,6 +167,12 @@ require("translucentCullBlockSheet" in projectile_renderer,
 netted_renderer = read("src/main/java/com/w0of26/martialspells/client/render/NettedEffectRenderer.java")
 require("ModelResourceLocation" not in netted_renderer,
         "Netted effect must use Forge 1.20.1 plain ResourceLocation lookup")
+require("RenderType.entityTranslucentCull(TextureAtlas.LOCATION_BLOCKS)" in netted_renderer,
+        "Netted effect must use the source-equivalent entity translucent cull block-atlas layer")
+require("W4 Netted VFX render hook active:" in netted_renderer,
+        "Netted runtime render diagnostic missing")
+require("countBakedQuads(model)" in netted_renderer,
+        "Netted runtime baked-quad diagnostic missing")
 require(
     "import net.minecraftforge.client.event.RenderLivingEvent;" not in netted_renderer
     and "@SubscribeEvent" not in netted_renderer,
