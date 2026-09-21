@@ -151,6 +151,47 @@ require("martial_spells:spell_projectile/throw_net" in model,
 require("rogues:spell_projectile/throw_net" not in model,
         "Throw Net model retains source namespace")
 
+
+projectile_renderer = read("src/main/java/com/w0of26/martialspells/client/render/ThrowNetRenderer.java")
+require("ModelResourceLocation" in projectile_renderer and '"standalone"' in projectile_renderer,
+        "Throw Net projectile must use Forge standalone baked-model lookup")
+require("directionYaw" in projectile_renderer and "+ 180.0F" in projectile_renderer,
+        "Throw Net projectile must preserve Spell Engine TOWARDS_MOTION yaw")
+require("directionPitch" in projectile_renderer and "Math.asin" in projectile_renderer,
+        "Throw Net projectile must preserve Spell Engine TOWARDS_MOTION pitch")
+require("translate(-0.5D, -0.5D, -0.5D)" in projectile_renderer,
+        "Throw Net projectile raw-model centering drifted")
+require("translucentCullBlockSheet" in projectile_renderer,
+        "Throw Net projectile must use source-equivalent non-emissive translucent cull layer")
+
+netted_renderer = read("src/main/java/com/w0of26/martialspells/client/render/NettedEffectRenderer.java")
+for token, message in (
+    ("RenderLivingEvent.Post", "Netted persistent model render hook missing"),
+    ('"spell_effect/net_trap"', "Netted effect model id missing"),
+    ('"standalone"', "Netted effect must use Forge standalone baked-model lookup"),
+    ("INITIAL_TRANSLATE_Y = 1.1F", "Netted initial drop height drifted"),
+    ("DROP_Y = -0.6F", "Netted drop distance drifted"),
+    ("DROP_END_TICK = 6.0F", "Netted EASE_IN_QUAD drop timing drifted"),
+    ("SNAP_END_TICK = 8.0F", "Netted EASE_OUT_BACK snap timing drifted"),
+    ("BACK_C1 = 1.70158F", "Netted source EASE_OUT_BACK constant drifted"),
+    ("Math.sqrt(entity.getBbWidth() / ENTITY_WIDTH_BASELINE)",
+     "Netted source WIDTH entity-scaling curve missing"),
+    ("ENTITY_WIDTH_BASELINE = 0.5F", "Netted source entity-scaling baseline drifted"),
+):
+    require(token in netted_renderer, message)
+
+netted_model = read("src/main/resources/assets/martial_spells/models/spell_effect/net_trap.json")
+require("martial_spells:spell_effect/net_trap" in netted_model,
+        "Netted model texture namespace not translated")
+require("rogues:spell_effect/net_trap" not in netted_model,
+        "Netted model retains source namespace")
+
+client_events = read("src/main/java/com/w0of26/martialspells/client/MartialClientEvents.java")
+require("event.register(ThrowNetRenderer.MODEL)" in client_events,
+        "Throw Net standalone model not registered")
+require("event.register(NettedEffectRenderer.MODEL)" in client_events,
+        "Netted standalone model not registered")
+
 expected_assets = {
     "src/main/resources/assets/martial_spells/textures/gui/spell_icons/throw_net.png":
         "6bffb24937a7aeddb959f05994bd846f21f8164e",
@@ -158,6 +199,8 @@ expected_assets = {
         "6bffb24937a7aeddb959f05994bd846f21f8164e",
     "src/main/resources/assets/martial_spells/textures/spell_projectile/throw_net.png":
         "57dcfd0337d544ae2f51459b6d7dbb5b3a82e815",
+    "src/main/resources/assets/martial_spells/textures/spell_effect/net_trap.png":
+        "4b18d0b08bb71156f6c1424c4cac6ae075b6619a",
     "src/main/resources/assets/martial_spells/sounds/net_casting.ogg":
         "5495c850ccfd2ab16becefb4831eccfc3e3834d0",
     "src/main/resources/assets/martial_spells/sounds/throw.ogg":
@@ -196,6 +239,6 @@ if errors:
 
 print("Warrior W4 audit PASS")
 print("Throw Net: 9-tick charge, 20% minimum release, 10->22 range, 0.5 damped output scaling.")
-print("Projectile: velocity 1, homing 1 deg/tick, spin 12 deg/tick, 8-tick travel sound.")
-print("Netted: 3-sec ROOT + knockback immunity under 100 + 2x Attack Damage max-health gate.")
+print("Projectile: velocity 1, homing 1 deg/tick, spin 12 deg/tick, standalone frozen model.")
+print("Netted: 3-sec ROOT + knockback immunity + frozen drop/snap model VFX.")
 print("W2 Charge and W3 Demoralizing Shout remain frozen; W5+ remain locked.")

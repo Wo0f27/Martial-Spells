@@ -13,6 +13,7 @@ import com.w0of26.martialspells.client.render.BearTrapRenderer;
 import com.w0of26.martialspells.client.render.CaltropFieldRenderer;
 import com.w0of26.martialspells.client.render.DiamondBodyShieldLayer;
 import com.w0of26.martialspells.client.render.EntanglingArrowRenderer;
+import com.w0of26.martialspells.client.render.NettedEffectRenderer;
 import com.w0of26.martialspells.client.render.ThrowNetRenderer;
 import com.w0of26.martialspells.registry.MartialEntityRegistry;
 import com.w0of26.martialspells.registry.MartialParticleRegistry;
@@ -42,6 +43,24 @@ public final class MartialClientEvents {
     @SubscribeEvent
     public static void registerAdditionalModels(ModelEvent.RegisterAdditional event) {
         event.register(ThrowNetRenderer.MODEL);
+        event.register(NettedEffectRenderer.MODEL);
+    }
+
+    @SubscribeEvent
+    public static void verifyAdditionalModels(ModelEvent.BakingCompleted event) {
+        var manager = event.getModelManager();
+        if (manager.getModel(ThrowNetRenderer.MODEL) == manager.getMissingModel()) {
+            MartialSpells.LOGGER.error(
+                    "Throw Net projectile model failed to bake: {}",
+                    ThrowNetRenderer.MODEL
+            );
+        }
+        if (manager.getModel(NettedEffectRenderer.MODEL) == manager.getMissingModel()) {
+            MartialSpells.LOGGER.error(
+                    "Netted status-effect model failed to bake: {}",
+                    NettedEffectRenderer.MODEL
+            );
+        }
     }
 
     @SubscribeEvent
