@@ -18,10 +18,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RenderLivingEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 
 /**
  * Frozen Rogues Netted model-FX translation.
@@ -31,16 +28,11 @@ import net.minecraftforge.fml.common.Mod;
  * over eight ticks with EASE_OUT_BACK. Playback is ONCE, so the final net
  * remains around the target until Netted expires.</p>
  *
- * <p>On Forge 1.20.1 this renderer is driven by RenderLivingEvent.Post. The
- * earlier direct LivingEntityRenderer mixin path did not execute in the user's
- * runtime, while this native Forge hook provides the same post-entity render
- * pose/buffer context without relying on a client mixin.</p>
+ * <p>On Forge 1.20.1 this renderer is driven by RenderLivingEvent.Post,
+ * registered explicitly from FMLClientSetupEvent. This mirrors the explicit
+ * Forge-47 client wiring used by the upstream 1.20.1-modern Spell Engine/Rogues
+ * ports and avoids relying on GAME-bus annotation scanning.</p>
  */
-@Mod.EventBusSubscriber(
-        modid = MartialSpells.MOD_ID,
-        bus = Mod.EventBusSubscriber.Bus.FORGE,
-        value = Dist.CLIENT
-)
 public final class NettedEffectRenderer {
     public static final ResourceLocation MODEL =
             ResourceLocation.fromNamespaceAndPath(
@@ -61,12 +53,19 @@ public final class NettedEffectRenderer {
     private static final RenderType NETTED_RENDER_TYPE =
             RenderType.entityTranslucentCull(TextureAtlas.LOCATION_BLOCKS);
 
-    private static boolean diagnosticLogged;
+    private static boolean renderEventObserved;
+    private static boolean nettedDiagnosticLogged;
 
     private NettedEffectRenderer() {}
 
-    @SubscribeEvent
     public static void onRenderLivingPost(RenderLivingEvent.Post<?, ?> event) {
+        if (!renderEventObserved) {
+            renderEventObserved = true;
+            MartialSpells.LOGGER.info(
+                    "W4 Netted Forge render event observed"
+            );
+        }
+
         LivingEntity entity = event.getEntity();
         MobEffectInstance netted =
                 entity.getEffect(MartialEffectRegistry.NET_TRAP.get());
@@ -119,10 +118,10 @@ public final class NettedEffectRenderer {
                 .getModelManager()
                 .getModel(MODEL);
 
-        if (!diagnosticLogged) {
-            diagnosticLogged = true;
+        if (!nettedDiagnosticLogged) {
+            nettedDiagnosticLogged = true;
             MartialSpells.LOGGER.info(
-                    "W4 Netted Forge render event active: entity={} id={} duration={} age={} modelMissing={} bakedQuads={}",
+                    "W4 Netted entity render active: entity={} id={} duration={} age={} modelMissing={} bakedQuads={}",
                     entity.getType(),
                     entity.getId(),
                     netted.getDuration(),

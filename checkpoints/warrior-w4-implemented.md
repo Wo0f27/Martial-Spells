@@ -100,3 +100,20 @@ W4 therefore now uses Forge's native `RenderLivingEvent.Post` for target-bound N
 
 The first affected rendered entity now emits a one-time diagnostic beginning with:
 `W4 Netted Forge render event active:`
+
+
+### Upstream 1.20.1-modern wiring audit
+
+A second upstream audit distinguished two Rogues lines:
+
+- `1.20.1` / Rogues 1.2.0 uses Spell Engine 0.15.4 and does not contain Throw Net / Netted.
+- `1.20.1-modern` / Rogues 3.1.1 uses Spell Engine 1.10.5+1.20.1 and is the source line that contains the frozen Throw Net + Netted model FX.
+
+The modern Forge ports explicitly register client hooks during client setup instead of relying on client GAME-bus `@EventBusSubscriber` scanning. Spell Engine also drives custom status-effect models from its own synchronized-effect list carrying `appliedAtWorldTime`.
+
+Martial Spells keeps its dependency-free native MobEffect implementation and derives the one-shot animation age from the fixed 60-tick Netted duration, but now mirrors upstream Forge wiring by registering `NettedEffectRenderer::onRenderLivingPost` explicitly on `MinecraftForge.EVENT_BUS` during `FMLClientSetupEvent`.
+
+Runtime diagnostics are split into:
+- `Registered W4 Netted Forge render hook`
+- `W4 Netted Forge render event observed`
+- `W4 Netted entity render active: ...`

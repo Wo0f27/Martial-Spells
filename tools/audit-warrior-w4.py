@@ -169,16 +169,18 @@ require("ModelResourceLocation" not in netted_renderer,
         "Netted effect must use Forge 1.20.1 plain ResourceLocation lookup")
 require("import net.minecraftforge.client.event.RenderLivingEvent;" in netted_renderer,
         "Netted renderer must use Forge RenderLivingEvent")
-require("@Mod.EventBusSubscriber(" in netted_renderer,
-        "Netted renderer Forge event subscriber missing")
-require("@SubscribeEvent" in netted_renderer,
-        "Netted renderer Forge event handler missing")
+require("@Mod.EventBusSubscriber(" not in netted_renderer,
+        "Netted renderer must not rely on GAME-bus annotation scanning")
+require("@SubscribeEvent" not in netted_renderer,
+        "Netted renderer must be explicitly registered, not annotation-scanned")
 require("RenderLivingEvent.Post<?, ?>" in netted_renderer,
         "Netted renderer must run after living-entity rendering")
 require("RenderType.entityTranslucentCull(TextureAtlas.LOCATION_BLOCKS)" in netted_renderer,
         "Netted effect must use the source-equivalent entity translucent cull block-atlas layer")
-require("W4 Netted Forge render event active:" in netted_renderer,
-        "Netted Forge-event runtime diagnostic missing")
+require("W4 Netted Forge render event observed" in netted_renderer,
+        "Netted Forge-event observation diagnostic missing")
+require("W4 Netted entity render active:" in netted_renderer,
+        "Netted affected-entity runtime diagnostic missing")
 require("countBakedQuads(model)" in netted_renderer,
         "Netted runtime baked-quad diagnostic missing")
 require(
@@ -221,6 +223,14 @@ require({
 } in atlas_sources, "block atlas missing spell_effect directory source")
 
 client_events = read("src/main/java/com/w0of26/martialspells/client/MartialClientEvents.java")
+require("FMLClientSetupEvent" in client_events,
+        "W4 explicit client setup registration missing")
+require("MinecraftForge.EVENT_BUS.addListener(" in client_events,
+        "W4 Netted Forge GAME-bus listener is not explicitly registered")
+require("NettedEffectRenderer::onRenderLivingPost" in client_events,
+        "W4 Netted renderer method reference is not registered")
+require("Registered W4 Netted Forge render hook" in client_events,
+        "W4 Netted client registration diagnostic missing")
 require("event.register(ThrowNetRenderer.MODEL)" in client_events,
         "Throw Net additional model not registered")
 require("event.register(NettedEffectRenderer.MODEL)" in client_events,
