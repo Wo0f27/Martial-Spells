@@ -21,6 +21,15 @@ public final class MartialParticleRegistry {
     public static final RegistryObject<SimpleParticleType> SHOCK_POWDER_ARC =
             PARTICLES.register("shock_powder_arc", () -> new SimpleParticleType(false));
 
+    public static final RegistryObject<SimpleParticleType> CHARGE_SPEED_SIGN =
+            PARTICLES.register("charge_speed_sign", () -> new SimpleParticleType(false));
+
+    public static final RegistryObject<SimpleParticleType> CHARGE_STRIPE =
+            PARTICLES.register("charge_stripe", () -> new SimpleParticleType(false));
+
+    public static final RegistryObject<SimpleParticleType> CHARGE_SPARK =
+            PARTICLES.register("charge_spark", () -> new SimpleParticleType(false));
+
     private MartialParticleRegistry() {}
 
     public static void register(IEventBus modEventBus) {

@@ -222,7 +222,7 @@
   "effect.martial_spells.charge.description": "Increases movement speed and knockback resistance.",
   "spell.martial_spells.charge": "Charge",
   "spell.martial_spells.charge.description": "Surge into battle with increased movement speed and resistance to knockback.",
-  "spell.martial_spells.charge.guide": "Instantly grants +50% base Movement Speed and +50% base Knockback Resistance for 2 seconds. Recasting refreshes Charge instead of stacking another copy. Charge has a 12-second base cooldown and is affected by normal Cooldown Reduction.",
+  "spell.martial_spells.charge.guide": "Instantly grants +50% base Movement Speed and +50% base Knockback Resistance for 10 seconds. Recasting refreshes Charge instead of stacking another copy. Charge has a 12-second base cooldown and is affected by normal Cooldown Reduction.",
   "ui.martial_spells.charge_movement_speed": "Movement Speed: +%s%% base",
   "ui.martial_spells.charge_knockback_resistance": "Knockback Resistance: +%s%% base"
 }

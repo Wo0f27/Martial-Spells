@@ -2,6 +2,7 @@ package com.w0of26.martialspells.spells;
 
 import com.w0of26.martialspells.MartialSpells;
 import com.w0of26.martialspells.registry.MartialEffectRegistry;
+import com.w0of26.martialspells.registry.MartialParticleRegistry;
 import com.w0of26.martialspells.registry.MartialSchoolRegistry;
 import com.w0of26.martialspells.registry.MartialSoundRegistry;
 import com.w0of26.martialspells.technique.MartialTechnique;
@@ -31,16 +32,18 @@ import java.util.Optional;
 /**
  * Forge/Iron's translation of frozen Rogues Charge.
  *
- * <p>The source spell is an instant self-buff lasting two seconds. It grants
- * +50% base Movement Speed and +50% base Knockback Resistance using
- * MULTIPLY_BASE modifiers, then enters a 12-second base cooldown.</p>
+ * <p>The frozen source spell is an instant self-buff lasting two seconds and
+ * granting +50% base Movement Speed plus +50% base Knockback Resistance.
+ * During W2 validation the user intentionally raised the duration to ten
+ * seconds. The attribute values, SET semantics and 12-second base cooldown
+ * remain unchanged.</p>
  */
 public final class ChargeSpell extends AbstractSpell implements MartialTechnique {
     public static final ResourceLocation SPELL_ID =
             ResourceLocation.fromNamespaceAndPath(MartialSpells.MOD_ID, "charge");
 
     public static final int MAX_LEVEL = 1;
-    public static final int EFFECT_DURATION_TICKS = 40;
+    public static final int EFFECT_DURATION_TICKS = 200;
     public static final double MOVEMENT_SPEED_BONUS = 0.50D;
     public static final double KNOCKBACK_RESISTANCE_BONUS = 0.50D;
     public static final int BASE_COOLDOWN_SECONDS = 12;
@@ -92,7 +95,6 @@ public final class ChargeSpell extends AbstractSpell implements MartialTechnique
 
     @Override
     public Optional<SoundEvent> getCastFinishSound() {
-        // Played manually alongside the translated release presentation.
         return Optional.empty();
     }
 
@@ -103,48 +105,28 @@ public final class ChargeSpell extends AbstractSpell implements MartialTechnique
 
     @Override
     public AnimationHolder getCastFinishAnimation() {
-        // Frozen Rogues used Spell Engine's one_handed_area_release. Iron's
-        // native instant-cast animation preserves the one-handed release role
-        // without introducing a Spell Engine runtime dependency.
         return SpellAnimations.ANIMATION_INSTANT_CAST;
     }
 
     @Override
     public List<MutableComponent> getUniqueInfo(int spellLevel, LivingEntity caster) {
         return List.of(
-                Component.translatable(
-                        "ui.martial_spells.effect_length",
-                        EFFECT_DURATION_TICKS / 20.0F
-                ),
-                Component.translatable(
-                        "ui.martial_spells.charge_movement_speed",
-                        Math.round(MOVEMENT_SPEED_BONUS * 100.0D)
-                ),
-                Component.translatable(
-                        "ui.martial_spells.charge_knockback_resistance",
-                        Math.round(KNOCKBACK_RESISTANCE_BONUS * 100.0D)
-                ),
-                Component.translatable(
-                        "ui.martial_spells.base_cooldown",
-                        BASE_COOLDOWN_SECONDS
-                )
+                Component.translatable("ui.martial_spells.effect_length", EFFECT_DURATION_TICKS / 20.0F),
+                Component.translatable("ui.martial_spells.charge_movement_speed",
+                        Math.round(MOVEMENT_SPEED_BONUS * 100.0D)),
+                Component.translatable("ui.martial_spells.charge_knockback_resistance",
+                        Math.round(KNOCKBACK_RESISTANCE_BONUS * 100.0D)),
+                Component.translatable("ui.martial_spells.base_cooldown", BASE_COOLDOWN_SECONDS)
         );
     }
 
     @Override
-    public void onCast(
-            Level level,
-            int spellLevel,
-            LivingEntity caster,
-            CastSource castSource,
-            MagicData magicData
-    ) {
+    public void onCast(Level level, int spellLevel, LivingEntity caster,
+                       CastSource castSource, MagicData magicData) {
         if (!(level instanceof ServerLevel serverLevel)) {
             return;
         }
 
-        // SET semantics: the same amplifier-0 effect is reapplied, refreshing
-        // its remaining duration rather than creating another attribute stack.
         caster.addEffect(new MobEffectInstance(
                 MartialEffectRegistry.CHARGE.get(),
                 EFFECT_DURATION_TICKS,
@@ -170,41 +152,57 @@ public final class ChargeSpell extends AbstractSpell implements MartialTechnique
                 1.0F
         );
 
-        // Preserve the frozen release silhouette: a dense energetic burst
-        // around the torso plus a broad smoke ring at the feet. The exact
-        // Spell Engine particle renderer is deliberately not imported.
         level.sendParticles(
-                ParticleTypes.CRIT,
+                MartialParticleRegistry.CHARGE_SPEED_SIGN.get(),
                 caster.getX(),
-                caster.getY() + caster.getBbHeight() * 0.55D,
+                caster.getY() + caster.getBbHeight() + 0.25D,
                 caster.getZ(),
-                25,
-                0.65D,
-                0.7D,
-                0.65D,
-                0.18D
+                1,
+                0.0D,
+                0.0D,
+                0.0D,
+                0.0D
         );
         level.sendParticles(
-                ParticleTypes.POOF,
+                MartialParticleRegistry.CHARGE_STRIPE.get(),
                 caster.getX(),
-                caster.getY() + caster.getBbHeight() * 0.45D,
+                caster.getY() + caster.getBbHeight() * 0.50D,
                 caster.getZ(),
                 25,
-                0.45D,
                 0.55D,
-                0.45D,
-                0.08D
+                0.70D,
+                0.55D,
+                0.20D
         );
         level.sendParticles(
-                ParticleTypes.CLOUD,
+                MartialParticleRegistry.CHARGE_SPARK.get(),
                 caster.getX(),
-                caster.getY() + 0.1D,
+                caster.getY() + caster.getBbHeight() * 0.50D,
                 caster.getZ(),
-                50,
-                1.25D,
-                0.08D,
-                1.25D,
-                0.04D
+                25,
+                0.55D,
+                0.55D,
+                0.55D,
+                0.10D
         );
+
+        final int ringOrigins = 25;
+        final double radius = 1.15D;
+        for (int i = 0; i < ringOrigins; i++) {
+            double angle = (Math.PI * 2.0D * i) / ringOrigins;
+            double cos = Math.cos(angle);
+            double sin = Math.sin(angle);
+            level.sendParticles(
+                    ParticleTypes.CLOUD,
+                    caster.getX() + cos * radius,
+                    caster.getY() + 0.08D,
+                    caster.getZ() + sin * radius,
+                    2,
+                    0.04D,
+                    0.03D,
+                    0.04D,
+                    0.04D
+            );
+        }
     }
 }

@@ -40,7 +40,7 @@ for token, message in (
     ('"charge"', "Charge spell resource id is missing"),
     ("MartialTechniqueClass.WARRIOR", "Charge must be classified as WARRIOR"),
     ("SpellRarity.RARE", "Charge must retain frozen tier-3/RARE mapping"),
-    ("EFFECT_DURATION_TICKS = 40", "Charge duration must be exactly 40 ticks"),
+    ("EFFECT_DURATION_TICKS = 200", "Charge duration must be exactly 200 ticks / 10 seconds"),
     ("MOVEMENT_SPEED_BONUS = 0.50D", "Charge Movement Speed bonus drifted from +50%"),
     ("KNOCKBACK_RESISTANCE_BONUS = 0.50D", "Charge Knockback Resistance bonus drifted from +50%"),
     ("BASE_COOLDOWN_SECONDS = 12", "Charge base cooldown must be exactly 12 seconds"),
@@ -53,6 +53,28 @@ for token, message in (
 require("new MobEffectInstance" in charge_spell and ",\n                0," in charge_spell,
         "Charge must apply amplifier 0 / SET-style effect semantics")
 require("Spell Engine" in charge_spell, "Charge translation note should document the removed Spell Engine dependency")
+require("ParticleTypes.CRIT" not in charge_spell, "Charge must not fall back to the old vanilla CRIT approximation")
+for particle_token in ("CHARGE_SPEED_SIGN", "CHARGE_STRIPE", "CHARGE_SPARK"):
+    require(particle_token in charge_spell, f"Charge release VFX is missing {particle_token}")
+
+particle_registry = read("src/main/java/com/w0of26/martialspells/registry/MartialParticleRegistry.java")
+for particle_id in ("charge_speed_sign", "charge_stripe", "charge_spark"):
+    require(f'PARTICLES.register("{particle_id}"' in particle_registry,
+            f"MartialParticleRegistry is missing {particle_id}")
+
+client_events = read("src/main/java/com/w0of26/martialspells/client/MartialClientEvents.java")
+for provider in ("ChargeSpeedSignParticle.Provider", "ChargeStripeParticle.Provider", "ChargeSparkParticle.Provider"):
+    require(provider in client_events, f"client particle provider missing: {provider}")
+
+for path in (
+    "src/main/resources/assets/martial_spells/particles/charge_speed_sign.json",
+    "src/main/resources/assets/martial_spells/particles/charge_stripe.json",
+    "src/main/resources/assets/martial_spells/particles/charge_spark.json",
+):
+    try:
+        json.loads(read(path))
+    except json.JSONDecodeError as exc:
+        errors.append(f"invalid JSON in {path}: {exc}")
 
 spell_registry = read("src/main/java/com/w0of26/martialspells/registry/MartialSpellRegistry.java")
 require('SPELLS.register("charge", ChargeSpell::new)' in spell_registry,
@@ -142,5 +164,5 @@ if errors:
     sys.exit(1)
 
 print("Warrior W2 audit PASS")
-print("Charge: 2 sec, +50% base Movement Speed, +50% base Knockback Resistance, 12 sec base cooldown.")
+print("Charge: 10 sec, +50% base Movement Speed, +50% base Knockback Resistance, 12 sec base cooldown.")
 print("Only Charge is active in the Warrior technique tag; W3+ remain locked.")

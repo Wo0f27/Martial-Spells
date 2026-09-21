@@ -102,7 +102,8 @@ W1 does not introduce a generic charged-technique runtime yet. The first charged
 
 ### Charge
 - source tier 3; `warrior_fury`; Physical Melee
-- instant self buff for 2 sec / 40 ticks
+- frozen source duration: 2 sec / 40 ticks
+- W2 user-approved balance override: 10 sec / 200 ticks
 - +50% base Movement Speed, MULTIPLY_BASE
 - +50% base Knockback Resistance, MULTIPLY_BASE
 - SET semantics; no stacking
@@ -187,14 +188,14 @@ W2 is restricted to `martial_spells:charge` and remains **VALIDATING** until the
 - Charge is classified as `MartialTechniqueClass.WARRIOR` and is the only value in the Warrior technique tag.
 - source tier 3 is mapped to Iron's `RARE` with one spell level and zero mana.
 - Charge is instant and self-targeted.
-- Charge lasts exactly 40 ticks / 2 seconds.
+- Charge deliberately lasts 200 ticks / 10 seconds after the user's W2 balance override; the frozen source duration was 40 ticks / 2 seconds.
 - Movement Speed receives +0.5 `MULTIPLY_BASE`.
 - Knockback Resistance receives +0.5 `MULTIPLY_BASE`.
 - reapplication uses amplifier 0 / SET-style refresh semantics rather than stacking.
 - base cooldown is exactly 12 seconds and uses normal Iron's Cooldown Reduction behavior.
 - the upstream Charge icon/effect icon is retained exactly.
 - `charge_activate.ogg` is synced from the frozen source commit and verified against Git blob `77ec5f2f81300f268e686c9fe2c1800127f2936f`.
-- Spell Engine's release presentation is translated without introducing Spell Engine as a dependency.
+- Spell Engine's release presentation is translated without introducing Spell Engine as a dependency: a custom Rage-tinted Charge sign, floating stripe particles, decelerating sparks, and a 50-particle smoke ring replace the earlier vanilla CRIT/POOF approximation.
 - Improved Charge skill-tree behavior is not imported.
 - W3+ Warrior spell classes remain absent.
 - clean build passes.
