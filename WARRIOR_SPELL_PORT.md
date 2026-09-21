@@ -161,8 +161,8 @@ W1 does not introduce a generic charged-technique runtime yet. The first charged
 - **W1 — Shared Warrior architecture:** PASS — Warrior technique class/tag + single-hand physical-melee adapter; no Warrior gameplay.
 - **W2 — Charge:** PASS — user validated the 10-second balance override and final no-overhead-sign presentation.
 - **W3 — Demoralizing Shout:** PASS — user validated effect application, stacking behavior, and the source health gate.
-- **W4 — Throw Net:** IMPLEMENTED / VALIDATING — charged projectile + Netted root vertical slice.
-- **W5 — Shattering Throw:** locked until explicit W4 PASS.
+- **W4 — Throw Net:** PASS — user validated the charged projectile, Netted root, textured projectile model, and synchronized physical net VFX.
+- **W5 — Shattering Throw:** unlocked for implementation; not started yet.
 - **W6 — Mortal Strike:** locked until explicit W5 PASS.
 - **W7 — Last Stand:** locked until explicit W6 PASS.
 - **W8 — Fidelity/final audit:** locked until explicit W7 PASS.
@@ -224,7 +224,7 @@ W3 is frozen as **PASS** after the user validated Demoralizing Shout and confirm
 
 ## W4 acceptance criteria
 
-W4 is restricted to `martial_spells:throw_net` and remains **VALIDATING** until the user explicitly passes it.
+W4 is frozen as **PASS** after the user validated gameplay and the final synchronized physical net VFX.
 
 - Warrior/Martial, one level, source tier-2 mapped to Iron's `UNCOMMON`, zero mana.
 - charged cast uses the frozen 9-tick / 0.45-second source duration.

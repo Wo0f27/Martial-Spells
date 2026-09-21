@@ -1,6 +1,6 @@
 # Warrior W4 — Throw Net implemented
 
-Status: **IMPLEMENTED / VALIDATING**
+Status: **PASS**
 
 Source freeze: `ZsoltMolnarrr/Rogues` commit `89ba33ad29adc42d7306660f5b74f28bd17b8ffa`.
 
@@ -89,7 +89,7 @@ Runtime checks:
 10. Base cooldown is 12 seconds before Cooldown Reduction.
 11. Shattering Throw, Mortal Strike, and Last Stand remain absent.
 
-W4 remains **VALIDATING**, not PASS, until the user explicitly confirms this gate.
+W4 is **PASS** and frozen. The user confirmed the physical net VFX renders correctly after the upstream-style S2C visual synchronization was added.
 
 
 ### Netted VFX hook correction
@@ -133,3 +133,15 @@ W4 now reproduces only the minimum state needed for Netted without adding Spell 
 Expected diagnostics after a successful hit:
 - `W4 Netted visual sync received: ...`
 - `W4 Netted entity render active: ... modelMissing=false bakedQuads=<nonzero>`
+
+
+## Final runtime result
+
+The user confirmed the completed W4 runtime path:
+
+- the flying Throw Net projectile renders with the correct textured physical model;
+- Netted gameplay/root behavior works;
+- the target receives the persistent physical net model VFX;
+- the final VFX path uses explicit Forge client event registration plus a minimal S2C visual-state packet carrying authoritative application time, matching the essential upstream Spell Engine 1.20.1-modern synchronization concept without introducing Spell Engine as a dependency.
+
+W4 is now frozen. W5 Shattering Throw may reuse only the already-accepted charged-release infrastructure and must not modify Throw Net behavior.
