@@ -54,20 +54,19 @@ require("new MobEffectInstance" in charge_spell and ",\n                0," in c
         "Charge must apply amplifier 0 / SET-style effect semantics")
 require("Spell Engine" in charge_spell, "Charge translation note should document the removed Spell Engine dependency")
 require("ParticleTypes.CRIT" not in charge_spell, "Charge must not fall back to the old vanilla CRIT approximation")
-for particle_token in ("CHARGE_SPEED_SIGN", "CHARGE_STRIPE", "CHARGE_SPARK"):
+for particle_token in ("CHARGE_STRIPE", "CHARGE_SPARK"):
     require(particle_token in charge_spell, f"Charge release VFX is missing {particle_token}")
 
 particle_registry = read("src/main/java/com/w0of26/martialspells/registry/MartialParticleRegistry.java")
-for particle_id in ("charge_speed_sign", "charge_stripe", "charge_spark"):
+for particle_id in ("charge_stripe", "charge_spark"):
     require(f'PARTICLES.register("{particle_id}"' in particle_registry,
             f"MartialParticleRegistry is missing {particle_id}")
 
 client_events = read("src/main/java/com/w0of26/martialspells/client/MartialClientEvents.java")
-for provider in ("ChargeSpeedSignParticle.Provider", "ChargeStripeParticle.Provider", "ChargeSparkParticle.Provider"):
+for provider in ("ChargeStripeParticle.Provider", "ChargeSparkParticle.Provider"):
     require(provider in client_events, f"client particle provider missing: {provider}")
 
 for path in (
-    "src/main/resources/assets/martial_spells/particles/charge_speed_sign.json",
     "src/main/resources/assets/martial_spells/particles/charge_stripe.json",
     "src/main/resources/assets/martial_spells/particles/charge_spark.json",
 ):
@@ -134,9 +133,14 @@ require(git_blob_sha("src/main/resources/assets/martial_spells/textures/gui/spel
 require(git_blob_sha("src/main/resources/assets/martial_spells/textures/mob_effect/charge.png")
         == "c278a806b067c9350bf81fbf89783c289a651517",
         "Charge effect icon does not match frozen Rogues")
-require(git_blob_sha("src/main/resources/assets/martial_spells/textures/particle/charge_speed_sign.png")
-        == "c278a806b067c9350bf81fbf89783c289a651517",
-        "Charge pop-up sign texture must match the retained Charge icon")
+require("CHARGE_SPEED_SIGN" not in charge_spell,
+        "Charge must not show the removed above-head speed/Charge sign")
+require(not (ROOT / "src/main/java/com/w0of26/martialspells/client/particle/ChargeSpeedSignParticle.java").exists(),
+        "removed Charge speed-sign particle class must stay absent")
+require(not (ROOT / "src/main/resources/assets/martial_spells/particles/charge_speed_sign.json").exists(),
+        "removed Charge speed-sign particle definition must stay absent")
+require(not (ROOT / "src/main/resources/assets/martial_spells/textures/particle/charge_speed_sign.png").exists(),
+        "removed Charge speed-sign texture must stay absent")
 require(git_blob_sha("src/main/resources/assets/martial_spells/sounds/charge_activate.ogg")
         == "77ec5f2f81300f268e686c9fe2c1800127f2936f",
         "Charge activation sound does not match frozen Rogues; run tools/sync-warrior-w2-assets.ps1")

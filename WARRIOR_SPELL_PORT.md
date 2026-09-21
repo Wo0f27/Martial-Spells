@@ -195,7 +195,7 @@ W2 is restricted to `martial_spells:charge` and remains **VALIDATING** until the
 - base cooldown is exactly 12 seconds and uses normal Iron's Cooldown Reduction behavior.
 - the upstream Charge icon/effect icon is retained exactly.
 - `charge_activate.ogg` is committed directly from the frozen source bytes and verified against Git blob `77ec5f2f81300f268e686c9fe2c1800127f2936f`.
-- Spell Engine's release presentation is translated without introducing Spell Engine as a dependency: a custom Rage-tinted Charge sign, floating stripe particles, decelerating sparks, and a 50-particle smoke ring replace the earlier vanilla CRIT/POOF approximation.
+- Spell Engine's release presentation is translated without introducing Spell Engine as a dependency: floating Rage-tinted stripe particles, decelerating sparks, and a 50-particle smoke ring replace the earlier vanilla CRIT/POOF approximation. The source speed-sign popup is intentionally omitted by user preference.
 - Improved Charge skill-tree behavior is not imported.
 - W3+ Warrior spell classes remain absent.
 - clean build passes.

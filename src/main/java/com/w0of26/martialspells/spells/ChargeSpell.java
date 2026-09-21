@@ -141,8 +141,9 @@ public final class ChargeSpell extends AbstractSpell implements MartialTechnique
     }
 
     private static void playReleasePresentation(ServerLevel level, LivingEntity caster) {
-        // Recreates the frozen Spell Engine release silhouette with native
-        // Martial Spells particles; Spell Engine is not a runtime dependency.
+        // Recreates the energetic part of the frozen Spell Engine release with
+        // native Martial Spells particles. The source speed-sign popup is
+        // intentionally omitted by user preference.
         level.playSound(
                 null,
                 caster.getX(),
@@ -154,17 +155,6 @@ public final class ChargeSpell extends AbstractSpell implements MartialTechnique
                 1.0F
         );
 
-        level.sendParticles(
-                MartialParticleRegistry.CHARGE_SPEED_SIGN.get(),
-                caster.getX(),
-                caster.getY() + caster.getBbHeight() + 0.25D,
-                caster.getZ(),
-                1,
-                0.0D,
-                0.0D,
-                0.0D,
-                0.0D
-        );
         level.sendParticles(
                 MartialParticleRegistry.CHARGE_STRIPE.get(),
                 caster.getX(),
