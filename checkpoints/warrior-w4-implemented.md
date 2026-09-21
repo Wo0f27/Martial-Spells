@@ -90,3 +90,13 @@ Runtime checks:
 11. Shattering Throw, Mortal Strike, and Last Stand remain absent.
 
 W4 remains **VALIDATING**, not PASS, until the user explicitly confirms this gate.
+
+
+### Netted VFX hook correction
+
+A runtime diagnostic on the direct `LivingEntityRenderer.render` TAIL mixin produced no log line at all while Jade showed `Netted` on the target. That proves the client had the effect but the mixin render hook was not executing in the Forge 1.20.1 dev runtime.
+
+W4 therefore now uses Forge's native `RenderLivingEvent.Post` for target-bound Netted rendering. The source-equivalent block-atlas render layer, frozen model, frozen texture, and drop/snap transforms remain unchanged. The obsolete client render mixin is removed from the active mixin config.
+
+The first affected rendered entity now emits a one-time diagnostic beginning with:
+`W4 Netted Forge render event active:`

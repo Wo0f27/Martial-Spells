@@ -18,6 +18,10 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.RenderLivingEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 
 /**
  * Frozen Rogues Netted model-FX translation.
@@ -27,10 +31,16 @@ import net.minecraft.world.item.ItemStack;
  * over eight ticks with EASE_OUT_BACK. Playback is ONCE, so the final net
  * remains around the target until Netted expires.</p>
  *
- * <p>Rendering is invoked from the client LivingEntityRenderer tail mixin,
- * matching Spell Engine's source integration point instead of approximating it
- * with Forge's RenderLivingEvent.Post.</p>
+ * <p>On Forge 1.20.1 this renderer is driven by RenderLivingEvent.Post. The
+ * earlier direct LivingEntityRenderer mixin path did not execute in the user's
+ * runtime, while this native Forge hook provides the same post-entity render
+ * pose/buffer context without relying on a client mixin.</p>
  */
+@Mod.EventBusSubscriber(
+        modid = MartialSpells.MOD_ID,
+        bus = Mod.EventBusSubscriber.Bus.FORGE,
+        value = Dist.CLIENT
+)
 public final class NettedEffectRenderer {
     public static final ResourceLocation MODEL =
             ResourceLocation.fromNamespaceAndPath(
@@ -48,13 +58,6 @@ public final class NettedEffectRenderer {
     private static final float BACK_C1 = 1.70158F;
     private static final float BACK_C3 = BACK_C1 + 1.0F;
 
-    /*
-     * Spell Engine LightEmission.NONE uses its spell_object_cull layer:
-     * entity-translucent-cull shader + block atlas + transparency + culling +
-     * lightmap/overlay. Vanilla's entityTranslucentCull(block atlas) is the
-     * closest Forge 1.20.1 equivalent and, unlike a Sheets convenience layer,
-     * exactly expresses the entity render path needed here.
-     */
     private static final RenderType NETTED_RENDER_TYPE =
             RenderType.entityTranslucentCull(TextureAtlas.LOCATION_BLOCKS);
 
@@ -62,19 +65,33 @@ public final class NettedEffectRenderer {
 
     private NettedEffectRenderer() {}
 
-    public static void render(
-            LivingEntity entity,
-            float partialTick,
-            PoseStack poseStack,
-            MultiBufferSource bufferSource,
-            int packedLight
-    ) {
+    @SubscribeEvent
+    public static void onRenderLivingPost(RenderLivingEvent.Post<?, ?> event) {
+        LivingEntity entity = event.getEntity();
         MobEffectInstance netted =
                 entity.getEffect(MartialEffectRegistry.NET_TRAP.get());
         if (netted == null) {
             return;
         }
 
+        render(
+                entity,
+                netted,
+                event.getPartialTick(),
+                event.getPoseStack(),
+                event.getMultiBufferSource(),
+                event.getPackedLight()
+        );
+    }
+
+    private static void render(
+            LivingEntity entity,
+            MobEffectInstance netted,
+            float partialTick,
+            PoseStack poseStack,
+            MultiBufferSource bufferSource,
+            int packedLight
+    ) {
         float age = Math.max(
                 0.0F,
                 ThrowNetSpell.NETTED_DURATION_TICKS
@@ -83,7 +100,7 @@ public final class NettedEffectRenderer {
         );
 
         float dropT = Mth.clamp(age / DROP_END_TICK, 0.0F, 1.0F);
-        float dropProgress = dropT * dropT; // EASE_IN_QUAD
+        float dropProgress = dropT * dropT;
 
         float snapT = Mth.clamp(age / SNAP_END_TICK, 0.0F, 1.0F);
         float snapProgress = easeOutBack(snapT);
@@ -105,7 +122,7 @@ public final class NettedEffectRenderer {
         if (!diagnosticLogged) {
             diagnosticLogged = true;
             MartialSpells.LOGGER.info(
-                    "W4 Netted VFX render hook active: entity={} id={} duration={} age={} modelMissing={} bakedQuads={}",
+                    "W4 Netted Forge render event active: entity={} id={} duration={} age={} modelMissing={} bakedQuads={}",
                     entity.getType(),
                     entity.getId(),
                     netted.getDuration(),
@@ -117,10 +134,7 @@ public final class NettedEffectRenderer {
 
         poseStack.pushPose();
 
-        // ModelFxEffectRenderer.entityScaling(WIDTH, 0.5F).
         poseStack.scale(entityScale, entityScale, entityScale);
-
-        // Frozen source initial + animated transforms.
         poseStack.translate(
                 0.0D,
                 INITIAL_TRANSLATE_Y + DROP_Y * dropProgress,
@@ -131,7 +145,6 @@ public final class NettedEffectRenderer {
         VertexConsumer vertices =
                 bufferSource.getBuffer(NETTED_RENDER_TYPE);
 
-        // Spell Engine CustomModels.renderModel raw-model centering.
         poseStack.translate(-0.5D, -0.5D, -0.5D);
         minecraft
                 .getItemRenderer()

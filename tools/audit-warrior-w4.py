@@ -167,27 +167,25 @@ require("translucentCullBlockSheet" in projectile_renderer,
 netted_renderer = read("src/main/java/com/w0of26/martialspells/client/render/NettedEffectRenderer.java")
 require("ModelResourceLocation" not in netted_renderer,
         "Netted effect must use Forge 1.20.1 plain ResourceLocation lookup")
+require("import net.minecraftforge.client.event.RenderLivingEvent;" in netted_renderer,
+        "Netted renderer must use Forge RenderLivingEvent")
+require("@Mod.EventBusSubscriber(" in netted_renderer,
+        "Netted renderer Forge event subscriber missing")
+require("@SubscribeEvent" in netted_renderer,
+        "Netted renderer Forge event handler missing")
+require("RenderLivingEvent.Post<?, ?>" in netted_renderer,
+        "Netted renderer must run after living-entity rendering")
 require("RenderType.entityTranslucentCull(TextureAtlas.LOCATION_BLOCKS)" in netted_renderer,
         "Netted effect must use the source-equivalent entity translucent cull block-atlas layer")
-require("W4 Netted VFX render hook active:" in netted_renderer,
-        "Netted runtime render diagnostic missing")
+require("W4 Netted Forge render event active:" in netted_renderer,
+        "Netted Forge-event runtime diagnostic missing")
 require("countBakedQuads(model)" in netted_renderer,
         "Netted runtime baked-quad diagnostic missing")
 require(
-    "import net.minecraftforge.client.event.RenderLivingEvent;" not in netted_renderer
-    and "@SubscribeEvent" not in netted_renderer,
-    "Netted renderer must not fall back to the Forge Post-event approximation"
+    "client.LivingEntityNettedRendererMixin" not in mixins.get("client", []),
+    "obsolete Netted LivingEntityRenderer client mixin still enabled"
 )
 
-netted_render_mixin = read("src/main/java/com/w0of26/martialspells/mixin/client/LivingEntityNettedRendererMixin.java")
-require('at = @At("TAIL")' in netted_render_mixin,
-        "Netted model FX must render at LivingEntityRenderer tail")
-require("NettedEffectRenderer.render(" in netted_render_mixin,
-        "Netted renderer-tail mixin is not invoking the model renderer")
-require(
-    "client.LivingEntityNettedRendererMixin" in mixins.get("client", []),
-    "Netted renderer-tail mixin missing from client mixin config"
-)
 for token, message in (
     ("public static void render(", "Netted persistent model render entrypoint missing"),
     ('"spell_effect/net_trap"', "Netted effect model id missing"),
