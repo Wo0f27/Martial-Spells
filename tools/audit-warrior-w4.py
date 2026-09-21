@@ -187,7 +187,8 @@ require(
 )
 
 for token, message in (
-    ("public static void render(", "Netted persistent model render entrypoint missing"),
+    ("public static void onRenderLivingPost(", "Netted Forge post-render entrypoint missing"),
+    ("private static void render(", "Netted model render helper missing"),
     ('"spell_effect/net_trap"', "Netted effect model id missing"),
     ("INITIAL_TRANSLATE_Y = 1.1F", "Netted initial drop height drifted"),
     ("DROP_Y = -0.6F", "Netted drop distance drifted"),
