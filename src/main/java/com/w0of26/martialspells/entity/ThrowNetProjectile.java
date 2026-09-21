@@ -67,6 +67,11 @@ public final class ThrowNetProjectile extends ThrowableProjectile {
     }
 
     @Override
+    protected void defineSynchedData() {
+        // Throw Net has no custom SynchedEntityData fields.
+    }
+
+    @Override
     protected float getGravity() {
         return 0.0F;
     }
