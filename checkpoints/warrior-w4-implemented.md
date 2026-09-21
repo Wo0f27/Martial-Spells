@@ -16,7 +16,7 @@ W3 Demoralizing Shout is frozen as PASS. W4 adds only `martial_spells:throw_net`
 - projectile flight range `10 + 12 * chargeRatio` (12.4 minimum valid, 22 full);
 - constant velocity 1.0, no gravity/drag, 1200-tick source safety cap;
 - source default homing angle 1 degree/tick toward the AIM target captured at cast start;
-- source custom projectile model and texture, spinning 12 degrees/tick through Forge's `#standalone` baked-model path;
+- source custom projectile model and texture, spinning 12 degrees/tick through Forge 1.20.1's plain-`ResourceLocation` additional-model path;
 - travel sound every 8 ticks;
 - direct damage `0.1 * current Attack Damage * chargeOutput`;
 - source knockback coefficient `0.1 * chargeOutput`, applied against vanilla's 0.4 damage-knockback baseline;
@@ -55,7 +55,11 @@ The projectile and Netted model JSON files necessarily have different blob hashe
 
 ### Visual repair after first runtime pass
 
-The first W4 runtime pass confirmed gameplay/root behavior but exposed two presentation defects: the projectile rendered with Minecraft's missing-texture appearance, and Netted had only ordinary potion particles. The repair switches custom model registration/lookup to Forge 1.20.1 `ModelResourceLocation(..., "standalone")`, mirrors Spell Engine's `TOWARDS_MOTION` projectile orientation and raw-model `-0.5/-0.5/-0.5` centering, and ports the frozen persistent Netted model-FX animation. A model-bake diagnostic now logs an explicit error if either standalone model resolves to Minecraft's missing model.
+The first W4 runtime pass confirmed gameplay/root behavior but exposed two presentation defects: the projectile rendered with Minecraft's purple/black missing-texture appearance, and Netted had only ordinary potion particles.
+
+The root cause of the texture failure is part of Spell Engine's 1.20.1 resource contract: its `assets/minecraft/atlases/blocks.json` explicitly adds the custom `spell_projectile` and `spell_effect` texture directories to Minecraft's block atlas. W4 now reproduces those two directory sources locally, so the copied frozen textures are actually stitched.
+
+Forge 47's own `ModelBakery` additional-model patch stores these models under plain `ResourceLocation` keys, so W4 deliberately uses the same plain IDs rather than newer NeoForge `#standalone` semantics. The repair also mirrors Spell Engine's `TOWARDS_MOTION` projectile orientation and raw-model `-0.5/-0.5/-0.5` centering, and ports the frozen persistent Netted model-FX animation. A model-bake diagnostic logs an explicit error if either model still resolves to Minecraft's missing model.
 
 ## Validation gate
 

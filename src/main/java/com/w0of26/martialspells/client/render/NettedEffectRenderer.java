@@ -9,7 +9,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -34,14 +33,11 @@ import net.minecraftforge.fml.common.Mod;
         value = Dist.CLIENT
 )
 public final class NettedEffectRenderer {
-    public static final ResourceLocation MODEL_ID =
+    public static final ResourceLocation MODEL =
             ResourceLocation.fromNamespaceAndPath(
                     MartialSpells.MOD_ID,
                     "spell_effect/net_trap"
             );
-
-    public static final ModelResourceLocation MODEL =
-            new ModelResourceLocation(MODEL_ID, "standalone");
 
     private static final float ENTITY_WIDTH_BASELINE = 0.5F;
     private static final float ENTITY_SCALE_MIN = 0.5F;

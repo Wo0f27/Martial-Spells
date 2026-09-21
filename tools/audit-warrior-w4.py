@@ -153,8 +153,8 @@ require("rogues:spell_projectile/throw_net" not in model,
 
 
 projectile_renderer = read("src/main/java/com/w0of26/martialspells/client/render/ThrowNetRenderer.java")
-require("ModelResourceLocation" in projectile_renderer and '"standalone"' in projectile_renderer,
-        "Throw Net projectile must use Forge standalone baked-model lookup")
+require("ModelResourceLocation" not in projectile_renderer,
+        "Throw Net projectile must use Forge 1.20.1 plain ResourceLocation lookup")
 require("directionYaw" in projectile_renderer and "+ 180.0F" in projectile_renderer,
         "Throw Net projectile must preserve Spell Engine TOWARDS_MOTION yaw")
 require("directionPitch" in projectile_renderer and "Math.asin" in projectile_renderer,
@@ -165,10 +165,11 @@ require("translucentCullBlockSheet" in projectile_renderer,
         "Throw Net projectile must use source-equivalent non-emissive translucent cull layer")
 
 netted_renderer = read("src/main/java/com/w0of26/martialspells/client/render/NettedEffectRenderer.java")
+require("ModelResourceLocation" not in netted_renderer,
+        "Netted effect must use Forge 1.20.1 plain ResourceLocation lookup")
 for token, message in (
     ("RenderLivingEvent.Post", "Netted persistent model render hook missing"),
     ('"spell_effect/net_trap"', "Netted effect model id missing"),
-    ('"standalone"', "Netted effect must use Forge standalone baked-model lookup"),
     ("INITIAL_TRANSLATE_Y = 1.1F", "Netted initial drop height drifted"),
     ("DROP_Y = -0.6F", "Netted drop distance drifted"),
     ("DROP_END_TICK = 6.0F", "Netted EASE_IN_QUAD drop timing drifted"),
@@ -186,11 +187,24 @@ require("martial_spells:spell_effect/net_trap" in netted_model,
 require("rogues:spell_effect/net_trap" not in netted_model,
         "Netted model retains source namespace")
 
+atlas = json.loads(read("src/main/resources/assets/minecraft/atlases/blocks.json"))
+atlas_sources = atlas.get("sources", [])
+require({
+    "type": "directory",
+    "source": "spell_projectile",
+    "prefix": "spell_projectile/",
+} in atlas_sources, "block atlas missing spell_projectile directory source")
+require({
+    "type": "directory",
+    "source": "spell_effect",
+    "prefix": "spell_effect/",
+} in atlas_sources, "block atlas missing spell_effect directory source")
+
 client_events = read("src/main/java/com/w0of26/martialspells/client/MartialClientEvents.java")
 require("event.register(ThrowNetRenderer.MODEL)" in client_events,
-        "Throw Net standalone model not registered")
+        "Throw Net additional model not registered")
 require("event.register(NettedEffectRenderer.MODEL)" in client_events,
-        "Netted standalone model not registered")
+        "Netted additional model not registered")
 
 expected_assets = {
     "src/main/resources/assets/martial_spells/textures/gui/spell_icons/throw_net.png":
@@ -239,6 +253,6 @@ if errors:
 
 print("Warrior W4 audit PASS")
 print("Throw Net: 9-tick charge, 20% minimum release, 10->22 range, 0.5 damped output scaling.")
-print("Projectile: velocity 1, homing 1 deg/tick, spin 12 deg/tick, standalone frozen model.")
+print("Projectile: velocity 1, homing 1 deg/tick, spin 12 deg/tick, frozen model + 1.20.1 atlas source.")
 print("Netted: 3-sec ROOT + knockback immunity + frozen drop/snap model VFX.")
 print("W2 Charge and W3 Demoralizing Shout remain frozen; W5+ remain locked.")
