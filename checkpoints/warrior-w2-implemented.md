@@ -18,7 +18,7 @@ W2 ports only `martial_spells:charge`. W3 and later Warrior techniques remain lo
 - 12-second base cooldown, using normal Iron's cooldown handling;
 - Warrior classification and Warrior/Martial technique tags;
 - upstream Charge icon/effect icon;
-- upstream `charge_activate.ogg` through a pinned hash-checked asset sync;
+- upstream `charge_activate.ogg` committed directly into the repository and pinned to its frozen Git blob hash;
 - dependency-native one-handed instant-release animation plus custom Martial Spells release VFX: Rage-tinted Charge sign, floating stripes, decelerating sparks, and a 50-particle smoke ring;
 - no Improved Charge skill-tree behavior.
 
@@ -55,3 +55,8 @@ After the first runtime test, the user explicitly approved two intentional W2 ch
 - extend Charge from the frozen two-second duration to ten seconds, accepting the balance increase.
 
 All other frozen Charge mechanics remain unchanged.
+
+
+## Bundled sound revision
+
+The exact frozen `charge_activate.ogg` is now tracked directly in Martial Spells. The W2 asset script no longer downloads from `raw.githubusercontent.com`; it only verifies the bundled file's Git blob SHA, so validation does not depend on GitHub Raw being reachable from the local network.

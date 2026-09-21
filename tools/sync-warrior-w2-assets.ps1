@@ -1,8 +1,9 @@
 $ErrorActionPreference = "Stop"
 
 $Root = Split-Path -Parent $PSScriptRoot
-$UpstreamCommit = "89ba33ad29adc42d7306660f5b74f28bd17b8ffa"
-$RawBase = "https://raw.githubusercontent.com/ZsoltMolnarrr/Rogues/$UpstreamCommit/common/src/main/resources/assets/rogues"
+$TargetRelative = "src/main/resources/assets/martial_spells/sounds/charge_activate.ogg"
+$ExpectedBlobSha = "77ec5f2f81300f268e686c9fe2c1800127f2936f"
+$Target = Join-Path $Root $TargetRelative
 
 function Get-GitBlobSha1([string]$Path) {
     $bytes = [System.IO.File]::ReadAllBytes($Path)
@@ -19,30 +20,13 @@ function Get-GitBlobSha1([string]$Path) {
     }
 }
 
-function Sync-ExactAsset(
-    [string]$SourceRelative,
-    [string]$TargetRelative,
-    [string]$ExpectedBlobSha
-) {
-    $target = Join-Path $Root $TargetRelative
-    New-Item -ItemType Directory -Force -Path (Split-Path -Parent $target) | Out-Null
-    $uri = "$RawBase/$SourceRelative"
-
-    Write-Host "Fetching $uri"
-    Invoke-WebRequest -UseBasicParsing -Uri $uri -OutFile $target
-
-    $actual = Get-GitBlobSha1 $target
-    if ($actual -ne $ExpectedBlobSha) {
-        Remove-Item -Force $target -ErrorAction SilentlyContinue
-        throw "Asset hash mismatch for $SourceRelative. Expected Git blob $ExpectedBlobSha, got $actual"
-    }
-
-    Write-Host "Verified $TargetRelative ($actual)" -ForegroundColor Green
+if (-not (Test-Path -LiteralPath $Target -PathType Leaf)) {
+    throw "Bundled W2 Charge sound is missing: $TargetRelative. Run git pull --ff-only origin feature/warrior-spells-port."
 }
 
-Sync-ExactAsset `
-    "sounds/charge_activate.ogg" `
-    "src/main/resources/assets/martial_spells/sounds/charge_activate.ogg" `
-    "77ec5f2f81300f268e686c9fe2c1800127f2936f"
+$actual = Get-GitBlobSha1 $Target
+if ($actual -ne $ExpectedBlobSha) {
+    throw "Charge sound hash mismatch. Expected Git blob $ExpectedBlobSha, got $actual. Restore the tracked file with git restore -- $TargetRelative."
+}
 
-Write-Host "W2 Charge frozen sound synced." -ForegroundColor Green
+Write-Host "Verified bundled W2 Charge sound: $TargetRelative ($actual)" -ForegroundColor Green

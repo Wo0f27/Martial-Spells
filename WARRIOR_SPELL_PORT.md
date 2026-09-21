@@ -194,11 +194,11 @@ W2 is restricted to `martial_spells:charge` and remains **VALIDATING** until the
 - reapplication uses amplifier 0 / SET-style refresh semantics rather than stacking.
 - base cooldown is exactly 12 seconds and uses normal Iron's Cooldown Reduction behavior.
 - the upstream Charge icon/effect icon is retained exactly.
-- `charge_activate.ogg` is synced from the frozen source commit and verified against Git blob `77ec5f2f81300f268e686c9fe2c1800127f2936f`.
+- `charge_activate.ogg` is committed directly from the frozen source bytes and verified against Git blob `77ec5f2f81300f268e686c9fe2c1800127f2936f`.
 - Spell Engine's release presentation is translated without introducing Spell Engine as a dependency: a custom Rage-tinted Charge sign, floating stripe particles, decelerating sparks, and a 50-particle smoke ring replace the earlier vanilla CRIT/POOF approximation.
 - Improved Charge skill-tree behavior is not imported.
 - W3+ Warrior spell classes remain absent.
 - clean build passes.
 - `runClient` boots successfully and runtime attribute behavior matches the frozen values.
 
-Run `tools/sync-warrior-w2-assets.ps1` before `tools/audit-warrior-w2.py`, then build and run the client. W2 is not PASS until the user explicitly validates the gate.
+`tools/sync-warrior-w2-assets.ps1` is now an offline verifier for the bundled frozen sound; run it before `tools/audit-warrior-w2.py`, then build and run the client. W2 is not PASS until the user explicitly validates the gate.
