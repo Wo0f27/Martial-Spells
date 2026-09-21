@@ -1,6 +1,8 @@
 package com.w0of26.martialspells.entity;
 
 import com.w0of26.martialspells.damage.MartialDamageTypes;
+import com.w0of26.martialspells.network.MartialNetwork;
+import com.w0of26.martialspells.network.SyncNettedVisualPacket;
 import com.w0of26.martialspells.registry.MartialEffectRegistry;
 import com.w0of26.martialspells.registry.MartialSoundRegistry;
 import com.w0of26.martialspells.spells.ThrowNetSpell;
@@ -220,7 +222,7 @@ public final class ThrowNetProjectile extends ThrowableProjectile {
         }
 
         if (target.getMaxHealth() <= controlHealthLimit) {
-            target.addEffect(
+            boolean applied = target.addEffect(
                     new MobEffectInstance(
                             MartialEffectRegistry.NET_TRAP.get(),
                             ThrowNetSpell.NETTED_DURATION_TICKS,
@@ -231,6 +233,18 @@ public final class ThrowNetProjectile extends ThrowableProjectile {
                     ),
                     owner
             );
+
+            if (applied || target.hasEffect(MartialEffectRegistry.NET_TRAP.get())) {
+                MartialNetwork.sendToTrackingEntityAndSelf(
+                        new SyncNettedVisualPacket(
+                                target.getId(),
+                                level().getGameTime(),
+                                ThrowNetSpell.NETTED_DURATION_TICKS
+                        ),
+                        target
+                );
+            }
+
             level().playSound(
                     null,
                     target.getX(),

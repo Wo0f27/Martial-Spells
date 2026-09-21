@@ -3,7 +3,7 @@ package com.w0of26.martialspells.client.render;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.w0of26.martialspells.MartialSpells;
-import com.w0of26.martialspells.registry.MartialEffectRegistry;
+import com.w0of26.martialspells.client.visual.NettedClientVisuals;
 import com.w0of26.martialspells.spells.ThrowNetSpell;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -15,7 +15,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.event.RenderLivingEvent;
@@ -29,9 +28,10 @@ import net.minecraftforge.client.event.RenderLivingEvent;
  * remains around the target until Netted expires.</p>
  *
  * <p>On Forge 1.20.1 this renderer is driven by RenderLivingEvent.Post,
- * registered explicitly from FMLClientSetupEvent. This mirrors the explicit
- * Forge-47 client wiring used by the upstream 1.20.1-modern Spell Engine/Rogues
- * ports and avoids relying on GAME-bus annotation scanning.</p>
+ * registered explicitly from FMLClientSetupEvent. Visual timing comes from
+ * NettedClientVisuals, a minimal S2C mirror of Spell Engine 1.20.1-modern's
+ * synchronized status-effect record (entity/effect application world time),
+ * rather than from the vanilla client MobEffect map.</p>
  */
 public final class NettedEffectRenderer {
     public static final ResourceLocation MODEL =
@@ -67,15 +67,15 @@ public final class NettedEffectRenderer {
         }
 
         LivingEntity entity = event.getEntity();
-        MobEffectInstance netted =
-                entity.getEffect(MartialEffectRegistry.NET_TRAP.get());
-        if (netted == null) {
+        NettedClientVisuals.State state =
+                NettedClientVisuals.stateFor(entity.getId());
+        if (state == null) {
             return;
         }
 
         render(
                 entity,
-                netted,
+                state,
                 event.getPartialTick(),
                 event.getPoseStack(),
                 event.getMultiBufferSource(),
@@ -85,18 +85,14 @@ public final class NettedEffectRenderer {
 
     private static void render(
             LivingEntity entity,
-            MobEffectInstance netted,
+            NettedClientVisuals.State state,
             float partialTick,
             PoseStack poseStack,
             MultiBufferSource bufferSource,
             int packedLight
     ) {
-        float age = Math.max(
-                0.0F,
-                ThrowNetSpell.NETTED_DURATION_TICKS
-                        - netted.getDuration()
-                        + partialTick
-        );
+        long clientWorldTime = entity.level().getGameTime();
+        float age = state.age(clientWorldTime, partialTick);
 
         float dropT = Mth.clamp(age / DROP_END_TICK, 0.0F, 1.0F);
         float dropProgress = dropT * dropT;
@@ -121,10 +117,11 @@ public final class NettedEffectRenderer {
         if (!nettedDiagnosticLogged) {
             nettedDiagnosticLogged = true;
             MartialSpells.LOGGER.info(
-                    "W4 Netted entity render active: entity={} id={} duration={} age={} modelMissing={} bakedQuads={}",
+                    "W4 Netted entity render active: entity={} id={} appliedAt={} expiresAt={} age={} modelMissing={} bakedQuads={}",
                     entity.getType(),
                     entity.getId(),
-                    netted.getDuration(),
+                    state.appliedAtWorldTime(),
+                    state.expiresAtWorldTime(),
                     age,
                     model == minecraft.getModelManager().getMissingModel(),
                     countBakedQuads(model)

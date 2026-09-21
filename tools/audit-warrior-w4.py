@@ -89,6 +89,9 @@ for token, message in (
     ("MartialEffectRegistry.NET_TRAP.get()", "Netted application missing"),
     ("MartialSoundRegistry.NET_TRAVEL.get()", "travel sound missing"),
     ("MartialSoundRegistry.NET_IMPACT.get()", "impact sound missing"),
+    ("SyncNettedVisualPacket", "Netted visual sync packet is not sent"),
+    ("level().getGameTime()", "Netted visual sync must carry authoritative world time"),
+    ("sendToTrackingEntityAndSelf", "Netted visual sync must reach tracking clients"),
 ):
     require(token in projectile, message)
 
@@ -181,6 +184,8 @@ require("W4 Netted Forge render event observed" in netted_renderer,
         "Netted Forge-event observation diagnostic missing")
 require("W4 Netted entity render active:" in netted_renderer,
         "Netted affected-entity runtime diagnostic missing")
+require("NettedClientVisuals.stateFor(entity.getId())" in netted_renderer,
+        "Netted renderer must consume synchronized client visual state")
 require("countBakedQuads(model)" in netted_renderer,
         "Netted runtime baked-quad diagnostic missing")
 require(
@@ -221,6 +226,31 @@ require({
     "source": "spell_effect",
     "prefix": "spell_effect/",
 } in atlas_sources, "block atlas missing spell_effect directory source")
+
+network = read("src/main/java/com/w0of26/martialspells/network/MartialNetwork.java")
+require('PROTOCOL_VERSION = "13"' in network,
+        "W4 Netted visual packet requires Martial network protocol 13")
+require("SyncNettedVisualPacket.class" in network,
+        "Netted visual sync packet not registered")
+
+netted_packet = read("src/main/java/com/w0of26/martialspells/network/SyncNettedVisualPacket.java")
+for token, message in (
+    ("entityId", "Netted sync entity id missing"),
+    ("appliedAtWorldTime", "Netted sync applied world time missing"),
+    ("durationTicks", "Netted sync duration missing"),
+    ("NettedClientVisuals.activate(", "Netted sync client handler missing"),
+):
+    require(token in netted_packet, message)
+
+netted_visuals = read("src/main/java/com/w0of26/martialspells/client/visual/NettedClientVisuals.java")
+require("record State(long appliedAtWorldTime, long expiresAtWorldTime)" in netted_visuals,
+        "Netted client synchronized state missing")
+require("existing.appliedAtWorldTime()" in netted_visuals,
+        "Netted refresh must preserve original application time")
+require("minecraft.level.getGameTime()" in netted_visuals,
+        "Netted client visual expiry must use client world time")
+require("W4 Netted visual sync received:" in netted_visuals,
+        "Netted visual sync receipt diagnostic missing")
 
 client_events = read("src/main/java/com/w0of26/martialspells/client/MartialClientEvents.java")
 require("FMLClientSetupEvent" in client_events,

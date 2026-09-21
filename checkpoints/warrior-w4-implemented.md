@@ -117,3 +117,19 @@ Runtime diagnostics are split into:
 - `Registered W4 Netted Forge render hook`
 - `W4 Netted Forge render event observed`
 - `W4 Netted entity render active: ...`
+
+
+### Upstream synchronized Netted visual state
+
+The explicit Forge render hook was confirmed registered and firing, but no affected-entity render diagnostic appeared while Jade still showed Netted. Re-checking Spell Engine 1.20.1-modern exposed the missing source mechanism: custom status-effect visuals do not read the vanilla client status-effect map. `LivingEntityStatusEffectSync` synchronizes a separate tracked-data record containing effect id, amplifier, and authoritative `appliedAtWorldTime`; `LivingEntityRendererMixin` renders from that synchronized list.
+
+W4 now reproduces only the minimum state needed for Netted without adding Spell Engine:
+- server sends `SyncNettedVisualPacket(entityId, appliedAtWorldTime, durationTicks)` to tracking clients after successful Netted application;
+- client stores the visual state in `NettedClientVisuals`;
+- refreshes preserve the original application timestamp while extending expiry, matching upstream one-shot playback semantics;
+- the Forge post-render hook renders from this synchronized visual state instead of `LivingEntity#getEffect`;
+- Martial network protocol advances from 12 to 13.
+
+Expected diagnostics after a successful hit:
+- `W4 Netted visual sync received: ...`
+- `W4 Netted entity render active: ... modelMissing=false bakedQuads=<nonzero>`

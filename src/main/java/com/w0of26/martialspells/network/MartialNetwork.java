@@ -11,7 +11,7 @@ import net.minecraftforge.network.simple.SimpleChannel;
 /** Registers and sends Martial Spells network packets. */
 public final class MartialNetwork {
     /* Increment whenever the packet protocol changes. */
-    private static final String PROTOCOL_VERSION = "12";
+    private static final String PROTOCOL_VERSION = "13";
 
     private static SimpleChannel instance;
     private static int packetId;
@@ -145,6 +145,16 @@ public final class MartialNetwork {
                 .decoder(SyncProneAnimationPacket::new)
                 .encoder(SyncProneAnimationPacket::toBytes)
                 .consumerMainThread(SyncProneAnimationPacket::handle)
+                .add();
+
+        instance.messageBuilder(
+                        SyncNettedVisualPacket.class,
+                        nextPacketId(),
+                        NetworkDirection.PLAY_TO_CLIENT
+                )
+                .decoder(SyncNettedVisualPacket::new)
+                .encoder(SyncNettedVisualPacket::toBytes)
+                .consumerMainThread(SyncNettedVisualPacket::handle)
                 .add();
     }
 
