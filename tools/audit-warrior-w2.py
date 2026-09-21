@@ -134,6 +134,9 @@ require(git_blob_sha("src/main/resources/assets/martial_spells/textures/gui/spel
 require(git_blob_sha("src/main/resources/assets/martial_spells/textures/mob_effect/charge.png")
         == "c278a806b067c9350bf81fbf89783c289a651517",
         "Charge effect icon does not match frozen Rogues")
+require(git_blob_sha("src/main/resources/assets/martial_spells/textures/particle/charge_speed_sign.png")
+        == "c278a806b067c9350bf81fbf89783c289a651517",
+        "Charge pop-up sign texture must match the retained Charge icon")
 require(git_blob_sha("src/main/resources/assets/martial_spells/sounds/charge_activate.ogg")
         == "77ec5f2f81300f268e686c9fe2c1800127f2936f",
         "Charge activation sound does not match frozen Rogues; run tools/sync-warrior-w2-assets.ps1")

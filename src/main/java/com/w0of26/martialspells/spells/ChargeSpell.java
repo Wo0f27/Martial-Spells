@@ -141,6 +141,8 @@ public final class ChargeSpell extends AbstractSpell implements MartialTechnique
     }
 
     private static void playReleasePresentation(ServerLevel level, LivingEntity caster) {
+        // Recreates the frozen Spell Engine release silhouette with native
+        // Martial Spells particles; Spell Engine is not a runtime dependency.
         level.playSound(
                 null,
                 caster.getX(),
