@@ -92,6 +92,16 @@ public final class MartialDamageTypes {
                     )
             );
 
+    public static final ResourceKey<DamageType>
+            SHATTERING_THROW =
+            ResourceKey.create(
+                    Registries.DAMAGE_TYPE,
+                    new ResourceLocation(
+                            MartialSpells.MOD_ID,
+                            "shattering_throw"
+                    )
+            );
+
     private MartialDamageTypes() {
     }
 
@@ -245,6 +255,25 @@ public final class MartialDamageTypes {
                                 Registries.DAMAGE_TYPE
                         )
                         .getHolderOrThrow(THROW_NET);
+
+        return new DamageSource(
+                damageType,
+                directEntity,
+                caster
+        );
+    }
+
+    public static DamageSource shatteringThrow(
+            net.minecraft.world.entity.LivingEntity caster,
+            Entity directEntity
+    ) {
+        Holder<DamageType> damageType =
+                caster.level()
+                        .registryAccess()
+                        .registryOrThrow(
+                                Registries.DAMAGE_TYPE
+                        )
+                        .getHolderOrThrow(SHATTERING_THROW);
 
         return new DamageSource(
                 damageType,

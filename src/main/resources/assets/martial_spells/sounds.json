@@ -68,5 +68,10 @@
     "sounds": [
       "martial_spells:net_impact"
     ]
+  },
+  "throw_impact": {
+    "sounds": [
+      "martial_spells:throw_impact"
+    ]
   }
 }

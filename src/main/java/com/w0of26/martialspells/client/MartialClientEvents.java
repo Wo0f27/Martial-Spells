@@ -8,6 +8,7 @@ import com.w0of26.martialspells.client.particle.ChargeStripeParticle;
 import com.w0of26.martialspells.client.particle.DemoralizeSmokeParticle;
 import com.w0of26.martialspells.client.particle.ShockPowderArcParticle;
 import com.w0of26.martialspells.client.particle.ShockPowderSmokeParticle;
+import com.w0of26.martialspells.client.particle.ShatterBloodParticle;
 import com.w0of26.martialspells.client.render.BarrageArrowRenderer;
 import com.w0of26.martialspells.client.render.BearTrapRenderer;
 import com.w0of26.martialspells.client.render.CaltropFieldRenderer;
@@ -15,6 +16,7 @@ import com.w0of26.martialspells.client.render.DiamondBodyShieldLayer;
 import com.w0of26.martialspells.client.render.EntanglingArrowRenderer;
 import com.w0of26.martialspells.client.render.NettedEffectRenderer;
 import com.w0of26.martialspells.client.render.ThrowNetRenderer;
+import com.w0of26.martialspells.client.render.ShatteringThrowRenderer;
 import com.w0of26.martialspells.registry.MartialEntityRegistry;
 import com.w0of26.martialspells.registry.MartialParticleRegistry;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
@@ -50,6 +52,7 @@ public final class MartialClientEvents {
         event.registerEntityRenderer(MartialEntityRegistry.CALTROP_FIELD.get(), CaltropFieldRenderer::new);
         event.registerEntityRenderer(MartialEntityRegistry.BEAR_TRAP.get(), BearTrapRenderer::new);
         event.registerEntityRenderer(MartialEntityRegistry.THROW_NET.get(), ThrowNetRenderer::new);
+        event.registerEntityRenderer(MartialEntityRegistry.SHATTERING_THROW.get(), ShatteringThrowRenderer::new);
     }
 
     @SubscribeEvent
@@ -88,6 +91,7 @@ public final class MartialClientEvents {
         event.registerSpriteSet(MartialParticleRegistry.CHARGE_STRIPE.get(), ChargeStripeParticle.Provider::new);
         event.registerSpriteSet(MartialParticleRegistry.CHARGE_SPARK.get(), ChargeSparkParticle.Provider::new);
         event.registerSpriteSet(MartialParticleRegistry.DEMORALIZE_SMOKE.get(), DemoralizeSmokeParticle.Provider::new);
+        event.registerSpriteSet(MartialParticleRegistry.SHATTER_BLOOD.get(), ShatterBloodParticle.Provider::new);
     }
 
     @SubscribeEvent

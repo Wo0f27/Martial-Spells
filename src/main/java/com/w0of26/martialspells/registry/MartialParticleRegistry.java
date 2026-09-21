@@ -30,6 +30,9 @@ public final class MartialParticleRegistry {
     public static final RegistryObject<SimpleParticleType> DEMORALIZE_SMOKE =
             PARTICLES.register("demoralize_smoke", () -> new SimpleParticleType(false));
 
+    public static final RegistryObject<SimpleParticleType> SHATTER_BLOOD =
+            PARTICLES.register("shatter_blood", () -> new SimpleParticleType(false));
+
     private MartialParticleRegistry() {}
 
     public static void register(IEventBus modEventBus) {

@@ -162,7 +162,7 @@ W1 does not introduce a generic charged-technique runtime yet. The first charged
 - **W2 — Charge:** PASS — user validated the 10-second balance override and final no-overhead-sign presentation.
 - **W3 — Demoralizing Shout:** PASS — user validated effect application, stacking behavior, and the source health gate.
 - **W4 — Throw Net:** PASS — user validated the charged projectile, Netted root, textured projectile model, and synchronized physical net VFX.
-- **W5 — Shattering Throw:** unlocked for implementation; not started yet.
+- **W5 — Shattering Throw:** IMPLEMENTED / VALIDATING — charged held-item projectile, one block bounce, damage + Shattered Armor vertical slice.
 - **W6 — Mortal Strike:** locked until explicit W5 PASS.
 - **W7 — Last Stand:** locked until explicit W6 PASS.
 - **W8 — Fidelity/final audit:** locked until explicit W7 PASS.
@@ -244,3 +244,33 @@ W4 is frozen as **PASS** after the user validated gameplay and the final synchro
 - base cooldown is 12 seconds and normal Iron's Cooldown Reduction remains available.
 - W2 Charge and W3 Demoralizing Shout remain frozen.
 - W5+ Warrior gameplay classes remain absent.
+
+
+## W5 acceptance criteria
+
+W5 is restricted to `martial_spells:shattering_throw` and remains **VALIDATING** until the user explicitly passes it.
+
+- Warrior/Martial, one level, source tier-2 mapped to Iron's `UNCOMMON`, zero mana.
+- charged cast uses the frozen 10-tick / 0.5-second source duration.
+- minimum release ratio is the Spell Engine default 0.2; releases below 20% fizzle through Iron's normal cancellation path with no projectile/cooldown.
+- source omits `output_scaling`, whose exact 1.20.1-modern default is 1.0, so innate output is fully proportional to linear charge ratio.
+- charge-scaled range is `12 + 12 * chargeRatio`: 14.4 blocks at minimum valid release and 24 blocks at full charge.
+- full-charge direct damage is `1.0 * PhysicalMeleePower`; at partial charge damage scales linearly with charge ratio.
+- source Damage default knockback is 1.0, translated through Spell Engine's 0.4 vanilla base: `0.4 * chargeRatio`.
+- source Damage default `bypass_iframes = true` is preserved for the direct hit.
+- projectile velocity is 0.8 with no gravity/drag and source age cap 1200 ticks.
+- AIM is not sticky: the homing target is resolved at release, not frozen when charging begins.
+- homing turn cap is 2 degrees/tick.
+- projectile has exactly one block bounce. The bounce reflects velocity across the hit-face normal, preserves speed, consumes the remaining travel in that collision tick, and then the next block impact terminates it.
+- the projectile visually renders a captured registry-ID copy of the caster's main-hand item. The real held stack is never removed or moved; NBT/enchant glint are not serialized because upstream also resolves the captured item type's default stack.
+- held-item visual uses Spell Engine's `ALONG_MOTION` orientation, `FIXED` display transform, -36 degrees/tick Z spin, and the source near-camera guard.
+- release and 8-tick projectile travel cadence both use the frozen `throw.ogg`; direct impact uses frozen `throw_impact.ogg`.
+- Shattered Armor lasts 160 ticks / 8 seconds with amplifier 0 / SET semantics and refreshes duration on reapplication.
+- Shattered Armor applies -30% base Armor using `MULTIPLY_BASE`.
+- Shattered Armor applies only when target max health is <= `100 + 2 * PhysicalMeleePower`; direct damage/knockback and throw-impact sound are independent of that gate.
+- successful Shatter application emits the frozen 10-particle dark-red dripping-blood impact batch; while Shattered Armor remains active it continues to drip one particle per tick at amplifier 0.
+- local dripping-blood translation uses the source `minecraft:drip_hang` sprite, #590000 tint, 0.11 +/-33% scale, DRIFT motion, gravity 0.8, collision, and 20-tick lifetime.
+- frozen spell/effect icon and `throw_impact.ogg` are committed directly; W4's already-frozen `throw.ogg` is reused byte-for-byte.
+- base cooldown is 8 seconds and normal Iron's Cooldown Reduction remains available.
+- W0-W4 remain frozen.
+- W6+ Warrior gameplay classes remain absent.

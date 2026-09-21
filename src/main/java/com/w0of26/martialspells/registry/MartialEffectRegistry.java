@@ -5,6 +5,7 @@ import com.w0of26.martialspells.effects.ChargeEffect;
 import com.w0of26.martialspells.effects.DemoralizedEffect;
 import com.w0of26.martialspells.effects.DiamondBodyEffect;
 import com.w0of26.martialspells.effects.NettedEffect;
+import com.w0of26.martialspells.effects.ShatterEffect;
 import com.w0of26.martialspells.effects.DiamondHeartEffect;
 import com.w0of26.martialspells.effects.GuardiansCovenantLinkedEffect;
 import com.w0of26.martialspells.effects.GuardiansCovenantTankEffect;
@@ -133,6 +134,14 @@ public final class MartialEffectRegistry {
             MOB_EFFECTS.register(
                     "net_trap",
                     NettedEffect::new
+            );
+
+    /** Frozen Warrior Shattering Throw armor debuff. */
+    public static final RegistryObject<MobEffect>
+            SHATTER =
+            MOB_EFFECTS.register(
+                    "shatter",
+                    ShatterEffect::new
             );
 
     private MartialEffectRegistry() {

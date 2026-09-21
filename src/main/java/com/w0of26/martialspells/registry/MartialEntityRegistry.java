@@ -7,6 +7,7 @@ import com.w0of26.martialspells.entity.CaltropBundleProjectile;
 import com.w0of26.martialspells.entity.CaltropFieldEntity;
 import com.w0of26.martialspells.entity.EntanglingArrow;
 import com.w0of26.martialspells.entity.ThrowNetProjectile;
+import com.w0of26.martialspells.entity.ShatteringThrowProjectile;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -73,6 +74,16 @@ public final class MartialEntityRegistry {
                     .clientTrackingRange(128)
                     .updateInterval(2)
                     .build(MartialSpells.MOD_ID + ":throw_net"));
+
+    /** Frozen Spell Engine spell-projectile dimensions and tracking. */
+    public static final RegistryObject<EntityType<ShatteringThrowProjectile>> SHATTERING_THROW =
+            ENTITY_TYPES.register("shattering_throw", () -> EntityType.Builder
+                    .<ShatteringThrowProjectile>of(ShatteringThrowProjectile::new, MobCategory.MISC)
+                    .sized(0.25F, 0.25F)
+                    .fireImmune()
+                    .clientTrackingRange(128)
+                    .updateInterval(2)
+                    .build(MartialSpells.MOD_ID + ":shattering_throw"));
 
     private MartialEntityRegistry() {}
 

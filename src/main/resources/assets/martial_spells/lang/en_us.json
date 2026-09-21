@@ -217,5 +217,18 @@
   "ui.martial_spells.throw_net_root": "Netted: %s seconds",
   "ui.martial_spells.throw_net_control_limit": "Root Health Limit: %s target max health",
   "death.attack.martial_spells.throw_net": "%1$s was struck by a thrown net",
-  "death.attack.martial_spells.throw_net.player": "%1$s was struck by %2$s's thrown net"
+  "death.attack.martial_spells.throw_net.player": "%1$s was struck by %2$s's thrown net",
+  "effect.martial_spells.shatter": "Shattered Armor",
+  "effect.martial_spells.shatter.description": "Reduces base armor.",
+  "spell.martial_spells.shattering_throw": "Shattering Throw",
+  "spell.martial_spells.shattering_throw.description": "Charge and hurl a visual copy of your held weapon, damaging enemies and shattering the armor of targets you can overpower.",
+  "spell.martial_spells.shattering_throw.guide": "Hold to charge for up to 0.5 seconds, then release. Releases below 20% charge fizzle without a cooldown. Charge scales damage fully from 20% to 100% and extends projectile range from 14.4 to 24 blocks. The projectile uses a visual copy of your main-hand item, travels at 0.8 blocks per tick, homes slightly toward the release-time aim target, and can bounce from one block surface. A full-charge hit deals 100% of current Attack Damage before armor mitigation. Targets whose maximum health is at most 100 + twice your current Attack Damage gain Shattered Armor for 8 seconds, reducing base Armor by 30%.",
+  "ui.martial_spells.shattering_throw_charge": "Charge: %ss; minimum release %s%%",
+  "ui.martial_spells.shattering_throw_range": "Projectile Range: %s-%s blocks",
+  "ui.martial_spells.shattering_throw_damage": "Full-Charge Damage: %s%% Attack Damage",
+  "ui.martial_spells.shattering_throw_shatter": "Shattered Armor: %ss; -%s%% base Armor",
+  "ui.martial_spells.shattering_throw_control_limit": "Shatter Health Limit: %s target max health",
+  "ui.martial_spells.shattering_throw_bounces": "Block Bounces: %s",
+  "death.attack.martial_spells.shattering_throw": "%1$s was struck by a shattering weapon",
+  "death.attack.martial_spells.shattering_throw.player": "%1$s was struck by %2$s's shattering weapon"
 }

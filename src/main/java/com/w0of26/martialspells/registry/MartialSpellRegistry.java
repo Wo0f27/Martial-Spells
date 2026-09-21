@@ -34,6 +34,7 @@ public final class MartialSpellRegistry {
     public static final RegistryObject<AbstractSpell> CHARGE = SPELLS.register("charge", ChargeSpell::new);
     public static final RegistryObject<AbstractSpell> DEMORALIZING_SHOUT = SPELLS.register("demoralizing_shout", DemoralizingShoutSpell::new);
     public static final RegistryObject<AbstractSpell> THROW_NET = SPELLS.register("throw_net", ThrowNetSpell::new);
+    public static final RegistryObject<AbstractSpell> SHATTERING_THROW = SPELLS.register("shattering_throw", ShatteringThrowSpell::new);
 
     private MartialSpellRegistry() {}
 
