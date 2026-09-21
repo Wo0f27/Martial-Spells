@@ -27,6 +27,9 @@ public final class MartialParticleRegistry {
     public static final RegistryObject<SimpleParticleType> CHARGE_SPARK =
             PARTICLES.register("charge_spark", () -> new SimpleParticleType(false));
 
+    public static final RegistryObject<SimpleParticleType> DEMORALIZE_SMOKE =
+            PARTICLES.register("demoralize_smoke", () -> new SimpleParticleType(false));
+
     private MartialParticleRegistry() {}
 
     public static void register(IEventBus modEventBus) {

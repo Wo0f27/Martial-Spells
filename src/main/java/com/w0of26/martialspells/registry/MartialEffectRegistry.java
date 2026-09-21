@@ -2,6 +2,7 @@ package com.w0of26.martialspells.registry;
 
 import com.w0of26.martialspells.MartialSpells;
 import com.w0of26.martialspells.effects.ChargeEffect;
+import com.w0of26.martialspells.effects.DemoralizedEffect;
 import com.w0of26.martialspells.effects.DiamondBodyEffect;
 import com.w0of26.martialspells.effects.DiamondHeartEffect;
 import com.w0of26.martialspells.effects.GuardiansCovenantLinkedEffect;
@@ -115,6 +116,14 @@ public final class MartialEffectRegistry {
             MOB_EFFECTS.register(
                     "charge",
                     ChargeEffect::new
+            );
+
+    /** Frozen Warrior Demoralizing Shout attack-damage debuff. */
+    public static final RegistryObject<MobEffect>
+            DEMORALIZED =
+            MOB_EFFECTS.register(
+                    "demoralized",
+                    DemoralizedEffect::new
             );
 
     private MartialEffectRegistry() {

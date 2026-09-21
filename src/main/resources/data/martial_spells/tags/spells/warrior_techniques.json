@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "martial_spells:charge"
+    "martial_spells:charge",
+    "martial_spells:demoralizing_shout"
   ]
 }

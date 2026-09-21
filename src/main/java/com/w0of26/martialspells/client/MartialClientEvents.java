@@ -5,6 +5,7 @@ import com.w0of26.martialspells.client.model.BearTrapModel;
 import com.w0of26.martialspells.client.particle.BarrageTrailParticle;
 import com.w0of26.martialspells.client.particle.ChargeSparkParticle;
 import com.w0of26.martialspells.client.particle.ChargeStripeParticle;
+import com.w0of26.martialspells.client.particle.DemoralizeSmokeParticle;
 import com.w0of26.martialspells.client.particle.ShockPowderArcParticle;
 import com.w0of26.martialspells.client.particle.ShockPowderSmokeParticle;
 import com.w0of26.martialspells.client.render.BarrageArrowRenderer;
@@ -47,6 +48,7 @@ public final class MartialClientEvents {
         event.registerSpriteSet(MartialParticleRegistry.SHOCK_POWDER_ARC.get(), ShockPowderArcParticle.Provider::new);
         event.registerSpriteSet(MartialParticleRegistry.CHARGE_STRIPE.get(), ChargeStripeParticle.Provider::new);
         event.registerSpriteSet(MartialParticleRegistry.CHARGE_SPARK.get(), ChargeSparkParticle.Provider::new);
+        event.registerSpriteSet(MartialParticleRegistry.DEMORALIZE_SMOKE.get(), DemoralizeSmokeParticle.Provider::new);
     }
 
     @SubscribeEvent

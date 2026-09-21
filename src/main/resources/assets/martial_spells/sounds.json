@@ -38,5 +38,15 @@
     "sounds": [
       "martial_spells:charge_activate"
     ]
+  },
+  "shout_release": {
+    "sounds": [
+      "martial_spells:shout_release"
+    ]
+  },
+  "demoralize_impact": {
+    "sounds": [
+      "martial_spells:demoralize_impact"
+    ]
   }
 }

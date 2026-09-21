@@ -72,6 +72,16 @@ public final class MartialDamageTypes {
                     )
             );
 
+    public static final ResourceKey<DamageType>
+            DEMORALIZING_SHOUT =
+            ResourceKey.create(
+                    Registries.DAMAGE_TYPE,
+                    new ResourceLocation(
+                            MartialSpells.MOD_ID,
+                            "demoralizing_shout"
+                    )
+            );
+
     private MartialDamageTypes() {
     }
 
@@ -193,6 +203,24 @@ public final class MartialDamageTypes {
                 damageType,
                 directEntity,
                 player
+        );
+    }
+
+    public static DamageSource demoralizingShout(
+            net.minecraft.world.entity.LivingEntity caster
+    ) {
+        Holder<DamageType> damageType =
+                caster.level()
+                        .registryAccess()
+                        .registryOrThrow(
+                                Registries.DAMAGE_TYPE
+                        )
+                        .getHolderOrThrow(DEMORALIZING_SHOUT);
+
+        return new DamageSource(
+                damageType,
+                caster,
+                caster
         );
     }
 }

@@ -159,8 +159,8 @@ W1 does not introduce a generic charged-technique runtime yet. The first charged
 
 - **W0 — Archaeology/contract:** PASS — exact six-technique inventory and frozen behavior approved.
 - **W1 — Shared Warrior architecture:** PASS — Warrior technique class/tag + single-hand physical-melee adapter; no Warrior gameplay.
-- **W2 — Charge:** IMPLEMENTED / VALIDATING — frozen two-second self-buff vertical slice.
-- **W3 — Demoralizing Shout:** locked until explicit W2 PASS.
+- **W2 — Charge:** PASS — user validated the 10-second balance override and final no-overhead-sign presentation.
+- **W3 — Demoralizing Shout:** IMPLEMENTED / VALIDATING — instant hostile-area debuff/damage vertical slice.
 - **W4 — Throw Net:** locked until explicit W3 PASS.
 - **W5 — Shattering Throw:** locked until explicit W4 PASS.
 - **W6 — Mortal Strike:** locked until explicit W5 PASS.
@@ -183,7 +183,7 @@ W1 has been explicitly accepted by the user. Its frozen gate was:
 
 ## W2 acceptance criteria
 
-W2 is restricted to `martial_spells:charge` and remains **VALIDATING** until the user explicitly passes it.
+W2 is frozen as **PASS** after the user validated the final Charge behavior and instructed the project to proceed to W3.
 
 - Charge is classified as `MartialTechniqueClass.WARRIOR` and is the only value in the Warrior technique tag.
 - source tier 3 is mapped to Iron's `RARE` with one spell level and zero mana.
@@ -201,4 +201,22 @@ W2 is restricted to `martial_spells:charge` and remains **VALIDATING** until the
 - clean build passes.
 - `runClient` boots successfully and runtime attribute behavior matches the frozen values.
 
-`tools/sync-warrior-w2-assets.ps1` is now an offline verifier for the bundled frozen sound; run it before `tools/audit-warrior-w2.py`, then build and run the client. W2 is not PASS until the user explicitly validates the gate.
+`tools/sync-warrior-w2-assets.ps1` is an offline verifier for the bundled frozen sound. W2 is frozen; W3 must not alter its accepted behavior.
+
+
+## W3 acceptance criteria
+
+W3 is restricted to `martial_spells:demoralizing_shout` and remains **VALIDATING** until the user explicitly passes it.
+
+- Warrior/Martial, one level, tier-3/RARE, zero mana, instant self-centered hostile area.
+- 12-block range with 0.5 vertical-range multiplier and obstacle-aware line of sight.
+- Demoralized lasts 160 ticks / 8 seconds.
+- Demoralized applies -0.2 base Attack Damage per effect level using `MULTIPLY_BASE`.
+- Source ADD semantics are preserved exactly: first application becomes amplifier 0, each later application adds 1, and source `amplifier_cap = 5` means a maximum Minecraft amplifier of 5 (Demoralized VI / six effective levels).
+- The debuff applies only when target max health is <= `50 + 2 * PhysicalMeleePower`.
+- The separate 0.05 x Physical Melee damage impact still applies to valid area targets even when they exceed the debuff health gate.
+- Direct damage uses an armor-respecting Martial damage type and restores pre-impact velocity so the source's zero-knockback contract is preserved.
+- Frozen `shout_release.ogg`, `demoralize_impact.ogg`, spell icon, and effect icon are committed directly.
+- Release/impact VFX are translated locally with Rage-tinted smoke; no Spell Engine runtime dependency is introduced.
+- Base cooldown is 12 seconds and normal Iron's Cooldown Reduction remains available.
+- W4+ Warrior spell classes remain absent.

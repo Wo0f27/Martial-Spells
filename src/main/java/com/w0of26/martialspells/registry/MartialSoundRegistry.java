@@ -48,6 +48,12 @@ public final class MartialSoundRegistry {
     public static final RegistryObject<SoundEvent> CHARGE_ACTIVATE =
             register("charge_activate");
 
+    public static final RegistryObject<SoundEvent> SHOUT_RELEASE =
+            register("shout_release");
+
+    public static final RegistryObject<SoundEvent> DEMORALIZE_IMPACT =
+            register("demoralize_impact");
+
     private MartialSoundRegistry() {}
 
     private static RegistryObject<SoundEvent> register(String path) {

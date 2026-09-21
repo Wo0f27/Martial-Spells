@@ -3,9 +3,7 @@
   "attribute.martial_spells.martial_spell_power": "Martial Spell Power",
   "attribute.martial_spells.martial_magic_resist": "Martial Resistance",
   "item.martial_spells.martial_focus": "Martial Focus",
-
   "effect.martial_spells.prone": "Prone",
-
   "death.attack.martial": "%1$s was defeated by a martial technique",
   "death.attack.martial.player": "%1$s was defeated by %2$s's martial technique",
   "death.attack.martial_spells.caltrops": "%1$s was cut down by caltrops",
@@ -13,7 +11,6 @@
   "death.attack.martial_spells.bear_trap": "%1$s was caught in a bear trap",
   "death.attack.martial_spells.bear_trap.player": "%1$s was caught in %2$s's bear trap",
   "ui.martial_spells.scales_with_martial_power": "Scales with Martial Spell Power.",
-
   "spell.martial_spells.guardians_cry": "Guardian's Cry",
   "spell.martial_spells.guardians_cry.guide": "Forces nearby hostile creatures to target the caster for a short duration.",
   "effect.martial_spells.guardians_cry": "Guardian's Cry",
@@ -22,43 +19,32 @@
   "ui.martial_spells.cooldown_reduction_immune": "Unaffected by Cooldown Reduction",
   "ui.martial_spells.base_cooldown": "Base Cooldown: %s seconds",
   "ui.martial_spells.minimum_cooldown": "Minimum Cooldown: %s seconds",
-
   "effect.martial_spells.guardians_covenant_tank": "Guardian's Covenant",
   "effect.martial_spells.guardians_covenant_linked": "Guardian's Protection",
-
   "spell.martial_spells.guardians_covenant": "Guardian's Covenant",
   "spell.martial_spells.guardians_covenant.description": "Become the defensive center of your allies, gaining temporary health and defenses while assuming part of their incoming damage.",
   "spell.martial_spells.guardians_covenant.guide": "Forms a defensive covenant with nearby allies. The caster gains absorption, armor, and armor toughness while a portion of damage received by protected allies is redirected to the caster.",
   "death.attack.martial_spells.guardians_covenant_redirect": "%1$s fell while protecting their allies",
   "death.attack.martial_spells.guardians_covenant_redirect.player": "%1$s fell while protecting their allies from %2$s",
-
   "ui.martial_spells.radius": "Radius: %s blocks",
   "ui.martial_spells.effect_length": "Duration: %s seconds",
   "ui.martial_spells.damage_redirect": "Damage Redirect: %s%%",
   "ui.martial_spells.absorption_health": "Absorption: %s health",
   "ui.martial_spells.armor_bonus": "Armor: +%s",
   "ui.martial_spells.toughness_bonus": "Armor Toughness: +%s",
-
   "item.martial_spells.monk_codex": "Monk Codex",
   "ui.martial_spells.monk_codex_only": "Monk techniques can only be inscribed into a Monk Codex.",
   "tooltip.martial_spells.monk_codex_tier": "Codex Tier: %s",
   "tooltip.martial_spells.monk_codex_max_ki": "Maximum Ki: %s",
-
   "item.martial_spells.monk_codex_advancement_ii": "Monk Codex Advancement: Tier II",
   "item.martial_spells.monk_codex_advancement_iii": "Monk Codex Advancement: Tier III",
   "item.martial_spells.monk_codex_advancement_iv": "Monk Codex Advancement: Tier IV",
   "item.martial_spells.monk_codex_advancement_v": "Monk Codex Advancement: Tier V",
-
   "spell.martial_spells.stillwater_meditation.guide": "Enter a state of deliberate stillness to restore Ki. Moving or attacking interrupts the meditation, while higher technique levels improve its resilience and restorative effects.",
-
   "spell.martial_spells.flurry_of_blows.guide": "Unleash two rapid strikes against an enemy directly in front of you. Damage scales from Attack Damage and Martial Spell Power, and the technique requires a valid Monk weapon.",
-
   "spell.martial_spells.diamond_body.guide": "Harden your body into an unyielding martial form, gaining armor, toughness, knockback resistance, and damage reduction. At higher mastery, Diamond Heart can prevent one lethal blow during the effect.",
-
   "spell.martial_spells.stunning_strike.guide": "Deliver a focused martial strike that damages and stuns the target while applying Rend II to weaken its armor. Some powerful enemies resist or are immune to the stun.",
-
   "spell.martial_spells.deflect_missiles.guide": "Assume a defensive stance that intercepts arrows, tridents, and fireballs while maintained. Incoming missiles are scattered away, with a level-scaled chance for eligible projectiles to be redirected toward their attacker.",
-
   "spell.martial_spells.stillwater_meditation": "Stillwater Meditation",
   "spell.martial_spells.stillwater_meditation.description": "Enter a state of deliberate stillness, gathering inner energy and restoring Ki upon completing the meditation.",
   "ui.martial_spells.ki_generated": "Ki Generated: %s",
@@ -72,7 +58,6 @@
   "ui.martial_spells.meditation_total_healing": "Full Channel Healing: %s%% max health",
   "ui.martial_spells.meditation_damage_reduction": "Damage Reduction: %s%%",
   "ui.martial_spells.interrupted_cooldown": "Interrupted Cooldown: 5–15 seconds",
-
   "spell.martial_spells.flurry_of_blows": "Flurry of Blows",
   "spell.martial_spells.flurry_of_blows.description": "Unleash two rapid martial strikes against an enemy directly in front of you.",
   "ui.martial_spells.ki_cost": "Ki Cost: %s",
@@ -84,7 +69,6 @@
   "ui.martial_spells.no_flurry_target": "No valid target is within striking range.",
   "ui.martial_spells.server_player_required": "This technique requires a server-side player.",
   "ui.martial_spells.heavy_armor_penalty": "Heavy Armor: +50% Ki cost and -25% technique damage.",
-
   "effect.martial_spells.diamond_body": "Diamond Body",
   "spell.martial_spells.diamond_body": "Diamond Body",
   "spell.martial_spells.diamond_body.description": "Hardens the body into an unyielding martial form, granting armor, toughness, knockback resistance, and final damage reduction.",
@@ -98,7 +82,6 @@
   "ui.martial_spells.diamond_body_oakskin_stacking": "Stacks multiplicatively with Oakskin.",
   "ui.martial_spells.diamond_heart_description": "Diamond Heart prevents one lethal hit during each activation.",
   "effect.martial_spells.diamond_heart": "Diamond Heart",
-
   "spell.martial_spells.stunning_strike": "Stunning Strike",
   "spell.martial_spells.stunning_strike.description": "Deliver a focused martial blow that stuns the target and rends its defenses, leaving it vulnerable to follow-up attacks.",
   "ui.martial_spells.stunning_strike_range": "Range: %s blocks",
@@ -107,14 +90,12 @@
   "ui.martial_spells.stunning_strike_damage": "Damage: %s%% Attack Damage",
   "ui.martial_spells.stunning_strike_stun_duration": "Stun Duration: %s seconds",
   "ui.martial_spells.stunning_strike_rend": "Rend II: -10% Armor for 5 seconds",
-
   "spell.martial_spells.deflect_missiles": "Deflect Missiles",
   "spell.martial_spells.deflect_missiles.description": "Enter a focused defensive stance, deflecting incoming missiles while the technique is maintained.",
   "ui.martial_spells.deflect_missiles_deflection": "Deflects arrows, tridents, and fireballs while channeling",
   "ui.martial_spells.deflect_missiles_channel": "Maximum Channel: %s seconds",
   "ui.martial_spells.deflect_missiles_on_cooldown": "Deflect Missiles is still on cooldown.",
   "ui.martial_spells.requires_deflect_missiles_weapon": "Requires empty hands, gauntlets, or a quarterstaff.",
-
   "spell.martial_spells.step_of_the_wind": "Step of the Wind",
   "spell.martial_spells.step_of_the_wind.description": "Move with supernatural speed, surging rapidly in the direction of your movement.",
   "spell.martial_spells.step_of_the_wind.guide": "Spend Ki to surge rapidly forward. Your aim provides limited vertical control, but the technique cannot be used while swimming, climbing, mounted, or flying.",
@@ -123,7 +104,6 @@
   "ui.martial_spells.step_of_the_wind_wall_run": "Run and climb along walls while Step remains active",
   "ui.martial_spells.step_of_the_wind_wall_jump": "Press Jump while wall-running to rebound away",
   "ui.martial_spells.step_of_the_wind_fall_protection": "Prevents fall damage from the protected movement",
-
   "spell.martial_spells.heavenfall_strike": "Heavenfall Strike",
   "spell.martial_spells.heavenfall_strike.description": "Launch into the air, choose a hostile target, and descend upon them with overwhelming martial force, unleashing a shockwave on impact.",
   "spell.martial_spells.heavenfall_strike.guide": "Launch skyward and aim at a hostile creature until it is marked in gold, then press Attack to commit to Heavenfall and dive toward it. A successful impact deals heavy martial damage, applies Rend and Blight, briefly stuns the primary target, and releases a damaging shockwave that knocks nearby enemies away. Stun-resistant enemies suffer a shorter stun. Landing without committing or losing a valid target safely ends the technique.",
@@ -134,7 +114,6 @@
   "ui.martial_spells.heavenfall_shockwave_radius": "Shockwave Radius: %s blocks",
   "ui.martial_spells.heavenfall_stun_duration": "Stun Duration: %s seconds; halved against resistant enemies",
   "ui.martial_spells.heavenfall_debuffs": "Rend %s / Blight %s: %s seconds",
-
   "spell.martial_spells.barrage": "Barrage",
   "spell.martial_spells.barrage.description": "Loose a rapid sequence of martial arrows, with higher spell levels increasing both arrow count and damage.",
   "spell.martial_spells.barrage.guide": "Requires a bow or crossbow. Barrage fires 2 to 5 consecutive physical arrows depending on spell level. Each shot follows your current aim independently. Damage per arrow scales from 50% weapon damage at Common to 100% at Legendary before Martial Spell Power and other ranged modifiers are applied. Barrage always has a 6-second cooldown and is unaffected by Cooldown Reduction.",
@@ -142,14 +121,12 @@
   "ui.martial_spells.barrage_projectiles": "Projectiles: %s",
   "ui.martial_spells.barrage_damage_per_arrow": "Damage per Arrow: %s%% weapon damage",
   "ui.martial_spells.barrage_interval": "Shot Interval: %s ticks",
-
   "spell.martial_spells.entangling_arrow": "Entangling Arrow",
   "spell.martial_spells.entangling_arrow.description": "Loose a martial arrow that binds a surviving target in grasping roots.",
   "spell.martial_spells.entangling_arrow.guide": "Requires a bow or crossbow. Entangling Arrow deals 50% to 100% weapon damage depending on spell level before Martial Spell Power and other ranged modifiers are applied. A surviving target that can be rooted is bound by Iron's Root for 2 to 6 seconds depending on spell level. Targets tagged as unable to be rooted still take the arrow damage. Its base cooldown is 15 seconds and Cooldown Reduction can lower it, but never below 7 seconds.",
   "ui.martial_spells.entangling_arrow_requires_ranged_weapon": "Entangling Arrow requires a bow or crossbow.",
   "ui.martial_spells.entangling_arrow_damage": "Damage: %s%% weapon damage",
   "ui.martial_spells.entangling_arrow_root_duration": "Root Duration: %s seconds",
-
   "spell.martial_spells.caltrops": "Caltrops",
   "spell.martial_spells.caltrops.description": "Throw a bundle of caltrops that spreads into a damaging, slowing ground hazard.",
   "spell.martial_spells.caltrops.guide": "Instantly throw a bundle that deploys caltrops when it strikes a block. Grounded non-allied creatures inside the field take physical damage every 0.5 seconds and are slowed. The field is 3x3 blocks at Levels I-III, 4x4 at Level IV, and 5x5 at Level V. Damage scales with Martial Spell Power. Caltrops has a fixed 15-second cooldown that is unaffected by Cooldown Reduction.",
@@ -162,7 +139,6 @@
   "spell.martial_spells.shock_powder.guide": "Instantly releases shock powder in a 5-block area. Eligible non-allied targets are stunned for 2 seconds. Targets whose maximum health exceeds 50 + twice your current Attack Damage resist the control effect. Martial stun resistance and immunity rules still apply.",
   "ui.martial_spells.shock_powder_stun_duration": "Stun Duration: %s seconds",
   "ui.martial_spells.shock_powder_control_limit": "Control Limit: %s target max health",
-
   "effect.martial_spells.shadow_step": "Shadowstep",
   "spell.martial_spells.shadow_step": "Shadowstep",
   "spell.martial_spells.shadow_step.description": "Step through the shadows to appear behind a targeted enemy, briefly disrupting their ability to track you.",
@@ -171,7 +147,6 @@
   "ui.martial_spells.shadow_step_distance": "Behind Target: %s blocks",
   "ui.martial_spells.shadow_step_untraceable": "Reduced Tracking: %s seconds at %s blocks",
   "ui.martial_spells.shadow_step_blocked": "There is no safe space behind that target.",
-
   "effect.martial_spells.slice_and_dice": "Slice & Dice",
   "effect.martial_spells.slice_and_dice.description": "Increases attack damage",
   "spell.martial_spells.slice_and_dice": "Slice & Dice",
@@ -180,7 +155,6 @@
   "ui.martial_spells.slice_and_dice_duration": "Duration: %s seconds",
   "ui.martial_spells.slice_and_dice_initial_bonus": "Initial Attack Damage: +%s%% base",
   "ui.martial_spells.slice_and_dice_max_bonus": "Maximum Attack Damage: +%s%% base",
-
   "effect.martial_spells.stealth": "Stealth",
   "effect.martial_spells.stealth.description": "Invisible to enemies",
   "spell.martial_spells.vanish": "Vanish",
@@ -189,7 +163,6 @@
   "ui.martial_spells.vanish_duration": "Stealth Duration: %s seconds",
   "ui.martial_spells.vanish_movement_penalty": "Movement Speed: -%s%% base",
   "ui.martial_spells.vanish_tracking_range": "Enemy Follow Distance: %s blocks",
-
   "effect.martial_spells.bear_trap": "Trapped",
   "effect.martial_spells.bear_trap.description": "Unable to move or jump.",
   "spell.martial_spells.bear_trap": "Bear Trap",
@@ -198,7 +171,6 @@
   "ui.martial_spells.bear_trap_count": "Traps: %s",
   "ui.martial_spells.bear_trap_duration": "Trap Duration: %s seconds",
   "ui.martial_spells.bear_trap_root": "Root Duration: %s seconds",
-
   "spell.martial_spells.mutilate": "Mutilate",
   "spell.martial_spells.mutilate.description": "Cross-cut nearby enemies with both hands in a brutal forward melee strike.",
   "spell.martial_spells.mutilate.guide": "After half of your current melee attack cycle, Mutilate strikes eligible enemies in a 3-block, 160-degree forward arc. Each selected target receives one fully charged vanilla melee attack using your main-hand damage plus the frozen dual-melee offhand contribution, preserving normal weapon enchantments, critical hits, knockback and other melee hooks. An empty offhand still contributes the source framework's base unarmed Attack Damage. Mutilate has a 12-second base cooldown and is affected by normal Cooldown Reduction.",
@@ -206,7 +178,6 @@
   "ui.martial_spells.mutilate_arc": "Forward Arc: %s degrees",
   "ui.martial_spells.mutilate_dual_damage": "Damage: main-hand melee + offhand weapon/unarmed contribution",
   "ui.martial_spells.mutilate_delay": "Contact: %s%% of current melee attack cycle",
-
   "effect.martial_spells.stillness_of_mind": "Stillness of Mind",
   "spell.martial_spells.stillness_of_mind": "Stillness of Mind",
   "spell.martial_spells.stillness_of_mind.description": "Transcend the limits of Ki for a brief moment, allowing martial techniques to be used without consuming Ki.",
@@ -217,12 +188,22 @@
   "ui.martial_spells.stillness_already_active": "Stillness of Mind is already active.",
   "ui.martial_spells.stillness_aftereffect": "Aftereffect: Weakness I for 60 seconds",
   "ui.martial_spells.stillness_requires_codex_active": "Unequipping the Monk Codex ends Stillness immediately",
-
   "effect.martial_spells.charge": "Charge",
   "effect.martial_spells.charge.description": "Increases movement speed and knockback resistance.",
   "spell.martial_spells.charge": "Charge",
   "spell.martial_spells.charge.description": "Surge into battle with increased movement speed and resistance to knockback.",
   "spell.martial_spells.charge.guide": "Instantly grants +50% base Movement Speed and +50% base Knockback Resistance for 10 seconds. Recasting refreshes Charge instead of stacking another copy. Charge has a 12-second base cooldown and is affected by normal Cooldown Reduction.",
   "ui.martial_spells.charge_movement_speed": "Movement Speed: +%s%% base",
-  "ui.martial_spells.charge_knockback_resistance": "Knockback Resistance: +%s%% base"
+  "ui.martial_spells.charge_knockback_resistance": "Knockback Resistance: +%s%% base",
+  "effect.martial_spells.demoralized": "Demoralized",
+  "effect.martial_spells.demoralized.description": "Reduces base attack damage.",
+  "spell.martial_spells.demoralizing_shout": "Demoralizing Shout",
+  "spell.martial_spells.demoralizing_shout.description": "Unleash a terrifying shout that weakens nearby enemies and deals a small amount of physical damage.",
+  "spell.martial_spells.demoralizing_shout.guide": "Shout at non-allied living targets within 12 blocks. Targets whose maximum health is at most 50 + twice your current Attack Damage gain Demoralized for 8 seconds. The first application is Demoralized I; repeated applications add one amplifier up to source cap 5 (Demoralized VI), with each effect level reducing base Attack Damage by 20%. All valid area targets still take 5% of your current Attack Damage as armor-respecting physical damage with no added knockback. Base cooldown: 12 seconds.",
+  "ui.martial_spells.demoralizing_shout_attack_reduction": "Attack Damage per Effect Level: -%s%% base",
+  "ui.martial_spells.demoralizing_shout_max_effect_level": "Maximum Effect Level: %s",
+  "ui.martial_spells.demoralizing_shout_damage": "Direct Damage: %s%% Attack Damage",
+  "ui.martial_spells.demoralizing_shout_control_limit": "Debuff Health Limit: %s target max health",
+  "death.attack.martial_spells.demoralizing_shout": "%1$s was overwhelmed by a demoralizing shout",
+  "death.attack.martial_spells.demoralizing_shout.player": "%1$s was overwhelmed by %2$s's demoralizing shout"
 }

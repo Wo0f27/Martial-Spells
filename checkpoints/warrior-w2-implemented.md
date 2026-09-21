@@ -1,10 +1,10 @@
 # Warrior W2 — Charge implemented
 
-Status: **IMPLEMENTED / VALIDATING**
+Status: **PASS**
 
 Source freeze: `ZsoltMolnarrr/Rogues` commit `89ba33ad29adc42d7306660f5b74f28bd17b8ffa`.
 
-W2 ports only `martial_spells:charge`. W3 and later Warrior techniques remain locked until the user explicitly passes this checkpoint.
+W2 ports only `martial_spells:charge`. The user accepted the final no-overhead-sign revision and explicitly instructed the project to proceed to W3.
 
 ## Frozen behavior implemented
 
@@ -44,7 +44,7 @@ Runtime checks:
 6. Verify the base cooldown is 12 seconds and normal Cooldown Reduction can reduce it.
 7. Confirm no Shattering Throw, Throw Net, Demoralizing Shout, Mortal Strike, or Last Stand Warrior technique is newly available yet.
 
-W2 remains **VALIDATING**, not PASS, until the user explicitly confirms this gate.
+W2 is **PASS** and frozen. W3 may proceed without changing accepted Charge behavior.
 
 
 ## W2 validation revision
