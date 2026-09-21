@@ -33,6 +33,7 @@ public final class MartialSpellRegistry {
     public static final RegistryObject<AbstractSpell> BEAR_TRAP = SPELLS.register("bear_trap", BearTrapSpell::new);
     public static final RegistryObject<AbstractSpell> CHARGE = SPELLS.register("charge", ChargeSpell::new);
     public static final RegistryObject<AbstractSpell> DEMORALIZING_SHOUT = SPELLS.register("demoralizing_shout", DemoralizingShoutSpell::new);
+    public static final RegistryObject<AbstractSpell> THROW_NET = SPELLS.register("throw_net", ThrowNetSpell::new);
 
     private MartialSpellRegistry() {}
 

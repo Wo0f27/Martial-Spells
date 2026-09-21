@@ -205,5 +205,17 @@
   "ui.martial_spells.demoralizing_shout_damage": "Direct Damage: %s%% Attack Damage",
   "ui.martial_spells.demoralizing_shout_control_limit": "Debuff Health Limit: %s target max health",
   "death.attack.martial_spells.demoralizing_shout": "%1$s was overwhelmed by a demoralizing shout",
-  "death.attack.martial_spells.demoralizing_shout.player": "%1$s was overwhelmed by %2$s's demoralizing shout"
+  "death.attack.martial_spells.demoralizing_shout.player": "%1$s was overwhelmed by %2$s's demoralizing shout",
+  "effect.martial_spells.net_trap": "Netted",
+  "effect.martial_spells.net_trap.description": "Unable to move or jump.",
+  "spell.martial_spells.throw_net": "Throw Net",
+  "spell.martial_spells.throw_net.description": "Charge and throw a weighted net that damages enemies and roots targets you can overpower.",
+  "spell.martial_spells.throw_net.guide": "Hold to charge for up to 0.45 seconds, then release. Releases below 20% charge fizzle without a cooldown. Charge linearly extends projectile range from 10 to 22 blocks and scales damage/knockback output from 60% to 100%. A hit deals 10% of current Attack Damage at full charge. Targets whose maximum health is at most 100 + twice your current Attack Damage become Netted for 3 seconds: they cannot move, jump, or be knocked back, but can still attack, use items, and cast.",
+  "ui.martial_spells.throw_net_charge": "Charge: %ss; minimum release %s%%",
+  "ui.martial_spells.throw_net_range": "Projectile Range: %s-%s blocks",
+  "ui.martial_spells.throw_net_damage": "Full-Charge Damage: %s%% Attack Damage",
+  "ui.martial_spells.throw_net_root": "Netted: %s seconds",
+  "ui.martial_spells.throw_net_control_limit": "Root Health Limit: %s target max health",
+  "death.attack.martial_spells.throw_net": "%1$s was struck by a thrown net",
+  "death.attack.martial_spells.throw_net.player": "%1$s was struck by %2$s's thrown net"
 }

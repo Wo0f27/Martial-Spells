@@ -1,0 +1,78 @@
+# Warrior W4 — Throw Net implemented
+
+Status: **IMPLEMENTED / VALIDATING**
+
+Source freeze: `ZsoltMolnarrr/Rogues` commit `89ba33ad29adc42d7306660f5b74f28bd17b8ffa`.
+
+W3 Demoralizing Shout is frozen as PASS. W4 adds only `martial_spells:throw_net` plus the minimal shared charged-release bridge required by the source. W5 and later Warrior techniques remain locked.
+
+## Frozen behavior implemented
+
+- source tier 2 mapped to Iron's `UNCOMMON`, one spell level, Martial/Warrior, zero mana;
+- 9-tick / 0.45-second charged cast;
+- minimum release ratio 0.2;
+- releases below 20% use Iron's normal cancel path: no projectile and no W4 cooldown;
+- source linear charge output with `output_scaling = 0.5`, giving `0.5 + 0.5 * chargeRatio`;
+- projectile flight range `10 + 12 * chargeRatio` (12.4 minimum valid, 22 full);
+- constant velocity 1.0, no gravity/drag, 1200-tick source safety cap;
+- source default homing angle 1 degree/tick toward the AIM target captured at cast start;
+- source custom projectile model and texture, spinning 12 degrees/tick;
+- travel sound every 8 ticks;
+- direct damage `0.1 * current Attack Damage * chargeOutput`;
+- source knockback coefficient `0.1 * chargeOutput`, applied against vanilla's 0.4 damage-knockback baseline;
+- Netted duration 3 seconds / 60 ticks;
+- Netted health gate `100 + 2 * current Attack Damage`;
+- damage still applies when a target is above the Netted health gate;
+- Netted blocks locomotion and jumping without silencing attacks, item use, or spell casting;
+- Netted cancels knockback while active, matching frozen Spell Engine `KnockbackImmunity`;
+- exact frozen icons and four sound files committed directly;
+- 12-second base cooldown with normal Iron's Cooldown Reduction;
+- no Spell Engine or Spell Power runtime dependency.
+
+## Charged-release bridge
+
+Iron's 1.20.1 `CastType.LONG` normally cancels when the use key is released before completion. Frozen Rogues Throw Net instead resolves a charge release at any ratio >= 0.2.
+
+W4 introduces `ReleaseChargedTechnique` and a mixin at Iron's `Utils.releaseUsingHelper`. The mixin intercepts only a currently-cast spell that explicitly implements that interface. Under-minimum releases fall through to Iron's original cancellation path unchanged. Valid releases execute the spell through Iron's normal `castSpell` cooldown/mana/event path and then complete the cast normally.
+
+This bridge is intentionally narrow. It does not change ordinary Iron's spells and is the only shared infrastructure W5 Shattering Throw is expected to reuse.
+
+## Frozen asset hashes
+
+- spell icon: `6bffb24937a7aeddb959f05994bd846f21f8164e`
+- effect icon: `6bffb24937a7aeddb959f05994bd846f21f8164e`
+- projectile texture: `57dcfd0337d544ae2f51459b6d7dbb5b3a82e815`
+- `net_casting.ogg`: `5495c850ccfd2ab16becefb4831eccfc3e3834d0`
+- `throw.ogg`: `ce5a789e74441a01f63624a608f8ba3ca1987a2d`
+- `net_travel.ogg`: `304fb9c0eae54244c1d05b1252241f3ba84720d1`
+- `net_impact.ogg`: `d0a9568906788c50def55cdaeb9a73bd51b6466d`
+
+The model JSON itself necessarily has a different blob hash because its texture identifier is translated from `rogues:spell_projectile/throw_net` to `martial_spells:spell_projectile/throw_net`; geometry/UV data are otherwise retained.
+
+## Validation gate
+
+Run:
+
+```powershell
+git switch feature/warrior-spells-port
+git pull --ff-only origin feature/warrior-spells-port
+python .\tools\audit-warrior-w4.py
+.\gradlew clean build
+.\gradlew runClient
+```
+
+Runtime checks:
+
+1. Charge and Demoralizing Shout remain unchanged from their frozen checkpoints.
+2. Throw Net appears as a one-level Uncommon Martial/Warrior technique with zero mana.
+3. Begin charging and release almost immediately, before 20% (~2 ticks): the cast should fizzle with no net projectile and no Throw Net cooldown.
+4. Release at/above 20%: a net projectile should launch. Near-minimum release has ~12.4-block flight range and ~60% output; full 9-tick charge reaches 22 blocks and 100% output.
+5. Verify the exact net projectile appearance, 12-degree/tick spin, source travel sound cadence, and subtle 1-degree/tick homing toward a target that was under the crosshair when charging began.
+6. A low-health eligible target receives 3 seconds of Netted. It cannot locomote or jump and cannot be knocked back, but it can still attack, use items, and cast.
+7. A target above `100 + 2 * current Attack Damage` receives direct damage/knockback but not Netted or the Netted impact sound.
+8. Full-charge damage is approximately 10% of current Attack Damage before armor mitigation; partial charge scales it by `0.5 + 0.5 * chargeRatio`.
+9. Projectile collision with a block removes the projectile; flight expires at its charge-scaled range.
+10. Base cooldown is 12 seconds before Cooldown Reduction.
+11. Shattering Throw, Mortal Strike, and Last Stand remain absent.
+
+W4 remains **VALIDATING**, not PASS, until the user explicitly confirms this gate.

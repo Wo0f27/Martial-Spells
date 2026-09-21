@@ -9,7 +9,9 @@
     "TargetGoalShadowstepMixin",
     "LivingEntityStealthMixin",
     "LivingEntityAttackStrengthAccessor",
-    "EntityInvulnerabilityAccessor"
+    "EntityInvulnerabilityAccessor",
+    "LivingEntityNettedMixin",
+    "IronsReleaseUsingHelperMixin"
   ],
   "client": [],
   "injectors": {

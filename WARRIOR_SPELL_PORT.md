@@ -160,8 +160,8 @@ W1 does not introduce a generic charged-technique runtime yet. The first charged
 - **W0 — Archaeology/contract:** PASS — exact six-technique inventory and frozen behavior approved.
 - **W1 — Shared Warrior architecture:** PASS — Warrior technique class/tag + single-hand physical-melee adapter; no Warrior gameplay.
 - **W2 — Charge:** PASS — user validated the 10-second balance override and final no-overhead-sign presentation.
-- **W3 — Demoralizing Shout:** IMPLEMENTED / VALIDATING — instant hostile-area debuff/damage vertical slice.
-- **W4 — Throw Net:** locked until explicit W3 PASS.
+- **W3 — Demoralizing Shout:** PASS — user validated effect application, stacking behavior, and the source health gate.
+- **W4 — Throw Net:** IMPLEMENTED / VALIDATING — charged projectile + Netted root vertical slice.
 - **W5 — Shattering Throw:** locked until explicit W4 PASS.
 - **W6 — Mortal Strike:** locked until explicit W5 PASS.
 - **W7 — Last Stand:** locked until explicit W6 PASS.
@@ -206,7 +206,7 @@ W2 is frozen as **PASS** after the user validated the final Charge behavior and 
 
 ## W3 acceptance criteria
 
-W3 is restricted to `martial_spells:demoralizing_shout` and remains **VALIDATING** until the user explicitly passes it.
+W3 is frozen as **PASS** after the user validated Demoralizing Shout and confirmed the Iron Golem case was the intended health-gate behavior.
 
 - Warrior/Martial, one level, tier-3/RARE, zero mana, instant self-centered hostile area.
 - 12-block range with 0.5 vertical-range multiplier and obstacle-aware line of sight.
@@ -219,4 +219,28 @@ W3 is restricted to `martial_spells:demoralizing_shout` and remains **VALIDATING
 - Frozen `shout_release.ogg`, `demoralize_impact.ogg`, spell icon, and effect icon are committed directly.
 - Release/impact VFX are translated locally with Rage-tinted smoke; no Spell Engine runtime dependency is introduced.
 - Base cooldown is 12 seconds and normal Iron's Cooldown Reduction remains available.
-- W4+ Warrior spell classes remain absent.
+- W3 is frozen; W4 may build on shared charged-technique infrastructure without changing Demoralizing Shout.
+
+
+## W4 acceptance criteria
+
+W4 is restricted to `martial_spells:throw_net` and remains **VALIDATING** until the user explicitly passes it.
+
+- Warrior/Martial, one level, source tier-2 mapped to Iron's `UNCOMMON`, zero mana.
+- charged cast uses the frozen 9-tick / 0.45-second source duration.
+- releases below source minimum ratio 0.2 fizzle through Iron's normal cancellation path and do not trigger W4 cooldown/delivery.
+- valid partial releases preserve the source linear charge curve and `output_scaling = 0.5`: output multiplier is `0.5 + 0.5 * chargeRatio`.
+- projectile range is `10 + 12 * chargeRatio`: 12.4 blocks at minimum valid release and 22 blocks at full charge.
+- projectile velocity is 1.0 with no gravity/drag, source age cap 1200 ticks, and 1 degree/tick homing toward the sticky target captured at cast start.
+- projectile uses the frozen custom net model/texture and rotates 12 degrees per tick.
+- travel sound plays every 8 ticks.
+- full-charge direct damage is `0.1 * PhysicalMeleePower`; charge output scales damage and source 0.1 knockback.
+- damage remains independent of the Netted control gate.
+- Netted lasts 60 ticks / 3 seconds and applies only when target max health is <= `100 + 2 * PhysicalMeleePower`.
+- Netted is ROOT semantics, not stun: movement and jumping are blocked, attacks/item use/spell casting remain allowed, and knockback is immune while the effect is active.
+- frozen spell/effect icon, projectile texture, `net_casting.ogg`, `throw.ogg`, `net_travel.ogg`, and `net_impact.ogg` are committed directly from the source bytes.
+- the source Blockbench projectile model is retained with only the asset namespace translated from `rogues:` to `martial_spells:`.
+- a narrow Iron's LONG-release bridge is introduced only for `ReleaseChargedTechnique` implementations; ordinary Iron's spells retain their native cancellation behavior.
+- base cooldown is 12 seconds and normal Iron's Cooldown Reduction remains available.
+- W2 Charge and W3 Demoralizing Shout remain frozen.
+- W5+ Warrior gameplay classes remain absent.

@@ -82,6 +82,16 @@ public final class MartialDamageTypes {
                     )
             );
 
+    public static final ResourceKey<DamageType>
+            THROW_NET =
+            ResourceKey.create(
+                    Registries.DAMAGE_TYPE,
+                    new ResourceLocation(
+                            MartialSpells.MOD_ID,
+                            "throw_net"
+                    )
+            );
+
     private MartialDamageTypes() {
     }
 
@@ -220,6 +230,25 @@ public final class MartialDamageTypes {
         return new DamageSource(
                 damageType,
                 caster,
+                caster
+        );
+    }
+
+    public static DamageSource throwNet(
+            net.minecraft.world.entity.LivingEntity caster,
+            Entity directEntity
+    ) {
+        Holder<DamageType> damageType =
+                caster.level()
+                        .registryAccess()
+                        .registryOrThrow(
+                                Registries.DAMAGE_TYPE
+                        )
+                        .getHolderOrThrow(THROW_NET);
+
+        return new DamageSource(
+                damageType,
+                directEntity,
                 caster
         );
     }

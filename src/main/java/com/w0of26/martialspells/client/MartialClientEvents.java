@@ -13,12 +13,14 @@ import com.w0of26.martialspells.client.render.BearTrapRenderer;
 import com.w0of26.martialspells.client.render.CaltropFieldRenderer;
 import com.w0of26.martialspells.client.render.DiamondBodyShieldLayer;
 import com.w0of26.martialspells.client.render.EntanglingArrowRenderer;
+import com.w0of26.martialspells.client.render.ThrowNetRenderer;
 import com.w0of26.martialspells.registry.MartialEntityRegistry;
 import com.w0of26.martialspells.registry.MartialParticleRegistry;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
+import net.minecraftforge.client.event.ModelEvent;
 import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -34,6 +36,12 @@ public final class MartialClientEvents {
         event.registerEntityRenderer(MartialEntityRegistry.CALTROP_BUNDLE.get(), ThrownItemRenderer::new);
         event.registerEntityRenderer(MartialEntityRegistry.CALTROP_FIELD.get(), CaltropFieldRenderer::new);
         event.registerEntityRenderer(MartialEntityRegistry.BEAR_TRAP.get(), BearTrapRenderer::new);
+        event.registerEntityRenderer(MartialEntityRegistry.THROW_NET.get(), ThrowNetRenderer::new);
+    }
+
+    @SubscribeEvent
+    public static void registerAdditionalModels(ModelEvent.RegisterAdditional event) {
+        event.register(ThrowNetRenderer.MODEL);
     }
 
     @SubscribeEvent

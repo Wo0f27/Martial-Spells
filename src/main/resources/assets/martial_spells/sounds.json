@@ -48,5 +48,25 @@
     "sounds": [
       "martial_spells:demoralize_impact"
     ]
+  },
+  "net_casting": {
+    "sounds": [
+      "martial_spells:net_casting"
+    ]
+  },
+  "throw": {
+    "sounds": [
+      "martial_spells:throw"
+    ]
+  },
+  "net_travel": {
+    "sounds": [
+      "martial_spells:net_travel"
+    ]
+  },
+  "net_impact": {
+    "sounds": [
+      "martial_spells:net_impact"
+    ]
   }
 }

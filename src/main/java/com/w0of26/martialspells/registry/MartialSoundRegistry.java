@@ -54,6 +54,18 @@ public final class MartialSoundRegistry {
     public static final RegistryObject<SoundEvent> DEMORALIZE_IMPACT =
             register("demoralize_impact");
 
+    public static final RegistryObject<SoundEvent> NET_CASTING =
+            register("net_casting");
+
+    public static final RegistryObject<SoundEvent> THROW =
+            register("throw");
+
+    public static final RegistryObject<SoundEvent> NET_TRAVEL =
+            register("net_travel");
+
+    public static final RegistryObject<SoundEvent> NET_IMPACT =
+            register("net_impact");
+
     private MartialSoundRegistry() {}
 
     private static RegistryObject<SoundEvent> register(String path) {

@@ -1,10 +1,10 @@
 # Warrior W3 — Demoralizing Shout implemented
 
-Status: **IMPLEMENTED / VALIDATING**
+Status: **PASS**
 
 Source freeze: `ZsoltMolnarrr/Rogues` commit `89ba33ad29adc42d7306660f5b74f28bd17b8ffa`.
 
-W2 Charge is frozen as PASS. W3 adds only `martial_spells:demoralizing_shout`; W4 and later Warrior techniques remain locked.
+W2 Charge is frozen as PASS. W3 adds only `martial_spells:demoralizing_shout`. The user validated Demoralizing Shout at runtime, including the source health-gate behavior, and explicitly instructed the project to proceed to W4.
 
 ## Frozen behavior implemented
 
@@ -57,4 +57,4 @@ Runtime checks:
 9. Base cooldown is 12 seconds before Cooldown Reduction.
 10. Throw Net, Shattering Throw, Mortal Strike, and Last Stand remain absent.
 
-W3 remains **VALIDATING**, not PASS, until the user explicitly confirms the gate.
+W3 is **PASS** and frozen. The apparent Iron Golem failure was confirmed to be expected source behavior: a 100-HP golem exceeds the `50 + 2 * Attack Damage` debuff cap unless the caster reaches at least 25 Attack Damage.

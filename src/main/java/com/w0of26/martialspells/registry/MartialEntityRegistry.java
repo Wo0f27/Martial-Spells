@@ -6,6 +6,7 @@ import com.w0of26.martialspells.entity.BearTrapEntity;
 import com.w0of26.martialspells.entity.CaltropBundleProjectile;
 import com.w0of26.martialspells.entity.CaltropFieldEntity;
 import com.w0of26.martialspells.entity.EntanglingArrow;
+import com.w0of26.martialspells.entity.ThrowNetProjectile;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -62,6 +63,16 @@ public final class MartialEntityRegistry {
                     .clientTrackingRange(128)
                     .updateInterval(20)
                     .build(MartialSpells.MOD_ID + ":bear_trap"));
+
+    /** Frozen Spell Engine spell-projectile dimensions and tracking. */
+    public static final RegistryObject<EntityType<ThrowNetProjectile>> THROW_NET =
+            ENTITY_TYPES.register("throw_net", () -> EntityType.Builder
+                    .<ThrowNetProjectile>of(ThrowNetProjectile::new, MobCategory.MISC)
+                    .sized(0.25F, 0.25F)
+                    .fireImmune()
+                    .clientTrackingRange(128)
+                    .updateInterval(2)
+                    .build(MartialSpells.MOD_ID + ":throw_net"));
 
     private MartialEntityRegistry() {}
 

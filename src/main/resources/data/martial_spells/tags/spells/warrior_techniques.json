@@ -2,6 +2,7 @@
   "replace": false,
   "values": [
     "martial_spells:charge",
-    "martial_spells:demoralizing_shout"
+    "martial_spells:demoralizing_shout",
+    "martial_spells:throw_net"
   ]
 }
