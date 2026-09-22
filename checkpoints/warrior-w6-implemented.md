@@ -1,12 +1,12 @@
 # Warrior W6 — Mortal Strike implemented
 
-Status: **IMPLEMENTED / VALIDATING**
+Status: **PASS / FROZEN**
 
 Rogues source freeze: `89ba33ad29adc42d7306660f5b74f28bd17b8ffa`.
 
 Exact Spell Engine dependency freeze: `1.10.5.034+1.20.1`, commit `270a6d61b00f241c1c8adb87573ad6de2d547f66`.
 
-W0-W5 remain frozen as PASS. W6 adds only Mortal Strike plus the local exact Bleed behavior needed by that source spell. W7 Last Stand remains locked.
+W0-W6 are frozen as PASS. W6 adds only Mortal Strike plus the local exact Bleed behavior needed by that source spell. W7 Last Stand is now unlocked; W8 remains locked.
 
 ## Frozen Mortal Strike behavior
 
@@ -93,4 +93,4 @@ Runtime checks:
 10. Blood presentation: 40-particle burst on Mortal Strike Bleed application plus recurring drips while Bleed remains.
 11. Last Stand remains absent.
 
-W6 remains **VALIDATING**, not PASS, until the user explicitly confirms this gate.
+W6 is **PASS / FROZEN**. The user confirmed runtime behavior. Before freeze, the animation sequence was re-verified: Rogues Mortal Strike uses `spell_engine:two_handed_slash_vertical_windup` during the 0.5-second cast and `spell_engine:two_handed_slash_vertical_slash` for melee release; the committed Martial Spells animation blobs exactly match Spell Engine 1.10.5.034 upstream hashes.

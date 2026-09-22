@@ -163,8 +163,8 @@ W1 does not introduce a generic charged-technique runtime yet. The first charged
 - **W3 — Demoralizing Shout:** PASS — user validated effect application, stacking behavior, and the source health gate.
 - **W4 — Throw Net:** PASS — user validated the charged projectile, Netted root, textured projectile model, and synchronized physical net VFX.
 - **W5 — Shattering Throw:** PASS — user validated charged release, held-item projectile, one block bounce, damage/knockback, Shattered Armor, sounds, and blood VFX. The comparatively noticeable drips on an Iron Golem were accepted as non-blocking/source-consistent presentation.
-- **W6 — Mortal Strike:** IMPLEMENTED / VALIDATING — timed vertical melee delivery, +50% vanilla weapon strike, exact Spell Engine 1.10.5.034 Bleed.
-- **W7 — Last Stand:** locked until explicit W6 PASS.
+- **W6 — Mortal Strike:** PASS — user validated runtime behavior; exact upstream 1.10.5.034 windup/slash animation assets and playback mapping were re-verified before freeze.
+- **W7 — Last Stand:** unlocked for implementation; not started yet.
 - **W8 — Fidelity/final audit:** locked until explicit W7 PASS.
 
 ## W1 acceptance criteria
@@ -278,7 +278,7 @@ W5 is frozen as **PASS** after the user validated the full runtime gate. The hea
 
 ## W6 acceptance criteria
 
-W6 is restricted to `martial_spells:mortal_strike` plus its exact local Spell Engine 1.10.5.034 Bleed translation and remains **VALIDATING** until the user explicitly passes it.
+W6 is frozen as **PASS** after the user validated runtime behavior and the animation sequence was re-verified against Rogues `89ba33ad...` plus exact Spell Engine `1.10.5.034` commit `270a6d61...`.
 
 - source tier 4 maps to Iron's `EPIC`, one spell level, Martial/Warrior, zero mana.
 - standard 10-tick / 0.5-second cast; releasing early cancels rather than partially firing.
