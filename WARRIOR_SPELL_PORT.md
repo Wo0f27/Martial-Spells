@@ -162,8 +162,8 @@ W1 does not introduce a generic charged-technique runtime yet. The first charged
 - **W2 — Charge:** PASS — user validated the 10-second balance override and final no-overhead-sign presentation.
 - **W3 — Demoralizing Shout:** PASS — user validated effect application, stacking behavior, and the source health gate.
 - **W4 — Throw Net:** PASS — user validated the charged projectile, Netted root, textured projectile model, and synchronized physical net VFX.
-- **W5 — Shattering Throw:** IMPLEMENTED / VALIDATING — charged held-item projectile, one block bounce, damage + Shattered Armor vertical slice.
-- **W6 — Mortal Strike:** locked until explicit W5 PASS.
+- **W5 — Shattering Throw:** PASS — user validated charged release, held-item projectile, one block bounce, damage/knockback, Shattered Armor, sounds, and blood VFX. The comparatively noticeable drips on an Iron Golem were accepted as non-blocking/source-consistent presentation.
+- **W6 — Mortal Strike:** unlocked for implementation; not started yet.
 - **W7 — Last Stand:** locked until explicit W6 PASS.
 - **W8 — Fidelity/final audit:** locked until explicit W7 PASS.
 
@@ -248,7 +248,7 @@ W4 is frozen as **PASS** after the user validated gameplay and the final synchro
 
 ## W5 acceptance criteria
 
-W5 is restricted to `martial_spells:shattering_throw` and remains **VALIDATING** until the user explicitly passes it.
+W5 is frozen as **PASS** after the user validated the full runtime gate. The heavier-looking continuous blood drips observed on an Iron Golem are accepted as non-blocking presentation from the source-style center-origin particle emitter on a large target.
 
 - Warrior/Martial, one level, source tier-2 mapped to Iron's `UNCOMMON`, zero mana.
 - charged cast uses the frozen 10-tick / 0.5-second source duration.

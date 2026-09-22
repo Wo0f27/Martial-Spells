@@ -1,10 +1,10 @@
 # Warrior W5 — Shattering Throw implemented
 
-Status: **IMPLEMENTED / VALIDATING**
+Status: **PASS / FROZEN**
 
 Source freeze: `ZsoltMolnarrr/Rogues` commit `89ba33ad29adc42d7306660f5b74f28bd17b8ffa`.
 
-W0-W4 are frozen as PASS. W5 adds only `martial_spells:shattering_throw` plus its projectile, Shattered Armor effect, and local blood-particle translation. W6 and later Warrior techniques remain locked.
+W0-W5 are frozen as PASS. W5 adds only `martial_spells:shattering_throw` plus its projectile, Shattered Armor effect, and local blood-particle translation. W6 Mortal Strike is now unlocked; W7+ remain locked.
 
 ## Frozen behavior implemented
 
@@ -74,4 +74,4 @@ Runtime checks:
 11. Verify `throw.ogg` at release/travel and `throw_impact.ogg` on entity impact.
 12. Mortal Strike and Last Stand remain absent.
 
-W5 remains **VALIDATING**, not PASS, until the user explicitly confirms this gate.
+W5 is **PASS / FROZEN**. The user confirmed the runtime gate works. The relatively noticeable blood drips seen on an Iron Golem are accepted as non-blocking/source-consistent presentation and do not require a W5 code change.
