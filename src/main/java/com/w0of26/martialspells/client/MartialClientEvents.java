@@ -9,6 +9,9 @@ import com.w0of26.martialspells.client.particle.DemoralizeSmokeParticle;
 import com.w0of26.martialspells.client.particle.ShockPowderArcParticle;
 import com.w0of26.martialspells.client.particle.ShockPowderSmokeParticle;
 import com.w0of26.martialspells.client.particle.ShatterBloodParticle;
+import com.w0of26.martialspells.client.particle.LastStandSparkParticle;
+import com.w0of26.martialspells.client.particle.LastStandSmokeParticle;
+import com.w0of26.martialspells.client.particle.LastStandAuraParticle;
 import com.w0of26.martialspells.client.render.BarrageArrowRenderer;
 import com.w0of26.martialspells.client.render.BearTrapRenderer;
 import com.w0of26.martialspells.client.render.CaltropFieldRenderer;
@@ -92,6 +95,9 @@ public final class MartialClientEvents {
         event.registerSpriteSet(MartialParticleRegistry.CHARGE_SPARK.get(), ChargeSparkParticle.Provider::new);
         event.registerSpriteSet(MartialParticleRegistry.DEMORALIZE_SMOKE.get(), DemoralizeSmokeParticle.Provider::new);
         event.registerSpriteSet(MartialParticleRegistry.SHATTER_BLOOD.get(), ShatterBloodParticle.Provider::new);
+        event.registerSpriteSet(MartialParticleRegistry.LAST_STAND_SPARK.get(), LastStandSparkParticle.Provider::new);
+        event.registerSpriteSet(MartialParticleRegistry.LAST_STAND_SMOKE.get(), LastStandSmokeParticle.Provider::new);
+        event.registerSpriteSet(MartialParticleRegistry.LAST_STAND_AURA.get(), LastStandAuraParticle.Provider::new);
     }
 
     @SubscribeEvent

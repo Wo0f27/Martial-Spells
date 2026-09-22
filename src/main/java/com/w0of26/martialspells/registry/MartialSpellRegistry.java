@@ -36,6 +36,7 @@ public final class MartialSpellRegistry {
     public static final RegistryObject<AbstractSpell> THROW_NET = SPELLS.register("throw_net", ThrowNetSpell::new);
     public static final RegistryObject<AbstractSpell> SHATTERING_THROW = SPELLS.register("shattering_throw", ShatteringThrowSpell::new);
     public static final RegistryObject<AbstractSpell> MORTAL_STRIKE = SPELLS.register("mortal_strike", MortalStrikeSpell::new);
+    public static final RegistryObject<AbstractSpell> LAST_STAND = SPELLS.register("last_stand", LastStandSpell::new);
 
     private MartialSpellRegistry() {}
 

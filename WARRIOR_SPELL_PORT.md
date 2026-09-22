@@ -153,7 +153,7 @@ W1 does not introduce a generic charged-technique runtime yet. The first charged
 - No frozen Warrior technique declares an axe/sword/heavy-weapon requirement.
 - Projectile defaults inherited from exact Spell Engine 1.10.5.034 must be resolved before charged-projectile fidelity is locked.
 - Mortal Strike Bleed was resolved against exact Spell Engine 1.10.5.034 commit `270a6d61b00f241c1c8adb87573ad6de2d547f66` before W6 implementation.
-- Last Stand proportional cooldown must be verified against exact Spell Engine execution before its checkpoint.
+- Last Stand proportional cooldown was resolved against Spell Engine 1.10.5.034: early release applies the same fraction of the full effective cooldown as cast progress.
 
 ## Checkpoint plan
 
@@ -164,7 +164,7 @@ W1 does not introduce a generic charged-technique runtime yet. The first charged
 - **W4 — Throw Net:** PASS — user validated the charged projectile, Netted root, textured projectile model, and synchronized physical net VFX.
 - **W5 — Shattering Throw:** PASS — user validated charged release, held-item projectile, one block bounce, damage/knockback, Shattered Armor, sounds, and blood VFX. The comparatively noticeable drips on an Iron Golem were accepted as non-blocking/source-consistent presentation.
 - **W6 — Mortal Strike:** PASS — user validated runtime behavior; exact upstream 1.10.5.034 windup/slash animation assets and playback mapping were re-verified before freeze.
-- **W7 — Last Stand:** unlocked for implementation; not started yet.
+- **W7 — Last Stand:** IMPLEMENTED / VALIDATING — exact five-pulse channel schedule, stacking defensive effect, sequential max-health healing, proportional early-release cooldown, and source VFX/audio.
 - **W8 — Fidelity/final audit:** locked until explicit W7 PASS.
 
 ## W1 acceptance criteria
@@ -301,3 +301,32 @@ W6 is frozen as **PASS** after the user validated runtime behavior and the anima
 - exact Spell Engine 1.10.5.034 Bleed icon and both vertical-slash animation JSONs are committed directly.
 - base cooldown is 15 seconds with normal Iron's Cooldown Reduction.
 - W0-W5 remain frozen and W7+ gameplay remains absent.
+
+
+## W7 acceptance criteria
+
+W7 is restricted to `martial_spells:last_stand` and its local presentation/runtime support and remains **VALIDATING** until explicit user PASS.
+
+- source tier 4 maps to Iron's `EPIC`, one level, Martial/Warrior, zero mana.
+- source HEALTH-school mechanics are translated directly from current Max Health; no Spell Engine or Spell Power dependency is introduced.
+- exact authored channel duration is 50 ticks / 2.5 sec with five deliveries.
+- exact Spell Engine 1.10.5.034 channel schedule is ticks `5, 15, 25, 35, 45`, followed by release at tick 50.
+- Iron's native CONTINUOUS scheduler is intentionally not used because its 1.20.1 cadence does not match the frozen source; Iron's LONG cast state/UI is used as transport while W7 schedules the five source channel impacts from `onServerCastTick`.
+- `getEffectiveCastTime` is fixed at 50 ticks because the frozen HEALTH school has no haste source for this spell.
+- holding beyond 2.5 sec cannot stretch the channel; W7 settles a still-active cast automatically at source tick 50.
+- caster movement speed is zero during channeling via a temporary -100% MULTIPLY_TOTAL Movement Speed modifier, removed on completion/cancel/cleanup. Incoming knockback is not forcibly erased.
+- each scheduled pulse uses source ADD semantics: no current effect -> amplifier 0; later pulses increment by one; cap amplifier 4; duration refreshes to 200 ticks / 10 sec.
+- full channel therefore reaches Last Stand V / five effective stacks.
+- executable frozen effect config grants, per effective stack, +20% base Max Health and +20% base Knockback Resistance using MULTIPLY_BASE.
+- the stale upstream comment mentioning -10% damage taken per stack is not implemented because no such modifier exists in the frozen executable config or its later correction history.
+- source impact order is preserved: apply/refresh the stack first, then heal.
+- source heal coefficient 0.2 combined with the 0.5-second channel output multiplier yields 10% of **current post-stack Max Health** per pulse. Healing therefore grows as Max Health stacks rise.
+- early release preserves all stacks/healing already earned.
+- early release cooldown is proportional to continuous cast progress: `effective full Iron cooldown * elapsed/50`, preserving Iron's normal Cooldown Reduction. Full channel keeps the normal effective 60-second base cooldown.
+- exact `one_handed_ground_charge` cast animation and `one_handed_shout_release` release animation are committed from Spell Engine 1.10.5.034.
+- exact `last_stand_start.ogg`, `last_stand_casting.ogg`, and `last_stand_release.ogg` are committed from frozen Rogues.
+- early release explicitly syncs the release animation because Iron's suppresses finish animations for cancelled LONG casts; full completion uses Iron's normal finish-animation path.
+- cast presentation reproduces the source every cast tick: 8 inward PHYSICAL_BLUE magic sparks and 6 50%-alpha PHYSICAL_BLUE smoke particles.
+- active Last Stand emits the source `area_effect_700` ground aura once every 20 ticks at 1.5 scale, PHYSICAL_BLUE with 50% alpha, horizontally attached to the affected entity.
+- effect application suppresses ordinary vanilla potion swirl particles, matching source `show_particles=false`.
+- W0-W6 gameplay remains frozen.

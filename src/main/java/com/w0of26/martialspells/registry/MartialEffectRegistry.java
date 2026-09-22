@@ -7,6 +7,7 @@ import com.w0of26.martialspells.effects.DiamondBodyEffect;
 import com.w0of26.martialspells.effects.NettedEffect;
 import com.w0of26.martialspells.effects.ShatterEffect;
 import com.w0of26.martialspells.effects.BleedEffect;
+import com.w0of26.martialspells.effects.LastStandEffect;
 import com.w0of26.martialspells.effects.DiamondHeartEffect;
 import com.w0of26.martialspells.effects.GuardiansCovenantLinkedEffect;
 import com.w0of26.martialspells.effects.GuardiansCovenantTankEffect;
@@ -151,6 +152,14 @@ public final class MartialEffectRegistry {
             MOB_EFFECTS.register(
                     "bleed",
                     BleedEffect::new
+            );
+
+    /** Frozen Warrior Last Stand defensive stacking effect. */
+    public static final RegistryObject<MobEffect>
+            LAST_STAND =
+            MOB_EFFECTS.register(
+                    "last_stand",
+                    LastStandEffect::new
             );
 
     private MartialEffectRegistry() {

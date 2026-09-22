@@ -88,5 +88,20 @@
     "sounds": [
       "martial_spells:mortal_strike_impact"
     ]
+  },
+  "last_stand_start": {
+    "sounds": [
+      "martial_spells:last_stand_start"
+    ]
+  },
+  "last_stand_casting": {
+    "sounds": [
+      "martial_spells:last_stand_casting"
+    ]
+  },
+  "last_stand_release": {
+    "sounds": [
+      "martial_spells:last_stand_release"
+    ]
   }
 }

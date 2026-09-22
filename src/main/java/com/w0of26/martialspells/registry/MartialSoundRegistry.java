@@ -78,6 +78,15 @@ public final class MartialSoundRegistry {
     public static final RegistryObject<SoundEvent> MORTAL_STRIKE_IMPACT =
             register("mortal_strike_impact");
 
+    public static final RegistryObject<SoundEvent> LAST_STAND_START =
+            register("last_stand_start");
+
+    public static final RegistryObject<SoundEvent> LAST_STAND_CASTING =
+            register("last_stand_casting");
+
+    public static final RegistryObject<SoundEvent> LAST_STAND_RELEASE =
+            register("last_stand_release");
+
     private MartialSoundRegistry() {}
 
     private static RegistryObject<SoundEvent> register(String path) {

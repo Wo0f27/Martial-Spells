@@ -33,6 +33,15 @@ public final class MartialParticleRegistry {
     public static final RegistryObject<SimpleParticleType> SHATTER_BLOOD =
             PARTICLES.register("shatter_blood", () -> new SimpleParticleType(false));
 
+    public static final RegistryObject<SimpleParticleType> LAST_STAND_SPARK =
+            PARTICLES.register("last_stand_spark", () -> new SimpleParticleType(false));
+
+    public static final RegistryObject<SimpleParticleType> LAST_STAND_SMOKE =
+            PARTICLES.register("last_stand_smoke", () -> new SimpleParticleType(false));
+
+    public static final RegistryObject<SimpleParticleType> LAST_STAND_AURA =
+            PARTICLES.register("last_stand_aura", () -> new SimpleParticleType(false));
+
     private MartialParticleRegistry() {}
 
     public static void register(IEventBus modEventBus) {

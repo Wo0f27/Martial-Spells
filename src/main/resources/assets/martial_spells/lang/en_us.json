@@ -239,5 +239,16 @@
   "ui.martial_spells.mortal_strike_range": "Melee Range: %s blocks",
   "ui.martial_spells.mortal_strike_damage_bonus": "Weapon Damage Bonus: +%s%%",
   "ui.martial_spells.mortal_strike_bleed": "Bleed Duration: %s seconds",
-  "ui.martial_spells.mortal_strike_delay": "Strike Contact: %s%% of melee attack cycle after release"
+  "ui.martial_spells.mortal_strike_delay": "Strike Contact: %s%% of melee attack cycle after release",
+  "effect.martial_spells.last_stand": "Last Stand",
+  "effect.martial_spells.last_stand.description": "Increases maximum health and knockback resistance.",
+  "spell.martial_spells.last_stand": "Last Stand",
+  "spell.martial_spells.last_stand.description": "Stand your ground and channel defensive resolve, building up to five stacks of increased maximum health and knockback resistance while healing on each channel pulse.",
+  "spell.martial_spells.last_stand.guide": "Channel for 2.5 seconds while rooted. Five pulses occur at 0.25, 0.75, 1.25, 1.75 and 2.25 seconds. Each pulse adds one Last Stand stack for 10 seconds, up to Last Stand V. Each effective stack grants +20% base maximum health and +20% base knockback resistance. After each new stack is applied, heal 10% of the newly increased current maximum health. Releasing early keeps earned stacks/healing and applies a proportional portion of the 60-second cooldown.",
+  "ui.martial_spells.last_stand_channel": "Channel: %ss; %s pulses",
+  "ui.martial_spells.last_stand_health": "Per Stack: +%s%% base Max Health; max %s stacks",
+  "ui.martial_spells.last_stand_knockback": "Per Stack: +%s%% base Knockback Resistance",
+  "ui.martial_spells.last_stand_heal": "Heal Per Pulse: %s%% of current Max Health",
+  "ui.martial_spells.last_stand_duration": "Stack Duration: %ss",
+  "ui.martial_spells.last_stand_cooldown": "Full Cooldown: %ss; proportional on early release"
 }
