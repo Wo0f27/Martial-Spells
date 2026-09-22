@@ -18,12 +18,20 @@ def read(path: str) -> str:
     return target.read_text(encoding="utf-8") if target.is_file() else ""
 
 
-def git_blob_sha(path: str) -> str:
+def git_blob_sha(path: str, normalize_text: bool = False) -> str:
     target = ROOT / path
     require(target.is_file(), f"missing asset: {path}")
     if not target.is_file():
         return ""
-    data = target.read_bytes()
+
+    if normalize_text:
+        # Git may check text files out as CRLF on Windows even though the
+        # frozen upstream blob is LF. Hash the canonical LF representation so
+        # platform line-ending conversion does not produce a false failure.
+        data = target.read_text(encoding="utf-8").replace("\r\n", "\n").encode("utf-8")
+    else:
+        data = target.read_bytes()
+
     return hashlib.sha1(
         f"blob {len(data)}\0".encode("ascii") + data
     ).hexdigest()
@@ -202,8 +210,15 @@ expected_assets = {
     "src/main/resources/assets/martial_spells/player_animation/two_handed_slash_vertical_slash.json":
         "f15ceccfdafb393eea6938bedac61249d047985c",
 }
+text_assets = {
+    "src/main/resources/assets/martial_spells/player_animation/two_handed_slash_vertical_windup.json",
+    "src/main/resources/assets/martial_spells/player_animation/two_handed_slash_vertical_slash.json",
+}
 for path, expected in expected_assets.items():
-    require(git_blob_sha(path) == expected, f"frozen asset mismatch: {path}")
+    require(
+        git_blob_sha(path, normalize_text=path in text_assets) == expected,
+        f"frozen asset mismatch: {path}"
+    )
 
 windup = json.loads(read(
     "src/main/resources/assets/martial_spells/player_animation/two_handed_slash_vertical_windup.json"
