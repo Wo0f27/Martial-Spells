@@ -1,6 +1,6 @@
 # Warrior W8 — Final fidelity / integration audit
 
-Status: **IMPLEMENTED / VALIDATING**
+Status: **PASS / FROZEN**
 
 Primary Rogues source freeze: `89ba33ad29adc42d7306660f5b74f28bd17b8ffa`.
 
@@ -132,4 +132,4 @@ Then perform a brief cross-regression smoke:
 
 If this build is immediately going onto the private dedicated server, also perform one server startup + client-join smoke before calling the combined work release-ready.
 
-W8 remains **VALIDATING** until the user explicitly reports the final audit/build/runtime gate as PASS.
+W8 is **PASS / FROZEN**. The user explicitly confirmed the final audit/build/runtime gate passed. The Warrior technique port into MartialSpells is complete.

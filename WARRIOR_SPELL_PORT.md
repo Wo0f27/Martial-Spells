@@ -165,7 +165,7 @@ W1 does not introduce a generic charged-technique runtime yet. The first charged
 - **W5 — Shattering Throw:** PASS — user validated charged release, held-item projectile, one block bounce, damage/knockback, Shattered Armor, sounds, and blood VFX. The comparatively noticeable drips on an Iron Golem were accepted as non-blocking/source-consistent presentation.
 - **W6 — Mortal Strike:** PASS — user validated runtime behavior; exact upstream 1.10.5.034 windup/slash animation assets and playback mapping were re-verified before freeze.
 - **W7 — Last Stand:** PASS — user validated source-faithful channel timing, stack/heal behavior, proportional cooldown, movement lock, animations/audio, and persistent aura.
-- **W8 — Fidelity/final audit:** IMPLEMENTED / VALIDATING — cumulative six-technique source, asset, dependency, and integration audit; no W0-W7 gameplay changes.
+- **W8 — Fidelity/final audit:** PASS / FROZEN — final static audit, clean build, client runtime regression, six-technique validation, and cross-regression smoke accepted by the user.
 
 ## W1 acceptance criteria
 
@@ -346,4 +346,18 @@ Do not mark W8 PASS until:
 - a brief Rogue + Monk cross-regression smoke passes;
 - dedicated-server smoke is performed as well if this candidate is immediately going onto the private server.
 
-A W8 PASS completes the **Warrior technique port into MartialSpells**.
+W8 is **PASS / FROZEN**. The **Warrior technique port into MartialSpells is complete**.
+
+
+## Warrior port completion
+
+The user explicitly accepted W8 as PASS after the final audit/build/runtime gate.
+
+Final state:
+
+- W0-W8: PASS / FROZEN.
+- All six frozen Warrior techniques are implemented in MartialSpells.
+- No Spell Engine / Spell Power runtime dependency was introduced.
+- Final Warrior network protocol remains 14.
+- The accepted Rogue baseline remains intact.
+- Further changes to these six techniques are post-port balance/design work, not part of the completed source-fidelity port.
