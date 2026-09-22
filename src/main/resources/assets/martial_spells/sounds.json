@@ -73,5 +73,20 @@
     "sounds": [
       "martial_spells:throw_impact"
     ]
+  },
+  "mortal_strike_swing": {
+    "sounds": [
+      "martial_spells:mortal_strike_swing"
+    ]
+  },
+  "mortal_strike_whoosh": {
+    "sounds": [
+      "martial_spells:mortal_strike_whoosh"
+    ]
+  },
+  "mortal_strike_impact": {
+    "sounds": [
+      "martial_spells:mortal_strike_impact"
+    ]
   }
 }

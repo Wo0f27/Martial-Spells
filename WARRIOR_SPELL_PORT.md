@@ -139,8 +139,8 @@ W1 does not introduce a generic charged-technique runtime yet. The first charged
 - hitbox width factor 0.5, height factor 1.5, arc 120 degrees
 - strike routes through normal weapon attack behavior
 - applies `spell_engine:bleed` for 6 sec
-- source Bleed amplifier: 1 + floor(0.25 x physical-melee power)
-- exact Spell Engine 1.10.5.034 Bleed tick constants must be resolved before the Mortal Strike checkpoint rather than inferred from a different revision
+- source Bleed amplifier: 1 + floor(0.25 x physical-melee power), evaluated while Mortal Strike's temporary +50% Attack Damage modifier is still active
+- exact Spell Engine 1.10.5.034 Bleed: lethal magic damage every 25 ticks; per effective stack 0.5 damage while stationary, scaling linearly to 2.0 damage at 2 blocks/sec horizontal speed
 - 15 sec cooldown
 
 ## Fidelity risks locked by W0
@@ -152,7 +152,7 @@ W1 does not introduce a generic charged-technique runtime yet. The first charged
 - Shattering Throw renders the held weapon virtually and does not remove it from inventory.
 - No frozen Warrior technique declares an axe/sword/heavy-weapon requirement.
 - Projectile defaults inherited from exact Spell Engine 1.10.5.034 must be resolved before charged-projectile fidelity is locked.
-- Mortal Strike Bleed must be checked against exact Spell Engine 1.10.5.034 before implementation.
+- Mortal Strike Bleed was resolved against exact Spell Engine 1.10.5.034 commit `270a6d61b00f241c1c8adb87573ad6de2d547f66` before W6 implementation.
 - Last Stand proportional cooldown must be verified against exact Spell Engine execution before its checkpoint.
 
 ## Checkpoint plan
@@ -163,7 +163,7 @@ W1 does not introduce a generic charged-technique runtime yet. The first charged
 - **W3 — Demoralizing Shout:** PASS — user validated effect application, stacking behavior, and the source health gate.
 - **W4 — Throw Net:** PASS — user validated the charged projectile, Netted root, textured projectile model, and synchronized physical net VFX.
 - **W5 — Shattering Throw:** PASS — user validated charged release, held-item projectile, one block bounce, damage/knockback, Shattered Armor, sounds, and blood VFX. The comparatively noticeable drips on an Iron Golem were accepted as non-blocking/source-consistent presentation.
-- **W6 — Mortal Strike:** unlocked for implementation; not started yet.
+- **W6 — Mortal Strike:** IMPLEMENTED / VALIDATING — timed vertical melee delivery, +50% vanilla weapon strike, exact Spell Engine 1.10.5.034 Bleed.
 - **W7 — Last Stand:** locked until explicit W6 PASS.
 - **W8 — Fidelity/final audit:** locked until explicit W7 PASS.
 
@@ -274,3 +274,30 @@ W5 is frozen as **PASS** after the user validated the full runtime gate. The hea
 - base cooldown is 8 seconds and normal Iron's Cooldown Reduction remains available.
 - W0-W4 remain frozen.
 - W6+ Warrior gameplay classes remain absent.
+
+
+## W6 acceptance criteria
+
+W6 is restricted to `martial_spells:mortal_strike` plus its exact local Spell Engine 1.10.5.034 Bleed translation and remains **VALIDATING** until the user explicitly passes it.
+
+- source tier 4 maps to Iron's `EPIC`, one spell level, Martial/Warrior, zero mana.
+- standard 10-tick / 0.5-second cast; releasing early cancels rather than partially firing.
+- exact Spell Engine `two_handed_slash_vertical_windup` is used during the cast and exact `two_handed_slash_vertical_slash` on release.
+- exact frozen `mortal_strike_swing.ogg` starts the cast; `mortal_strike_whoosh.ogg` begins the melee delivery; `mortal_strike_impact.ogg` plays on up to three selected hit targets.
+- source `range_mechanic: MELEE` resolves to fixed 3-block vanilla melee range on 1.20.1.
+- hitbox factors are length 1.0, width 0.5, height 1.5 with a 120-degree arc.
+- source melee `delay = 0.3` is a ratio of the current vanilla attack cycle, not seconds: contact delay is `round((20 / AttackSpeed) * 0.3)`, minimum 1 tick.
+- the hit routes through normal `ServerPlayer#attack` so normal weapon/enchantment/critical/fire-aspect behavior remains available.
+- source `damage_bonus = 0.5` is translated as a temporary +50% `MULTIPLY_TOTAL` Attack Damage modifier around the vanilla weapon attacks.
+- the attack-strength ticker is forced fully charged for each selected contact and restored afterwards.
+- target invulnerability time is temporarily zeroed for the skill hit and restored afterwards, matching Spell Engine's melee delivery.
+- Bleed lasts 120 ticks / 6 seconds, uses SET/default refresh semantics, and has zero-based amplifier `1 + floor(0.25 * impactPhysicalMeleePower)`.
+- `impactPhysicalMeleePower` is intentionally read while Mortal Strike's temporary +50% Attack Damage modifier is active, matching Spell Engine 1.10.5.034 execution order.
+- local Bleed is harmful color `0xB30000`, lethal, and ticks every 25 ticks using vanilla magic damage.
+- each effective Bleed stack deals 0.5 damage per tick at zero horizontal movement, linearly scaling to 2.0 damage at >=2 blocks/sec horizontal speed.
+- active Bleed reproduces Spell Engine's visual spawner: every 5 entity ticks, `amplifier + 1` local dripping-blood particles at 0.1-0.3 speed.
+- Mortal Strike's status-impact VFX emits 40 dripping-blood particles at 0.2-0.4 speed.
+- exact Rogues Mortal Strike icon and all three sounds are committed directly.
+- exact Spell Engine 1.10.5.034 Bleed icon and both vertical-slash animation JSONs are committed directly.
+- base cooldown is 15 seconds with normal Iron's Cooldown Reduction.
+- W0-W5 remain frozen and W7+ gameplay remains absent.

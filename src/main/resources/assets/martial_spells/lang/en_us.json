@@ -230,5 +230,14 @@
   "ui.martial_spells.shattering_throw_control_limit": "Shatter Health Limit: %s target max health",
   "ui.martial_spells.shattering_throw_bounces": "Block Bounces: %s",
   "death.attack.martial_spells.shattering_throw": "%1$s was struck by a shattering weapon",
-  "death.attack.martial_spells.shattering_throw.player": "%1$s was struck by %2$s's shattering weapon"
+  "death.attack.martial_spells.shattering_throw.player": "%1$s was struck by %2$s's shattering weapon",
+  "effect.martial_spells.bleed": "Bleed",
+  "effect.martial_spells.bleed.description": "Losing health over time, worse while moving.",
+  "spell.martial_spells.mortal_strike": "Mortal Strike",
+  "spell.martial_spells.mortal_strike.description": "Wind up a brutal vertical weapon strike that deals 50% bonus weapon damage and inflicts movement-scaled lethal Bleed.",
+  "spell.martial_spells.mortal_strike.guide": "Wind up for 0.5 seconds, then perform a normal fully charged weapon attack in a 3-block, 120-degree vertical melee arc. The strike temporarily gains 50% total Attack Damage. Each struck living target receives 6 seconds of Bleed with amplifier 1 + floor(25% of Mortal Strike's temporarily boosted Attack Damage). Bleed deals lethal magic damage every 25 ticks: 0.5 damage per effective stack while stationary, scaling linearly up to 2 damage per stack at 2 blocks/second horizontal speed.",
+  "ui.martial_spells.mortal_strike_range": "Melee Range: %s blocks",
+  "ui.martial_spells.mortal_strike_damage_bonus": "Weapon Damage Bonus: +%s%%",
+  "ui.martial_spells.mortal_strike_bleed": "Bleed Duration: %s seconds",
+  "ui.martial_spells.mortal_strike_delay": "Strike Contact: %s%% of melee attack cycle after release"
 }

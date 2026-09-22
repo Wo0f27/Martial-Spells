@@ -6,6 +6,7 @@ import com.w0of26.martialspells.effects.DemoralizedEffect;
 import com.w0of26.martialspells.effects.DiamondBodyEffect;
 import com.w0of26.martialspells.effects.NettedEffect;
 import com.w0of26.martialspells.effects.ShatterEffect;
+import com.w0of26.martialspells.effects.BleedEffect;
 import com.w0of26.martialspells.effects.DiamondHeartEffect;
 import com.w0of26.martialspells.effects.GuardiansCovenantLinkedEffect;
 import com.w0of26.martialspells.effects.GuardiansCovenantTankEffect;
@@ -142,6 +143,14 @@ public final class MartialEffectRegistry {
             MOB_EFFECTS.register(
                     "shatter",
                     ShatterEffect::new
+            );
+
+    /** Exact local Spell Engine 1.10.5.034 Bleed used by Mortal Strike. */
+    public static final RegistryObject<MobEffect>
+            BLEED =
+            MOB_EFFECTS.register(
+                    "bleed",
+                    BleedEffect::new
             );
 
     private MartialEffectRegistry() {
