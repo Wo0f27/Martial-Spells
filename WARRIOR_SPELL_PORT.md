@@ -164,8 +164,8 @@ W1 does not introduce a generic charged-technique runtime yet. The first charged
 - **W4 — Throw Net:** PASS — user validated the charged projectile, Netted root, textured projectile model, and synchronized physical net VFX.
 - **W5 — Shattering Throw:** PASS — user validated charged release, held-item projectile, one block bounce, damage/knockback, Shattered Armor, sounds, and blood VFX. The comparatively noticeable drips on an Iron Golem were accepted as non-blocking/source-consistent presentation.
 - **W6 — Mortal Strike:** PASS — user validated runtime behavior; exact upstream 1.10.5.034 windup/slash animation assets and playback mapping were re-verified before freeze.
-- **W7 — Last Stand:** IMPLEMENTED / VALIDATING — exact five-pulse channel schedule, stacking defensive effect, sequential max-health healing, proportional early-release cooldown, and source VFX/audio.
-- **W8 — Fidelity/final audit:** locked until explicit W7 PASS.
+- **W7 — Last Stand:** PASS — user validated source-faithful channel timing, stack/heal behavior, proportional cooldown, movement lock, animations/audio, and persistent aura.
+- **W8 — Fidelity/final audit:** UNLOCKED / NOT STARTED.
 
 ## W1 acceptance criteria
 
@@ -305,7 +305,7 @@ W6 is frozen as **PASS** after the user validated runtime behavior and the anima
 
 ## W7 acceptance criteria
 
-W7 is restricted to `martial_spells:last_stand` and its local presentation/runtime support and remains **VALIDATING** until explicit user PASS.
+W7 is frozen as **PASS** after the user confirmed the source-faithful runtime behavior, including the intended full-channel result of 36/40 HP from a 20/20 baseline.
 
 - source tier 4 maps to Iron's `EPIC`, one level, Martial/Warrior, zero mana.
 - source HEALTH-school mechanics are translated directly from current Max Health; no Spell Engine or Spell Power dependency is introduced.

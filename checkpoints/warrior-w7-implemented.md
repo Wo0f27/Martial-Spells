@@ -1,12 +1,12 @@
 # Warrior W7 — Last Stand implemented
 
-Status: **IMPLEMENTED / VALIDATING**
+Status: **PASS / FROZEN**
 
 Rogues source freeze: `89ba33ad29adc42d7306660f5b74f28bd17b8ffa`.
 
 Exact Spell Engine dependency freeze: `1.10.5.034+1.20.1`, commit `270a6d61b00f241c1c8adb87573ad6de2d547f66`.
 
-W0-W6 remain frozen as PASS. W7 adds only Last Stand and the local presentation/runtime support required to reproduce it. W8 remains locked.
+W0-W7 are frozen as PASS. W7 adds only Last Stand and the local presentation/runtime support required to reproduce it. W8 final fidelity audit is now unlocked.
 
 ## Exact channel timing
 
@@ -111,4 +111,4 @@ Validate:
 11. Recasting after cooldown follows ADD/cap/refresh semantics without exceeding amplifier 4.
 12. W8/final changes remain absent.
 
-W7 remains **VALIDATING**, not PASS, until explicit runtime confirmation.
+W7 is **PASS / FROZEN**. The user confirmed the runtime gate works as intended. The full-channel health result was specifically verified: from a 20/20 baseline, five post-stack heals total 16 HP while max health rises to 40, so the source-faithful endpoint is 36/40 HP rather than a full refill.
