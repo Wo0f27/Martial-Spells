@@ -165,7 +165,7 @@ W1 does not introduce a generic charged-technique runtime yet. The first charged
 - **W5 — Shattering Throw:** PASS — user validated charged release, held-item projectile, one block bounce, damage/knockback, Shattered Armor, sounds, and blood VFX. The comparatively noticeable drips on an Iron Golem were accepted as non-blocking/source-consistent presentation.
 - **W6 — Mortal Strike:** PASS — user validated runtime behavior; exact upstream 1.10.5.034 windup/slash animation assets and playback mapping were re-verified before freeze.
 - **W7 — Last Stand:** PASS — user validated source-faithful channel timing, stack/heal behavior, proportional cooldown, movement lock, animations/audio, and persistent aura.
-- **W8 — Fidelity/final audit:** UNLOCKED / NOT STARTED.
+- **W8 — Fidelity/final audit:** IMPLEMENTED / VALIDATING — cumulative six-technique source, asset, dependency, and integration audit; no W0-W7 gameplay changes.
 
 ## W1 acceptance criteria
 
@@ -330,3 +330,20 @@ W7 is frozen as **PASS** after the user confirmed the source-faithful runtime be
 - active Last Stand emits the source `area_effect_700` ground aura once every 20 ticks at 1.5 scale, PHYSICAL_BLUE with 50% alpha, horizontally attached to the affected entity.
 - effect application suppresses ordinary vanilla potion swirl particles, matching source `show_particles=false`.
 - W0-W6 gameplay remains frozen.
+
+
+## W8 final acceptance criteria
+
+W8 is a validation-only checkpoint. `tools/audit-warrior-w8.py` reuses the W7 finished-state audit and adds final six-technique registry/tag, source-mechanics sentinel, exact imported asset, dependency-boundary, network-protocol, and accepted-Rogue-baseline checks.
+
+W8 records the final fidelity boundary honestly: mechanics are source-faithful subject to the explicit W2 Charge duration override, while some W2-W5 Spell Engine presentation primitives are intentionally translated to Iron's/local equivalents. W6 Mortal Strike and W7 Last Stand retain the exact imported Spell Engine 1.10.5.034 animation assets used by their frozen source behavior.
+
+Do not mark W8 PASS until:
+- `python .\\tools\\audit-warrior-w8.py` passes;
+- `.\\gradlew clean build` passes;
+- `.\\gradlew runClient` boots;
+- all six Warrior techniques pass the final regression matrix in `checkpoints/warrior-w8-final-audit.md`;
+- a brief Rogue + Monk cross-regression smoke passes;
+- dedicated-server smoke is performed as well if this candidate is immediately going onto the private server.
+
+A W8 PASS completes the **Warrior technique port into MartialSpells**.
