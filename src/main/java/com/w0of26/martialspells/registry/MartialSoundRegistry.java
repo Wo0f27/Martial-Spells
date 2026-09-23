@@ -87,6 +87,12 @@ public final class MartialSoundRegistry {
     public static final RegistryObject<SoundEvent> LAST_STAND_RELEASE =
             register("last_stand_release");
 
+    public static final RegistryObject<SoundEvent> HOLY_SHOCK_HEAL =
+            register("holy_shock_heal");
+
+    public static final RegistryObject<SoundEvent> HOLY_SHOCK_DAMAGE =
+            register("holy_shock_damage");
+
     private MartialSoundRegistry() {}
 
     private static RegistryObject<SoundEvent> register(String path) {

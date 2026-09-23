@@ -106,6 +106,14 @@ Inventory and freeze the exact source/target contract. No gameplay implementatio
 - Holy Shock
 - Circle of Healing
 
+P1 target normalization:
+- all four spells use a shared Iron's base spell power reference of **5.0**,
+- frozen source coefficients remain exact multipliers over that reference,
+- unmodified target baselines are therefore Heal 2.5, Flash Heal 6.0, Holy Shock 2.0 heal / 4.0 damage, Circle of Healing 2.0 per target,
+- Iron's generic Spell Power and Holy Spell Power then scale those values normally,
+- P1 mana values are target-side balance values: Heal 15, Holy Shock 20, Flash Heal 30, Circle of Healing 40,
+- those mana values are not claimed as upstream Spell Engine fidelity.
+
 ### P2 — Retribution and protection core
 - Blessed Strikes
 - Divine Protection

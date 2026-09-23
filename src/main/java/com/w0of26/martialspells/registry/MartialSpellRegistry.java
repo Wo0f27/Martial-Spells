@@ -38,6 +38,16 @@ public final class MartialSpellRegistry {
     public static final RegistryObject<AbstractSpell> MORTAL_STRIKE = SPELLS.register("mortal_strike", MortalStrikeSpell::new);
     public static final RegistryObject<AbstractSpell> LAST_STAND = SPELLS.register("last_stand", LastStandSpell::new);
 
+    // CP11 Paladin/Priest Holy spell port.
+    public static final RegistryObject<AbstractSpell> HEAL =
+            SPELLS.register("heal", PaladinHealSpell::new);
+    public static final RegistryObject<AbstractSpell> HOLY_SHOCK =
+            SPELLS.register("holy_shock", PaladinHolyShockSpell::new);
+    public static final RegistryObject<AbstractSpell> FLASH_HEAL =
+            SPELLS.register("flash_heal", PaladinFlashHealSpell::new);
+    public static final RegistryObject<AbstractSpell> CIRCLE_OF_HEALING =
+            SPELLS.register("circle_of_healing", PaladinCircleOfHealingSpell::new);
+
     private MartialSpellRegistry() {}
 
     public static void register(IEventBus modEventBus) {

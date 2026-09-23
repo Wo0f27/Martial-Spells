@@ -103,5 +103,15 @@
     "sounds": [
       "martial_spells:last_stand_release"
     ]
+  },
+  "holy_shock_heal": {
+    "sounds": [
+      "martial_spells:holy_shock_heal"
+    ]
+  },
+  "holy_shock_damage": {
+    "sounds": [
+      "martial_spells:holy_shock_damage"
+    ]
   }
 }

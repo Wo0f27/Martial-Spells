@@ -250,5 +250,18 @@
   "ui.martial_spells.last_stand_knockback": "Per Stack: +%s%% base Knockback Resistance",
   "ui.martial_spells.last_stand_heal": "Heal Per Pulse: %s%% of current Max Health",
   "ui.martial_spells.last_stand_duration": "Stack Duration: %ss",
-  "ui.martial_spells.last_stand_cooldown": "Full Cooldown: %ss; proportional on early release"
+  "ui.martial_spells.last_stand_cooldown": "Full Cooldown: %ss; proportional on early release",
+  "spell.martial_spells.heal": "Heal",
+  "spell.martial_spells.heal.description": "Heal yourself or a friendly target with holy magic.",
+  "spell.martial_spells.heal.guide": "Aim at a friendly target within 16 blocks; if no valid friendly target is selected, Heal targets you instead. Healing scales with Iron's Holy Spell Power.",
+  "spell.martial_spells.flash_heal": "Flash Heal",
+  "spell.martial_spells.flash_heal.description": "Rapidly restore a large amount of health to yourself or a friendly target.",
+  "spell.martial_spells.flash_heal.guide": "A fast 0.5-second Holy cast that heals a friendly target within 16 blocks, falling back to the caster when no valid ally is selected.",
+  "spell.martial_spells.holy_shock": "Holy Shock",
+  "spell.martial_spells.holy_shock.description": "Release holy power that heals a friendly target or damages an enemy.",
+  "spell.martial_spells.holy_shock.guide": "Aim at a living target within 16 blocks. Friendly targets are healed; hostile targets take Holy spell damage and light knockback. With no target, Holy Shock heals the caster.",
+  "spell.martial_spells.circle_of_healing": "Circle of Healing",
+  "spell.martial_spells.circle_of_healing.description": "Heal yourself and friendly targets in a wide area around you.",
+  "spell.martial_spells.circle_of_healing.guide": "After a 0.5-second Holy cast, heal yourself and friendly living targets within an 8-block horizontal radius and the source-equivalent reduced vertical range.",
+  "ui.martial_spells.paladin_target_range": "Target Range: %s blocks"
 }
