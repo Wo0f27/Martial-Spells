@@ -128,6 +128,8 @@ for token in (
     "* CHANNEL_VALUE_MULTIPLIER",
     "Math.floor(",
     "SHIELD_POWER_COEFFICIENT",
+    "CHANNEL_TICKS",
+    "* power",
     "MartialEntityRegistry",
     ".PENANCE_PROJECTILE",
     "PENANCE_RELEASE",
