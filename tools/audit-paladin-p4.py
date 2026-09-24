@@ -281,42 +281,105 @@ for token in (
     "Z_SLANT",
     "LIGHT_UP_ORDER",
     "entity.isExpiring()",
-    "0.80F",
-    "0.40F",
     "item/barrier",
+    "renderConnector(",
+    "currentPose",
+    "previousPose",
 ):
     if token not in barrier_renderer:
-        errors.append(f"Barrier renderer missing {token}")
+        errors.append(f"Barrier source renderer missing {token}")
+if barrier_renderer.count("renderConnector(") < 2:
+    errors.append("Barrier renderer must define and call the source seam-connector wedge; panel-only dome has visible gaps")
+
+banner_animation_path = client_model_dir.parent / "animation" / "BattleBannerAnimations.java"
+banner_animations = banner_animation_path.read_text(encoding="utf-8")
+for token in (
+    "AnimationDefinition idle",
+    "withLength(2.5F).looping()",
+    "AnimationDefinition place",
+    "withLength(2.15F)",
+    'addAnimation("battle_flag"',
+    "scaleVec(0.0F, 0.0F, 0.0F)",
+    "posVec(0.0F, 16.0F, 0.0F)",
+):
+    if token not in banner_animations:
+        errors.append(f"Battle Banner frozen keyframe data missing {token}")
 
 banner_model = (client_model_dir / "BattleBannerModel.java").read_text(encoding="utf-8")
 for token in (
+    "extends HierarchicalModel<BattleBannerEntity>",
     '"battle_flag"',
     '"flag_part"',
     '"flag_part_2"',
     '"flag_part_3"',
     '"flag_part_4"',
-    "LayerDefinition.create(",
+    "entity.spawnAnimationState",
+    "BattleBannerAnimations.place",
+    "entity.idleAnimationState",
+    "BattleBannerAnimations.idle",
+    "entity.despawnAnimationState",
+    "-1.0F",
 ):
     if token not in banner_model:
-        errors.append(f"Battle Banner model missing {token}")
+        errors.append(f"Battle Banner exact model/animation integration missing {token}")
 
 banner_renderer = (client_render_dir / "BattleBannerRenderer.java").read_text(encoding="utf-8")
 for token in (
     '"textures/entity/battle_banner.png"',
-    "entity.lifecycleScale(",
     "LightTexture.FULL_BRIGHT",
 ):
     if token not in banner_renderer:
         errors.append(f"Battle Banner renderer missing {token}")
+if "lifecycleScale(" in banner_renderer:
+    errors.append("Battle Banner must not use the old whole-entity scale approximation; source uses place keyframes")
+
+lightwell_animation_path = client_model_dir.parent / "animation" / "LightwellAnimations.java"
+lightwell_animations = lightwell_animation_path.read_text(encoding="utf-8")
+for token in (
+    "AnimationDefinition idle",
+    "withLength(1.5F).looping()",
+    "AnimationDefinition spawn",
+    "withLength(1.0F)",
+    "AnimationDefinition spell_release",
+    "scaleVec(0.0F, 0.0F, 0.0F)",
+    "degreeVec(0.0F, -362.5F, 0.0F)",
+):
+    if token not in lightwell_animations:
+        errors.append(f"Lightwell frozen keyframe data missing {token}")
 
 lightwell_model = (client_model_dir / "LightwellModel.java").read_text(encoding="utf-8")
 for token in (
+    "extends HierarchicalModel<LightwellEntity>",
     '"root"',
     '"light"',
-    "LayerDefinition.create(",
+    "entity.spawnAnimationState",
+    "LightwellAnimations.spawn",
+    "entity.despawnAnimationState",
+    "-1.0F",
+    "entity.idleAnimationState",
+    "LightwellAnimations.idle",
+    "entity.spellReleaseAnimationState",
+    "LightwellAnimations.spell_release",
+    "20.0F / LightwellEntity.SPELL_RELEASE_ANIMATION_TICKS",
 ):
     if token not in lightwell_model:
-        errors.append(f"Lightwell model missing {token}")
+        errors.append(f"Lightwell exact model/animation integration missing {token}")
+
+lightwell_entity = (entity_dir / "LightwellEntity.java").read_text(encoding="utf-8")
+for token in (
+    "SPELL_RELEASE_ANIMATION_TICKS = 15",
+    "SPELL_RELEASE_EVENT = 61",
+    "spawnAnimationState",
+    "despawnAnimationState",
+    "idleAnimationState",
+    "spellReleaseAnimationState",
+    "broadcastEntityEvent(",
+    "setupAnimationStates()",
+    "despawnAnimationState.start(",
+    "TOTAL_TICKS",
+):
+    if token not in lightwell_entity:
+        errors.append(f"Lightwell animation-state lifecycle missing {token}")
 
 lightwell_renderer = (client_render_dir / "LightwellRenderer.java").read_text(encoding="utf-8")
 for token in (
@@ -324,10 +387,11 @@ for token in (
     '"textures/entity/lightwell_glow.png"',
     "RenderType.entityTranslucentEmissive(",
     "LightTexture.FULL_BRIGHT",
-    "entity.lifecycleScale(",
 ):
     if token not in lightwell_renderer:
         errors.append(f"Lightwell renderer missing {token}")
+if "lifecycleScale(" in lightwell_renderer:
+    errors.append("Lightwell must not use the old whole-entity lifecycle scaling approximation")
 
 mote_renderer = (client_render_dir / "HolyMoteRenderer.java").read_text(encoding="utf-8")
 for token in (
@@ -336,6 +400,13 @@ for token in (
 ):
     if token not in mote_renderer:
         errors.append(f"Holy Mote renderer missing {token}")
+
+# Holy Mote must use the source magic_holy five-particle LINE trail rather
+# than END_ROD or another generic substitute.
+if "PaladinVfx.holyMoteTrail(" not in mote:
+    errors.append("Holy Mote projectile missing source Holy trail")
+if "ParticleTypes.END_ROD" in mote:
+    errors.append("Holy Mote projectile must not use END_ROD trail fallback")
 
 # Source-owned sounds and mappings.
 p4_sounds = (
