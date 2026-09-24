@@ -285,7 +285,7 @@
   "spell.martial_spells.holy_beam.guide": "Channel for up to 5 seconds. Twenty-five midpoint pulses trace your current aim out to 32 blocks. Friendly targets are healed and hostile targets take Holy damage; every pulse preserves Spell Engine's 0.2-second channel multiplier. Releasing early keeps completed pulses and applies proportional mana and cooldown.",
   "spell.martial_spells.levitate": "Levitate",
   "spell.martial_spells.levitate.description": "Channel holy light to rise into the air, then drift gently back down.",
-  "spell.martial_spells.levitate.guide": "Channel for up to 1.5 seconds while horizontally rooted. Four source-timed releases reset your motion to a +0.15 vertical lift and refresh Levitate for 5 seconds. Levitate maintains Slow Falling using the source 1.20.1 refresh guard, leaving a soft-fall tail after the channel. Releasing early applies proportional mana and cooldown.",
+  "spell.martial_spells.levitate.guide": "Channel for up to 1.5 seconds while horizontally rooted. Four source-timed releases reset your motion to a +0.15 vertical lift and refresh Levitate for 5 seconds. Levitate maintains vanilla Slow Falling using the frozen 1.20.1 refresh rule; the remaining soft-fall time after Levitate ends depends on when that refresh occurred. Releasing early applies proportional mana and cooldown.",
   "effect.martial_spells.levitate": "Levitate",
   "effect.martial_spells.levitate.description": "You drift gently through the air.",
   "spell.martial_spells.penance": "Penance",
@@ -295,6 +295,6 @@
   "effect.martial_spells.priest_absorption.description": "Absorbs some damage you would take.",
   "ui.martial_spells.priest_channel": "Channel: %ss; %s releases",
   "ui.martial_spells.levitate_linger": "Levitate: %s seconds",
-  "ui.martial_spells.levitate_soft_landing": "Slow Falling Refresh Buffer: %s seconds",
+  "ui.martial_spells.levitate_soft_landing": "Slow Falling refresh extension: +%s seconds",
   "ui.martial_spells.penance_absorption": "Absorption per Bolt: %s; radius %s blocks; %ss"
 }
