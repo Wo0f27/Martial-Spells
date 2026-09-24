@@ -368,10 +368,12 @@ for token in (
 
 source_area_particle = (root / "src/main/java/com/w0of26/martialspells/client/particle/PaladinSourceAreaParticle.java").read_text(encoding="utf-8")
 for token in (
-    "Facing.CAMERA",
-    "Facing.GROUND",
+    "enum Facing",
+    "GROUND",
+    "CAMERA",
     "encodedFollowId",
-    "followEntityId",
+    "followEntity",
+    "followOffset",
 ):
     if token not in source_area_particle:
         errors.append(f"PaladinSourceAreaParticle missing {token}")
@@ -487,7 +489,7 @@ for token in (
     "EQUAL_DEPTH_TEST",
     "SourceFactor.ONE",
     "DestFactor.ONE",
-    "1.0F,",
+    "intensity,",
     "0.80F * intensity",
     "setShaderGlintAlpha(",
 ):
@@ -546,6 +548,9 @@ client_events = (root / "src/main/java/com/w0of26/martialspells/client/MartialCl
 for token in (
     "DivineProtectionRenderer::onRenderLivingPost",
     "PALADIN_AREA_553_CAMERA",
+    "PALADIN_AREA_637_GROUND",
+    "PaladinSourceAreaParticle.Facing.GROUND",
+    "PaladinSourceAreaParticle.Facing.CAMERA",
     "PaladinSourceMagicParticle.Motion.FLOAT",
     "PaladinSourceMagicParticle.Motion.DECELERATE",
     "PaladinSourceMagicParticle.Motion.ASCEND",
