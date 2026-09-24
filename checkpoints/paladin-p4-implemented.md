@@ -63,9 +63,10 @@ P0-P3 remain PASS. P5 stays locked until P4 receives local build and runtime PAS
   - +40% Iron's cast-time haste translation,
   - +40% Iron's cooldown-reduction haste translation,
   - +40% RangedWeaponAPI draw haste.
-- The Forge RangedWeaponAPI port expresses ranged haste as a 10%-per-level
-  status effect, so Battle Banner applies its haste effect at amplifier 3
-  (four effective levels = 40%).
+- The Forge RangedWeaponAPI port ultimately maps ranged haste to Apothic
+  Attributes `DRAW_SPEED`; Battle Banner therefore adds its own +40%
+  MULTIPLY_BASE draw-speed modifier. This stacks independently instead of
+  competing with an existing RangedWeaponAPI Haste status effect.
 - Source banner geometry/texture and fullbright presentation are restored.
   The exact upstream Blockbench keyframe clips remain final presentation polish;
   P4 uses the source geometry with lifecycle scaling and a chained flag wave.
