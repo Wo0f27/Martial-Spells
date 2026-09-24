@@ -42,7 +42,8 @@ public final class PaladinSourceAreaParticle
             Facing facing,
             int frames,
             double encodedScale,
-            double encodedAlpha
+            double encodedAlpha,
+            double encodedFollowId
     ) {
         super(
                 level,
@@ -59,7 +60,7 @@ public final class PaladinSourceAreaParticle
 
         int followId =
                 facing == Facing.CAMERA
-                        ? (int) Math.round(zd)
+                        ? (int) Math.round(encodedFollowId)
                         : -1;
         followEntity =
                 followId > 0
@@ -319,7 +320,8 @@ public final class PaladinSourceAreaParticle
                     facing,
                     frames,
                     xd,
-                    yd
+                    yd,
+                    zd
             );
         }
     }
