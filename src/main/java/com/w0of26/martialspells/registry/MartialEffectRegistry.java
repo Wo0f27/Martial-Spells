@@ -8,6 +8,8 @@ import com.w0of26.martialspells.effects.NettedEffect;
 import com.w0of26.martialspells.effects.ShatterEffect;
 import com.w0of26.martialspells.effects.BleedEffect;
 import com.w0of26.martialspells.effects.BlessedStrikesEffect;
+import com.w0of26.martialspells.effects.BattleBannerEffect;
+import com.w0of26.martialspells.effects.BarrierProtectedEffect;
 import com.w0of26.martialspells.effects.DivineProtectionEffect;
 import com.w0of26.martialspells.effects.LastStandEffect;
 import com.w0of26.martialspells.effects.LevitateEffect;
@@ -196,6 +198,22 @@ public final class MartialEffectRegistry {
             MOB_EFFECTS.register(
                     "priest_absorption",
                     PriestAbsorptionEffect::new
+            );
+
+    /** Frozen Paladins Barrier five-tick protection refresh marker. */
+    public static final RegistryObject<MobEffect>
+            BARRIER_PROTECTED =
+            MOB_EFFECTS.register(
+                    "barrier_protected",
+                    BarrierProtectedEffect::new
+            );
+
+    /** Frozen Paladins Battle Banner two-second aura effect. */
+    public static final RegistryObject<MobEffect>
+            BATTLE_BANNER =
+            MOB_EFFECTS.register(
+                    "battle_banner",
+                    BattleBannerEffect::new
             );
 
     private MartialEffectRegistry() {
