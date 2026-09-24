@@ -20,8 +20,9 @@ import net.minecraft.util.Mth;
 /**
  * Frozen Paladins Battle Banner geometry translated to Mojmap.
  *
- * <p>P4 keeps the exact source cuboids and a lightweight chained flag wave.
- * The exact upstream keyframe clip remains final-presentation polish.</p>
+ * <p>P4 keeps the exact source cuboids and frozen Blockbench place/idle
+ * keyframe definitions. Spawn plays place forward; despawn samples the same
+ * clip in reverse, matching the upstream summoned-entity lifecycle.</p>
  */
 public final class BattleBannerModel
         extends HierarchicalModel<BattleBannerEntity> {
