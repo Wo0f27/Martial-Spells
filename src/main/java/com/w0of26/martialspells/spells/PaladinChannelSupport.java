@@ -1,14 +1,17 @@
 package com.w0of26.martialspells.spells;
 
+import io.redspace.ironsspellbooks.api.events.SpellCooldownAddedEvent;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
 import io.redspace.ironsspellbooks.api.spells.CastSource;
 import io.redspace.ironsspellbooks.capabilities.magic.MagicManager;
+import io.redspace.ironsspellbooks.config.ServerConfigs;
 import io.redspace.ironsspellbooks.item.Scroll;
 import io.redspace.ironsspellbooks.network.SyncManaPacket;
 import io.redspace.ironsspellbooks.setup.PacketDistributor;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
+import net.minecraftforge.common.MinecraftForge;
 
 /**
  * Shared transport for the frozen Paladins/Priests Spell Engine channels.
@@ -104,7 +107,8 @@ final class PaladinChannelSupport {
             float progress
     ) {
         if (!castSource.consumesMana()
-                || player.isCreative()
+                || (player.isCreative()
+                && !ServerConfigs.CREATIVE_MANA_COST.get())
                 || progress <= 0.0F) {
             return;
         }
@@ -138,16 +142,10 @@ final class PaladinChannelSupport {
             CastSource castSource,
             float progress
     ) {
-        var cooldowns =
-                MagicData.getPlayerMagicData(player)
-                        .getPlayerCooldowns();
-
-        cooldowns.removeCooldown(
-                spell.getSpellId()
-        );
-
-        if (castSource == CastSource.SCROLL) {
-            cooldowns.syncToPlayer(player);
+        if (castSource == CastSource.SCROLL
+                || (player.isCreative()
+                && !ServerConfigs.CREATIVE_COOLDOWN.get())
+                || progress <= 0.0F) {
             return;
         }
 
@@ -163,14 +161,55 @@ final class PaladinChannelSupport {
                         fullEffectiveCooldown * progress
                 );
 
-        if (proportionalCooldown > 0) {
-            cooldowns.addCooldown(
-                    spell,
-                    proportionalCooldown
-            );
+        if (proportionalCooldown <= 0) {
+            return;
         }
 
+        /*
+         * Preserve Iron's normal cooldown integration surface. The event sees
+         * the actual partial cooldown being applied, so other Iron's addons
+         * can cancel or modify it exactly as they can a normal cast.
+         */
+        SpellCooldownAddedEvent.Pre pre =
+                new SpellCooldownAddedEvent.Pre(
+                        proportionalCooldown,
+                        spell,
+                        player,
+                        castSource
+                );
+
+        if (MinecraftForge.EVENT_BUS.post(pre)) {
+            return;
+        }
+
+        int finalCooldown =
+                Math.max(
+                        0,
+                        pre.getEffectiveCooldown()
+                );
+
+        if (finalCooldown <= 0) {
+            return;
+        }
+
+        var cooldowns =
+                MagicData.getPlayerMagicData(player)
+                        .getPlayerCooldowns();
+
+        cooldowns.addCooldown(
+                spell,
+                finalCooldown
+        );
         cooldowns.syncToPlayer(player);
+
+        MinecraftForge.EVENT_BUS.post(
+                new SpellCooldownAddedEvent.Post(
+                        finalCooldown,
+                        spell,
+                        player,
+                        castSource
+                )
+        );
     }
 
     static final class ChannelState {
