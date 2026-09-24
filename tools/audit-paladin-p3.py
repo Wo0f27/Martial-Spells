@@ -299,7 +299,9 @@ for token in (
 holy_beam_renderer = (root / "src/main/java/com/w0of26/martialspells/client/render/HolyBeamVisualRenderer.java").read_text(encoding="utf-8")
 for token in (
     '"textures/entity/beacon_beam.png"',
-    "RenderType.beaconBeam(",
+    "PaladinSpellModelRenderTypes",
+    ".holyBeamInner(",
+    ".holyBeamOuter(",
     "WIDTH = 0.10F",
     "FLOW = 1.50F",
     "OUTER_RED = 255",
@@ -326,6 +328,17 @@ for token in (
 ):
     if token not in holy_beam:
         errors.append(f"Holy Light source launch/presentation missing {token}")
+
+spell_model_layers = (root / "src/main/java/com/w0of26/martialspells/client/render/PaladinSpellModelRenderTypes.java").read_text(encoding="utf-8")
+for token in (
+    "RENDERTYPE_BEACON_BEAM_SHADER",
+    "RENDERTYPE_ENTITY_TRANSLUCENT_EMISSIVE_SHADER",
+    "holyBeamInner(",
+    "holyBeamOuter(",
+    "PARTICLES_TARGET",
+):
+    if token not in spell_model_layers:
+        errors.append(f"Paladin spell-model render layer missing {token}")
 
 judgement_renderer = (root / "src/main/java/com/w0of26/martialspells/client/render/JudgementVisualRenderer.java").read_text(encoding="utf-8")
 for token in (
@@ -469,9 +482,12 @@ blessed_glow = (root / "src/main/java/com/w0of26/martialspells/client/render/Ble
 for token in (
     "OPACITY_PER_STACK =",
     "0.20F",
+    "TEXTURE_SCALE =",
+    "8.0F",
     "MAX_STACKS =",
     "5",
     "VertexMultiConsumer.create(",
+    "BlessedStrikesGlowVertexConsumer",
     "EquipmentSlot.MAINHAND",
     "EquipmentSlot.OFFHAND",
 ):
@@ -482,19 +498,27 @@ blessed_render_types = (root / "src/main/java/com/w0of26/martialspells/client/re
 for token in (
     "extends RenderType",
     '"textures/misc/paladin_item_glow.png"',
-    "TEXTURE_SCALE = 8.0F",
-    "GAIN = 3.0F",
-    "OPACITY_PER_STACK = 0.20F",
-    "RENDERTYPE_GLINT_SHADER",
+    "RENDERTYPE_ENTITY_TRANSLUCENT_EMISSIVE_SHADER",
     "EQUAL_DEPTH_TEST",
     "SourceFactor.ONE",
     "DestFactor.ONE",
-    "intensity,",
-    "0.80F * intensity",
-    "setShaderGlintAlpha(",
+    "COLOR_WRITE",
+    "LIGHTMAP",
 ):
     if token not in blessed_render_types:
-        errors.append(f"Blessed Strikes source glow RenderType missing {token}")
+        errors.append(f"Blessed Strikes safe glow RenderType missing {token}")
+if "RENDERTYPE_GLINT_SHADER" in blessed_render_types:
+    errors.append("Blessed Strikes must not use the old Forge-blackening GLINT render path")
+
+blessed_vertex = (root / "src/main/java/com/w0of26/martialspells/client/render/BlessedStrikesGlowVertexConsumer.java").read_text(encoding="utf-8")
+for token in (
+    "opacity * 3.0F",
+    "255.0F * intensity",
+    "204.0F * intensity",
+    "textureMatrix.transformPosition(",
+):
+    if token not in blessed_vertex:
+        errors.append(f"Blessed Strikes Holy emissive vertex adapter missing {token}")
 
 blessed_mixin = (root / "src/main/java/com/w0of26/martialspells/mixin/client/BlessedStrikesItemRendererMixin.java").read_text(encoding="utf-8")
 for token in (
@@ -655,6 +679,9 @@ if "2807417a1dd9a65204c002ded487da0e6ae467a1" not in sync_text:
     errors.append("P3 asset sync is not pinned to frozen Paladins commit")
 if "sync-paladin-p2-assets.ps1" not in sync_text:
     errors.append("P3 asset sync must re-assert finalized P2 assets first")
+
+if "d057c13" not in sync_text:
+    errors.append("P3 exact VFX assets must be pinned to Spell Engine 1.10.5 commit d057c13")
 
 for source_texture in (
     "textures/spell_projectile/judgement.png",
