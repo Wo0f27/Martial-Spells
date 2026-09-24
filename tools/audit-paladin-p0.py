@@ -18,7 +18,8 @@ for required in (
     "lightwell_orb",
     "SchoolRegistry.HOLY_RESOURCE",
     "max level 1",
-    "Holy Wand -> Heal",
+    "Holy Wand -> native Iron's Blessing of Life binding",
+    "do not register `martial_spells:heal`",
     "Holy Staff -> Holy Shock",
 ):
     if required.lower() not in text.lower():
