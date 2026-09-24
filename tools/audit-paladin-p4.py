@@ -54,6 +54,7 @@ spell_contract = {
         "EXTRA_RADIUS_POWER_COEFFICIENT = 1.0F",
         "EXTRA_RADIUS_POWER_CAP = 4.0F",
         "Math.min(",
+        "getSourceEquivalentPower(",
         "BASE_COOLDOWN_SECONDS = 45",
         "aheadOnGround(",
         "2.0D",
@@ -67,6 +68,7 @@ spell_contract = {
         "BASE_COOLDOWN_SECONDS = 45",
         "WELL_BASE_HEALING_POWER = 1.0F",
         "OWNER_POWER_COEFFICIENT = 0.50F",
+        "getSourceEquivalentPower(",
         "aheadOnGround(",
         "1.5D",
         "lightwell.setYRot(",
@@ -209,6 +211,14 @@ for token in (
     if token not in p4_events:
         errors.append(f"PaladinP4Events missing {token}")
 
+support = (spell_dir / "PaladinHolySpellSupport.java").read_text(encoding="utf-8")
+for token in (
+    "getSourceEquivalentPower(",
+    "/ SOURCE_POWER_REFERENCE",
+):
+    if token not in support:
+        errors.append(f"Paladin Holy source-power translation missing {token}")
+
 # P4 effects.
 for effect_id, class_name in (
     ("barrier_protected", "BarrierProtectedEffect::new"),
@@ -274,7 +284,7 @@ for token in (
     "entity.isExpiring()",
     "0.80F",
     "0.40F",
-    "textures/entity" if False else "item/barrier",
+    "item/barrier",
 ):
     if token not in barrier_renderer:
         errors.append(f"Barrier renderer missing {token}")
@@ -415,7 +425,8 @@ print("CP11 P4 Constructs/summons summary")
 print(" - Barrier: 4-block range / 10 sec / 4-tick ally protection refresh")
 print(" - Barrier: player attack + explosion + magic immunity; hostile intrusion/projectile control")
 print(" - Battle Banner: 43 spawn + 200 active + 43 despawn ticks")
-print(" - Battle Banner: power-scaled 3-7 block radius; +40% melee/spell/ranged haste + knockback resistance")
+print(" - Battle Banner: source-equivalent power-scaled radius; baseline 4 blocks, cap 7")
+print(" - Battle Banner: +40% melee/spell/ranged haste + knockback resistance")
 print(" - Lightwell: 20 spawn + 240 active + 20 despawn ticks; stationary wounded-ally healer")
 print(" - Holy Mote: 12-block cap / 1.0 speed / +30-degree lob / 16 deg/tick homing / one bounce")
 print(" - Holy Mote heal: 0.35x translated well healing power")
