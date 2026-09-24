@@ -111,6 +111,9 @@ public final class PaladinLightwellSpell extends AbstractSpell {
                 placement.y,
                 placement.z
         );
+        lightwell.setYRot(
+                caster.getYRot()
+        );
         serverLevel.addFreshEntity(
                 lightwell
         );
