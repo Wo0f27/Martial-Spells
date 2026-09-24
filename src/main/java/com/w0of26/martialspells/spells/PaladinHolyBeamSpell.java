@@ -1,7 +1,9 @@
 package com.w0of26.martialspells.spells;
 
 import com.w0of26.martialspells.MartialSpells;
+import com.w0of26.martialspells.entity.HolyBeamVisualEntity;
 import com.w0of26.martialspells.registry.MartialSoundRegistry;
+import com.w0of26.martialspells.registry.MartialEntityRegistry;
 import io.redspace.ironsspellbooks.api.config.DefaultConfig;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.api.registry.SchoolRegistry;
@@ -61,6 +63,9 @@ public final class PaladinHolyBeamSpell extends AbstractSpell {
 
     private static final Map<UUID, PaladinChannelSupport.ChannelState>
             CHANNELS = new ConcurrentHashMap<>();
+
+    private static final Map<UUID, UUID>
+            BEAM_VISUALS = new ConcurrentHashMap<>();
 
     private final DefaultConfig defaultConfig =
             new DefaultConfig()
@@ -124,6 +129,34 @@ public final class PaladinHolyBeamSpell extends AbstractSpell {
                             spellLevel,
                             CHANNEL_TICKS
                     )
+            );
+
+            UUID oldVisualId =
+                    BEAM_VISUALS.remove(
+                            player.getUUID()
+                    );
+            if (oldVisualId != null) {
+                Entity oldVisual =
+                        player.serverLevel()
+                                .getEntity(oldVisualId);
+                if (oldVisual != null) {
+                    oldVisual.discard();
+                }
+            }
+
+            HolyBeamVisualEntity visual =
+                    new HolyBeamVisualEntity(
+                            MartialEntityRegistry
+                                    .HOLY_BEAM_VISUAL
+                                    .get(),
+                            player.serverLevel(),
+                            player
+                    );
+            player.serverLevel()
+                    .addFreshEntity(visual);
+            BEAM_VISUALS.put(
+                    player.getUUID(),
+                    visual.getUUID()
             );
 
             player.serverLevel().playSound(
@@ -465,6 +498,23 @@ public final class PaladinHolyBeamSpell extends AbstractSpell {
                 entity instanceof ServerPlayer player
                         ? CHANNELS.remove(player.getUUID())
                         : null;
+
+        if (entity instanceof ServerPlayer player) {
+            UUID visualId =
+                    BEAM_VISUALS.remove(
+                            player.getUUID()
+                    );
+            if (visualId != null
+                    && level instanceof ServerLevel serverLevel) {
+                Entity visual =
+                        serverLevel.getEntity(
+                                visualId
+                        );
+                if (visual != null) {
+                    visual.discard();
+                }
+            }
+        }
 
         if (cancelled
                 && state != null
