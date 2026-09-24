@@ -3,7 +3,7 @@ package com.w0of26.martialspells.combat;
 import com.w0of26.martialspells.MartialSpells;
 import com.w0of26.martialspells.registry.MartialSpellRegistry;
 import com.w0of26.martialspells.spells.PaladinJudgementSpell;
-import net.minecraft.core.particles.ParticleTypes;
+import com.w0of26.martialspells.spells.PaladinVfx;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -97,16 +97,9 @@ public final class JudgementImpactManager {
                         0.0D
                 );
 
-        level.sendParticles(
-                ParticleTypes.END_ROD,
-                launch.x,
-                launch.y,
-                launch.z,
-                8,
-                0.2D,
-                0.2D,
-                0.2D,
-                0.02D
+        PaladinVfx.judgementTrail(
+                level,
+                launch
         );
     }
 
@@ -149,16 +142,13 @@ public final class JudgementImpactManager {
                         + remaining
                         * PaladinJudgementSpell.METEOR_VELOCITY;
 
-        level.sendParticles(
-                ParticleTypes.END_ROD,
-                impact.x,
-                meteorY,
-                impact.z,
-                5,
-                0.15D,
-                0.35D,
-                0.15D,
-                0.02D
+        PaladinVfx.judgementTrail(
+                level,
+                new Vec3(
+                        impact.x,
+                        meteorY,
+                        impact.z
+                )
         );
 
         if (remaining > 0) {
