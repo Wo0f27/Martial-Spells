@@ -41,10 +41,10 @@ P4/P5 remain locked until explicit P3 runtime PASS.
   Iron's balance values and are not claimed as upstream reagent fidelity.
 - Source spell/effect icons and Paladins-owned P3 sounds are synchronized from
   the frozen commit.
-- P1-P3 visual parity is now part of the P3 validation gate. Spell Engine's
+- P1-P3 source-style visual coverage is now part of the P3 validation gate. Spell Engine's
   generic Holy/healing particle language is reconstructed with Forge/vanilla
   particles so no Spell Engine runtime dependency is added.
-- Holy Light now draws a blocked golden beam path and source-style heal/damage
+- Holy Light now draws a continuous blocked golden beam plus flowing particles and source-style heal/damage
   impacts; Levitate has persistent Holy lift particles.
 - Penance now renders the frozen Lightwell-orb model at source scale/orbit/spin
   with a synchronized double-helix Holy trail and source-style shield pulse.
