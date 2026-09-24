@@ -1,7 +1,9 @@
 package com.w0of26.martialspells.combat;
 
 import com.w0of26.martialspells.MartialSpells;
+import com.w0of26.martialspells.entity.JudgementVisualEntity;
 import com.w0of26.martialspells.registry.MartialSpellRegistry;
+import com.w0of26.martialspells.registry.MartialEntityRegistry;
 import com.w0of26.martialspells.spells.PaladinJudgementSpell;
 import com.w0of26.martialspells.spells.PaladinVfx;
 import net.minecraft.nbt.CompoundTag;
@@ -97,10 +99,14 @@ public final class JudgementImpactManager {
                         0.0D
                 );
 
-        PaladinVfx.judgementTrail(
-                level,
-                launch
-        );
+        JudgementVisualEntity visual =
+                new JudgementVisualEntity(
+                        MartialEntityRegistry.JUDGEMENT_VISUAL.get(),
+                        level,
+                        target,
+                        launch
+                );
+        level.addFreshEntity(visual);
     }
 
     @SubscribeEvent
@@ -141,15 +147,6 @@ public final class JudgementImpactManager {
                 impact.y
                         + remaining
                         * PaladinJudgementSpell.METEOR_VELOCITY;
-
-        PaladinVfx.judgementTrail(
-                level,
-                new Vec3(
-                        impact.x,
-                        meteorY,
-                        impact.z
-                )
-        );
 
         if (remaining > 0) {
             data.putInt(
