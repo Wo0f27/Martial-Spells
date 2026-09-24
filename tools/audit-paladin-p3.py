@@ -217,6 +217,12 @@ client_events = (root / "src/main/java/com/w0of26/martialspells/client/MartialCl
 if "PenanceProjectileRenderer::new" not in client_events:
     errors.append("Penance projectile renderer not registered")
 
+penance_renderer = (root / "src/main/java/com/w0of26/martialspells/client/render/PenanceProjectileRenderer.java").read_text(encoding="utf-8")
+if "extends EntityRenderer<PenanceProjectile>" not in penance_renderer:
+    errors.append("P3 Penance renderer must use the no-geometry EntityRenderer safety surface")
+if "ThrownItemRenderer" in penance_renderer:
+    errors.append("P3 Penance renderer must not substitute a placeholder item cube")
+
 lang = json.loads((root / "src/main/resources/assets/martial_spells/lang/en_us.json").read_text(encoding="utf-8"))
 for key in (
     "spell.martial_spells.holy_beam",
@@ -287,6 +293,10 @@ for sound in (
     if not path.is_file():
         errors.append(f"source sound missing; run P3 asset sync: {sound}")
 
+for locked_spell in ("barrier", "battle_banner", "lightwell", "lightwell_orb"):
+    if f'SPELLS.register("{locked_spell}"' in spell_registry:
+        errors.append(f"P3 must not register locked P4 spell: {locked_spell}")
+
 build = (root / "build.gradle").read_text(encoding="utf-8").lower()
 for forbidden in ("spell_engine", "spell-engine", "spell-power", "spell_power"):
     if forbidden in build:
@@ -297,9 +307,9 @@ print("CP11 P3 Priest channel/control summary")
 print(" - spells: Holy Light, Levitate, Penance")
 print(" - source channel scheduling: equal-interval midpoints")
 print(" - Holy Light: 5 sec / 25 pulses / 0.2x per-pulse channel multiplier")
-print(" - Levitate: 1.5 sec / 4 lift releases / 5 sec float + 3 sec soft landing")
-print(" - Penance: 1.5 sec / 3 homing bolts / 0.5x per-bolt damage multiplier")
-print(" - Penance: 8-block no-falloff ally absorption pulse, 6 sec")
+print(" - Levitate: 1.5 sec / 4 lift releases / 5 sec float + source Slow Falling buffer logic")
+print(" - Penance: 1.5 sec / 3 look-launched homing bolts / 20-block travel cap / 0.5x per-bolt damage multiplier")
+print(" - Penance: 8-block no-falloff ally absorption pulse, 6 sec; executable independent-floor cap")
 print(" - early release: proportional mana + effective cooldown")
 print(" - target-side mana: 40 / 25 / 45")
 print(" - exact Penance orb model remains P5 presentation work")
