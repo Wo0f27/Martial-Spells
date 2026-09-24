@@ -139,6 +139,10 @@ for spell_id in ("holy_shock", "flash_heal", "circle_of_healing"):
     if not icon.is_file():
         errors.append(f"source icon missing; run P1 asset sync: {spell_id}.png")
 
+redundant_heal_icon = root / "src/main/resources/assets/martial_spells/textures/gui/spell_icons/heal.png"
+if redundant_heal_icon.exists():
+    errors.append("redundant martial_spells Heal icon must be removed; rerun P1 asset sync")
+
 for sound in ("holy_shock_heal.ogg", "holy_shock_damage.ogg"):
     path = root / "src/main/resources/assets/martial_spells/sounds" / sound
     if not path.is_file():

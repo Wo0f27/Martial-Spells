@@ -1,5 +1,9 @@
 $ErrorActionPreference = "Stop"
 
+# Re-assert the finalized P1 resource set first. This also removes the
+# intentionally dropped martial_spells:heal icon from older working trees.
+& "$PSScriptRoot\sync-paladin-p1-assets.ps1"
+
 $SourceCommit = "2807417a1dd9a65204c002ded487da0e6ae467a1"
 $SourceRoot = "https://raw.githubusercontent.com/ZsoltMolnarrr/Paladins/$SourceCommit/common/src/main/resources/assets/paladins"
 $TargetRoot = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot ".."))

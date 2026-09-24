@@ -121,6 +121,17 @@ P1 target normalization:
 - Judgement
 - Immolation
 
+P2 translation:
+- Blessed Strikes keeps the frozen 2.5-second channel and five 0.5-second seal releases. Amplifier + 1 is the seal count, capped at 6 like the source; one successful melee swing consumes one seal on the next tick so same-tick Better Combat cleaves all receive the bonus impact.
+- Blessed Strikes and Immolation preserve the frozen weighted-average power blend exactly: 75% Holy reference power / 25% current Attack Damage.
+- Judgement preserves the inverse blend: 75% current Attack Damage / 25% Holy reference power.
+- Divine Protection reproduces Spell Engine Protection semantics: effect amplifier is floor(0.5 x effective Holy multiplier), capped at 2, so amplifier + 1 gives 1-3 fully negated incoming attacks during the 8-second window.
+- Judgement preserves the required 16-block hostile target, 0.5-second cast, 12-block launch height, 1.2-block/tick meteor descent, 6-block squared AOE falloff, +50% power against undead, and 3-second stun gate of 50 + 2 x Attack Damage target max health.
+- Immolation preserves the 5-block / 0.5 vertical-range area, mixed helpful/harmful intent, 1.2 damage coefficient, 0.5 heal coefficient, 4-second burn, +50% undead power, and source guaranteed undead critical at the default source 1.5x critical multiplier.
+- Iron's 1.20.1 exposes no spell-critical-chance or spell-critical-damage attributes. Therefore generic source random crit blending cannot be translated one-for-one; hybrid power weights are exact, while Immolation's explicit guaranteed undead critical is preserved at the frozen source default critical multiplier.
+- Target-side mana: Blessed Strikes consumes 5 mana at channel initiation and each of its five seal ticks (30 for a full channel); Divine Protection 40; Judgement 45; Immolation 60. These are balancing values, not upstream reagent fidelity.
+- Exact Judgement projectile model/rendering remains P5 presentation work; P2 preserves server-authoritative meteor timing and impact behavior.
+
 ### P3 — Priest channel and control
 - Holy Light (`holy_beam`)
 - Levitate
