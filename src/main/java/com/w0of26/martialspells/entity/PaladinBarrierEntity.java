@@ -75,6 +75,17 @@ public final class PaladinBarrierEntity extends Entity {
             return;
         }
 
+        if (tickCount == 1) {
+            serverLevel.playSound(
+                    null,
+                    blockPosition(),
+                    MartialSoundRegistry.HOLY_BARRIER_IDLE.get(),
+                    SoundSource.PLAYERS,
+                    1.0F,
+                    1.0F
+            );
+        }
+
         if (tickCount == LIFE_TICKS - EXPIRATION_TICKS) {
             serverLevel.playSound(
                     null,
