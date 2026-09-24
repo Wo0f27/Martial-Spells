@@ -1,13 +1,16 @@
 # CP11 P3 — Priest channel and control
 
-Status: **PASS**
+Status: **MECHANICS PASS / PRESENTATION REVALIDATING**
 
 Frozen source: `ZsoltMolnarrr/Paladins` commit
 `2807417a1dd9a65204c002ded487da0e6ae467a1`.
 
 P0-P2 are frozen as PASS. P3 adds only Holy Light (`holy_beam`),
 Levitate, and Penance plus the two required effects and Penance projectile.
-P3 runtime validation was confirmed after the P1-P3 VFX restoration pass. P4 is now unlocked; P5 remains reserved for final integration/polish.
+P3 mechanics/runtime were previously confirmed. Presentation was reopened after
+the user compared the port directly against frozen Paladins and found visual
+approximations. P4 remains unlocked for the integrated parity pass; P5 remains
+reserved for final bindings/package integration.
 
 ## Frozen behavior implemented
 
@@ -41,13 +44,19 @@ P3 runtime validation was confirmed after the P1-P3 VFX restoration pass. P4 is 
   Iron's balance values and are not claimed as upstream reagent fidelity.
 - Source spell/effect icons and Paladins-owned P3 sounds are synchronized from
   the frozen commit.
-- P1-P3 source-style visual coverage is now part of the P3 validation gate. Spell Engine's
-  generic Holy/healing particle language is reconstructed with Forge/vanilla
-  particles so no Spell Engine runtime dependency is added.
-- Holy Light now draws a continuous blocked golden beam plus flowing particles and source-style heal/damage
-  impacts; Levitate has persistent Holy lift particles.
-- Penance now renders the frozen Lightwell-orb model at source scale/orbit/spin
-  with a synchronized double-helix Holy trail and source-style shield pulse.
+- P1-P3 presentation is now audited against the frozen Spell Engine/Paladins
+  render recipes rather than against approximate vanilla substitutes. Martial
+  Spells owns compatible local particle/render implementations and pins only
+  the small required source-art subset; Spell Engine is not a runtime
+  dependency.
+- Holy Light uses the frozen beacon-beam prism geometry, 0.1 source width,
+  white inner core, #FFCC66 outer layers, flow 1.5, source rotation, and the
+  same shoulder-height +0.5-forward launch geometry for rendering and hits.
+- Levitate keeps its exact channel Holy particles and restores the separate
+  upstream client-side two-cloud foot ring every three ticks while active.
+- Penance renders the frozen Lightwell-orb model at source scale/orbit/spin,
+  the two source LINE particle strands, source hit/shield/area effects, and the
+  attached area_effect_553 Priest Absorption aura.
 - Judgement now renders the frozen projectile model on a presentation-only
   meteor entity while its previously validated P2 damage/timing logic remains
   server-authoritative.
@@ -106,11 +115,13 @@ Runtime checks:
     old END_ROD-only placeholder.
 14. Early release of Holy Light, Levitate, and Penance gives proportional mana
     and effective cooldown rather than a free partial cast or the full cooldown.
-15. Recheck P1/P2 presentation: Holy Shock has distinct heal/damage impacts;
-    Flash Heal has a healing pillar; Circle of Healing visibly marks its radius;
-    Blessed Strikes draws light into the weapon and maintains a seal aura;
-    Divine Protection has apply/pop glimmer; Immolation erupts as a radial
-    Holy-fire effect; Judgement has its model, trail and large impact burst.
+15. Recheck P1/P2 presentation against frozen upstream, not merely for
+    visibility: Circle of Healing must use the source area_effect_637 decal;
+    Blessed Strikes must use the actual #FFFFCC item-glow layer at 0.2 opacity
+    per stack; Divine Protection must show amplifier+1 orbiting base/glow
+    shields; Immolation must use the source 637+676 area effects; Judgement
+    must show its source trail, direct Holy burst, large area burst, and
+    orbiting CRIT stun marker.
 
-P3 is **PASS**. The user runtime-tested all P1-P3 Paladin/Priest spells after
-the VFX restoration pass and confirmed they behaved as intended.
+P3 mechanics remain **PASS**, but presentation is **REVALIDATING** until the
+user tests this source-faithful parity pass.
