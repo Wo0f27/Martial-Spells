@@ -171,6 +171,7 @@ public final class JudgementVisualEntity extends Entity {
                         PaladinJudgementSpell.METEOR_VELOCITY
                 )
         );
+        hasImpulse = true;
     }
 
     @Override
