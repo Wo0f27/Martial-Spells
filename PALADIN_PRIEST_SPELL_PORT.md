@@ -146,11 +146,16 @@ P3 translation:
   (0.2x output per release), Levitate 4 releases over 1.5 seconds, and Penance
   3 releases over 1.5 seconds (0.5x damage/knockback per bolt).
 - Levitate preserves reset-velocity +0.15Y releases, horizontal root during the
-  channel, 5-second Levitate refresh, vanilla Slow Falling as the 1.20.1 gravity
-  carrier, and the source's additional 3-second soft landing.
-- Penance preserves its sticky 20-block hostile target, 0.8 projectile speed,
-  16-degree/tick homing, 8-block no-falloff ally absorption pulse, and 6-second
-  absorption duration.
+  channel, 5-second Levitate refresh, and the executable 1.20.1 Slow Falling
+  carrier logic: Slow Falling is refreshed only below 20 ticks remaining and is
+  then set to current Levitate duration + 60 ticks. Because Levitate itself is
+  refreshed by each channel release, a full channel can leave less than three
+  seconds of Slow Falling after Levitate ends; the executable behavior wins
+  over the broader source comment.
+- Penance preserves its sticky 20-block hostile target, Spell Engine shoulder
+  launch point, initial caster-look launch direction, 0.8 projectile speed,
+  16-degree/tick homing, 20-block projectile travel cap, 8-block no-falloff
+  ally absorption pulse, and 6-second absorption duration.
 - Penance follows the executable status-effect integer arithmetic: per bolt
   stacks are `1 + floor(0.1 * Holy power)`; amplifier cap is
   `2 + floor(0.3 * Holy power)`. The upstream "exactly one full volley"
