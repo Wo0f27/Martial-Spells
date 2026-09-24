@@ -179,10 +179,53 @@ P3 translation:
 P3 status: **PASS** after local runtime validation of all P1-P3 spells, including the restored VFX/model layer.
 
 ### P4 — constructs and summons
+Status: **IMPLEMENTED / VALIDATING**
+
 - Barrier
+  - 0.5-second cast, 4-block source range, 10-second 8x4 barrier, 40-second
+    cooldown.
+  - every 4 ticks refreshes 5 ticks of ally protection against player attacks,
+    explosions and common/Iron's magic damage;
+  - hostile intruders are pushed outward at 0.30 strength;
+  - friendly projectiles pass while hostile projectiles collide/are stopped;
+  - source segmented golden dome and activate/idle/impact/deactivate audio are
+    restored.
 - Battle Banner
+  - instant, 45-second cooldown, placed 2 blocks ahead at +20° yaw;
+  - 43-tick spawn + 200-tick active + 43-tick despawn lifecycle;
+  - source radius formula is `3 + min(4, source-equivalent Holy power)` with
+    0.3x vertical range and 10-tick aura refreshes;
+  - source-equivalent power normalizes Iron's reference scale with
+    `Iron Holy power / 5`, because Spell Power 1.20.1's default Healing Power
+    is 1.0. Baseline radius is therefore 4 blocks and the cap is 7.
+  - grants +40% base Attack Speed, Knockback Resistance, Iron's cast/cooldown
+    haste translation, and RangedWeaponAPI draw haste.
+  - source model/texture/fullbright presentation restored; exact source
+    Blockbench keyframe clips remain final presentation polish.
 - Lightwell
+  - instant; outer 45-second cooldown is fixed and ignores Iron's generic
+    cooldown reduction, matching source summon-uptime behavior;
+  - ground-snapped 1.5 blocks ahead, stationary/invulnerable;
+  - 20-tick spawn + 240-tick active + 20-tick despawn;
+  - repeatedly acquires wounded friendly targets within 12 blocks;
+  - well source power is `1 + 0.5 * (Iron Holy power / 5)`;
+  - Holy Mote cadence starts at 30 ticks and uses Iron's cooldown-reduction
+    attribute as the target-system analogue of source Healing Haste;
+  - source base/glow model presentation, bob, lifecycle audio, spawn burst and
+    active-only existence particles restored.
 - Holy Mote (`lightwell_orb`) internal helper
+  - not intended for player binding;
+  - 12-block travel cap, speed 1.0, +30° upward launch, no gravity;
+  - homing begins after 15% of the initial target distance and turns at
+    16°/tick;
+  - one terrain bounce;
+  - heals `0.35 * translated well power`;
+  - frozen Lightwell-orb model and Holy travel/heal visuals restored.
+  - Spell Engine generic healing release audio is translated to Iron's native
+    Holy cast sound; no Spell Engine runtime dependency is introduced.
+
+P4 remains **VALIDATING** until local audit/build/runtime confirmation. P5 stays
+locked until that PASS.
 
 ### P5 — bindings and final integration
 - Paladin/Priest grouping
