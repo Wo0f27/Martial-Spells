@@ -29,9 +29,12 @@ P4/P5 remain locked until explicit P3 runtime PASS.
   source 0.5 channel multiplier.
 - Each successful Penance bolt radiates only the absorption action to friendly
   living entities in an eight-block spherical area with no distance falloff.
-- Penance absorption lasts six seconds, grants two absorption health per
-  effective stack, adds `1 + floor(0.1 * Holy power)` stacks per bolt, and is
-  capped to exactly one full three-bolt volley from that caster.
+- Penance absorption lasts six seconds and grants two absorption health per
+  effective stack. The executable source floors its two scaling expressions
+  independently: each bolt adds `1 + floor(0.1 * Holy power)` stacks, while
+  the amplifier cap is `2 + floor(0.3 * Holy power)`. This intentionally
+  follows executable Spell Engine behavior even where the upstream comment's
+  "exactly one full volley" shorthand diverges because of integer truncation.
 - Target-side mana values are Holy Light 40, Levitate 25, Penance 45. These are
   Iron's balance values and are not claimed as upstream reagent fidelity.
 - Source spell/effect icons and Paladins-owned P3 sounds are synchronized from
