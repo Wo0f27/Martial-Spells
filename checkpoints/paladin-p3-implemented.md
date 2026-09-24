@@ -1,0 +1,89 @@
+# CP11 P3 — Priest channel and control
+
+Status: **IMPLEMENTED / VALIDATING**
+
+Frozen source: `ZsoltMolnarrr/Paladins` commit
+`2807417a1dd9a65204c002ded487da0e6ae467a1`.
+
+P0-P2 are frozen as PASS. P3 adds only Holy Light (`holy_beam`),
+Levitate, and Penance plus the two required effects and Penance projectile.
+P4/P5 remain locked until explicit P3 runtime PASS.
+
+## Frozen behavior implemented
+
+- Spell Engine channel deliveries are translated using equal-interval midpoint
+  scheduling over Iron's effective cast duration.
+- Early channel release keeps already delivered impacts and applies a
+  proportional share of target-side mana and the current effective Iron's
+  cooldown.
+- Holy Light: Rare Holy, 32-block live aim, 5-second source duration,
+  25 deliveries, source 0.2 channel multiplier, 0.4 heal / 0.8 damage
+  coefficients and source 0.5 knockback before channel normalization.
+- Levitate: Rare Holy, 1.5-second source duration, four midpoint releases,
+  horizontal movement lock, reset velocity to +0.15Y on each release,
+  five-second Levitate refresh, Slow Falling carrier on Minecraft 1.20.1 and
+  three-second soft landing after Levitate ends.
+- Penance: Epic Holy, required sticky hostile target within 20 blocks,
+  1.5-second source duration, three midpoint projectile releases, velocity
+  0.8, 16 degrees/tick homing, source 0.55 damage and 0.2 knockback with the
+  source 0.5 channel multiplier.
+- Each successful Penance bolt radiates only the absorption action to friendly
+  living entities in an eight-block spherical area with no distance falloff.
+- Penance absorption lasts six seconds, grants two absorption health per
+  effective stack, adds `1 + floor(0.1 * Holy power)` stacks per bolt, and is
+  capped to exactly one full three-bolt volley from that caster.
+- Target-side mana values are Holy Light 40, Levitate 25, Penance 45. These are
+  Iron's balance values and are not claimed as upstream reagent fidelity.
+- Source spell/effect icons and Paladins-owned P3 sounds are synchronized from
+  the frozen commit.
+- Exact Holy Light beam rendering, Spell Engine generic wind/healing loop
+  presentation, and Penance's orbiting Lightwell-orb composite model remain P5
+  presentation work. P3 uses a particle-visible Penance projectile with a
+  no-geometry renderer so a missing-model cube can never appear.
+
+## Validation gate
+
+Run:
+
+```powershell
+git pull --ff-only origin cp11/paladin-priest-spells
+powershell -ExecutionPolicy Bypass -File .\tools\sync-paladin-p3-assets.ps1
+python .\tools\audit-paladin-p3.py
+.\gradlew clean build
+.\gradlew runClient
+```
+
+Runtime checks:
+
+1. P1 and P2 retain their previously accepted behavior.
+2. Holy Light appears as a one-level Rare Holy spell, costs 40 mana for a full
+   channel, and can be held for five seconds.
+3. Holding Holy Light on an ally heals in many small pulses; holding it on a
+   hostile target deals many small damage pulses. Moving aim during the channel
+   changes which entity receives later pulses.
+4. A full Holy Light channel produces 25 deliveries. Releasing around half way
+   keeps delivered impacts and produces roughly half the normal effective
+   cooldown and mana cost.
+5. Levitate appears as a one-level Rare Holy spell and horizontally roots the
+   caster while channeling.
+6. A full Levitate channel gives four distinct upward kicks. Each kick resets
+   movement rather than accelerating from the prior kick.
+7. Releasing Levitate stops further ascent; the five-second Levitate effect
+   remains and the player descends under Slow Falling, retaining about three
+   seconds of soft landing after Levitate itself expires.
+8. Penance requires a hostile target within 20 blocks and keeps that target
+   locked through the channel.
+9. A full Penance channel launches exactly three visible particle-traced bolts.
+   They travel at 0.8 blocks/tick and visibly home toward a moving target.
+10. Each Penance bolt damages only the hostile primary target. A nearby friendly
+    player/entity within eight blocks of the impact receives/refreshes Priest
+    Absorption instead of taking splash damage.
+11. Repeated bolts increase the absorption stack to the one-volley cap; the
+    effect lasts six seconds. Allies outside eight blocks receive no shield.
+12. Penance's projectile must never display a purple/black missing-model cube.
+    The final orbiting source orb is intentionally deferred to P5.
+13. Early release of Holy Light, Levitate, and Penance gives proportional mana
+    and effective cooldown rather than a free partial cast or the full cooldown.
+
+P3 remains **VALIDATING**, not PASS, until the user explicitly confirms this
+runtime gate.
