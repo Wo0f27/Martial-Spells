@@ -21,7 +21,7 @@ import javax.annotation.Nullable;
  * healing-family spell port.
  */
 final class PaladinHolySpellSupport {
-    static final float SOURCE_POWER_REFERENCE = 5.0F;
+    static final int SOURCE_POWER_REFERENCE = 5;
     static final float AIM_ASSIST = 0.35F;
 
     private PaladinHolySpellSupport() {
