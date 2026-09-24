@@ -10,6 +10,8 @@ import com.w0of26.martialspells.effects.BleedEffect;
 import com.w0of26.martialspells.effects.BlessedStrikesEffect;
 import com.w0of26.martialspells.effects.DivineProtectionEffect;
 import com.w0of26.martialspells.effects.LastStandEffect;
+import com.w0of26.martialspells.effects.LevitateEffect;
+import com.w0of26.martialspells.effects.PriestAbsorptionEffect;
 import com.w0of26.martialspells.effects.DiamondHeartEffect;
 import com.w0of26.martialspells.effects.GuardiansCovenantLinkedEffect;
 import com.w0of26.martialspells.effects.GuardiansCovenantTankEffect;
@@ -178,6 +180,22 @@ public final class MartialEffectRegistry {
             MOB_EFFECTS.register(
                     "divine_protection",
                     DivineProtectionEffect::new
+            );
+
+    /** Frozen Priest Levitate compatibility effect. */
+    public static final RegistryObject<MobEffect>
+            LEVITATE =
+            MOB_EFFECTS.register(
+                    "levitate",
+                    LevitateEffect::new
+            );
+
+    /** Frozen Priest Penance absorption shield marker. */
+    public static final RegistryObject<MobEffect>
+            PRIEST_ABSORPTION =
+            MOB_EFFECTS.register(
+                    "priest_absorption",
+                    PriestAbsorptionEffect::new
             );
 
     private MartialEffectRegistry() {
