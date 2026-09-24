@@ -97,6 +97,27 @@ final class PaladinHolySpellSupport {
         return targetData.getTarget(serverLevel);
     }
 
+    /**
+     * Converts Iron's absolute Holy spell-power scale back to the frozen
+     * Spell Power 1.20.1 source scale, whose default Healing Power is 1.0.
+     *
+     * P1-P3 direct output coefficients intentionally use Iron's target-side
+     * reference power of 5. P4's executable radius/summon attribute formulas,
+     * however, consume the source system's power units and therefore require
+     * this normalization.
+     */
+    static float getSourceEquivalentPower(
+            AbstractSpell spell,
+            int spellLevel,
+            LivingEntity caster
+    ) {
+        return spell.getSpellPower(
+                        spellLevel,
+                        caster
+                )
+                / SOURCE_POWER_REFERENCE;
+    }
+
     static float getScaledAmount(
             AbstractSpell spell,
             int spellLevel,
