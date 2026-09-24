@@ -10,8 +10,6 @@ import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
 import io.redspace.ironsspellbooks.api.spells.CastSource;
 import io.redspace.ironsspellbooks.api.spells.CastType;
 import io.redspace.ironsspellbooks.api.spells.SpellRarity;
-import io.redspace.ironsspellbooks.capabilities.magic.MagicManager;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -122,18 +120,9 @@ public final class PaladinDivineProtectionSpell extends AbstractSpell {
                     1.0F
             );
 
-            MagicManager.spawnParticles(
+            PaladinVfx.divineProtectionApply(
                     serverLevel,
-                    ParticleTypes.END_ROD,
-                    caster.getX(),
-                    caster.getY() + caster.getBbHeight() * 0.5D,
-                    caster.getZ(),
-                    40,
-                    caster.getBbWidth() * 0.5D,
-                    caster.getBbHeight() * 0.4D,
-                    caster.getBbWidth() * 0.5D,
-                    0.08D,
-                    false
+                    caster
             );
         }
 
