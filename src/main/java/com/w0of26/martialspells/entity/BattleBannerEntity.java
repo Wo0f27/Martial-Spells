@@ -10,6 +10,7 @@ import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.AnimationState;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -34,6 +35,13 @@ public final class BattleBannerEntity extends Entity {
     private UUID ownerId;
     private float radius = 3.0F;
 
+    public final AnimationState spawnAnimationState =
+            new AnimationState();
+    public final AnimationState idleAnimationState =
+            new AnimationState();
+    public final AnimationState despawnAnimationState =
+            new AnimationState();
+
     public BattleBannerEntity(
             EntityType<? extends BattleBannerEntity> type,
             Level level
@@ -41,6 +49,7 @@ public final class BattleBannerEntity extends Entity {
         super(type, level);
         noPhysics = true;
         noCulling = true;
+        spawnAnimationState.startIfStopped(0);
     }
 
     public BattleBannerEntity(
@@ -64,8 +73,12 @@ public final class BattleBannerEntity extends Entity {
     public void tick() {
         super.tick();
 
-        if (level().isClientSide
-                || !(level() instanceof ServerLevel serverLevel)) {
+        if (level().isClientSide) {
+            setupAnimationStates();
+            return;
+        }
+
+        if (!(level() instanceof ServerLevel serverLevel)) {
             return;
         }
 
@@ -99,6 +112,39 @@ public final class BattleBannerEntity extends Entity {
                         radius
                 );
             }
+        }
+    }
+
+    private void setupAnimationStates() {
+        boolean spawning =
+                tickCount < SPAWN_TICKS;
+        boolean active =
+                tickCount >= SPAWN_TICKS
+                        && tickCount
+                        < SPAWN_TICKS + ACTIVE_TICKS;
+        boolean despawning =
+                tickCount >= SPAWN_TICKS + ACTIVE_TICKS
+                        && tickCount < TOTAL_TICKS;
+
+        spawnAnimationState.animateWhen(
+                spawning,
+                tickCount
+        );
+        idleAnimationState.animateWhen(
+                active,
+                tickCount
+        );
+
+        if (despawning
+                && !despawnAnimationState.isStarted()) {
+            // Mirrors Spell Engine SummonedEntity: starting at the future
+            // end-of-phase age lets a -1 playback multiplier sample PLACE
+            // from tail to head during despawn.
+            despawnAnimationState.start(
+                    TOTAL_TICKS
+            );
+        } else if (!despawning) {
+            despawnAnimationState.stop();
         }
     }
 
