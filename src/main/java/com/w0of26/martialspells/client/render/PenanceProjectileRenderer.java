@@ -8,7 +8,6 @@ import com.w0of26.martialspells.entity.PenanceProjectile;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -109,7 +108,7 @@ public final class PenanceProjectileRenderer
 
         VertexConsumer vertices =
                 bufferSource.getBuffer(
-                        Sheets.translucentCullBlockSheet()
+                        PaladinSpellModelRenderTypes.glow()
                 );
 
         poseStack.translate(
