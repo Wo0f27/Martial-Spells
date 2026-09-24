@@ -115,8 +115,7 @@ public final class PaladinBarrierSpell extends AbstractSpell {
         );
         PaladinVfx.barrierSpawn(
                 serverLevel,
-                caster.position(),
-                RANGE
+                caster
         );
 
         super.onCast(
