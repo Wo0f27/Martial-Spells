@@ -396,7 +396,11 @@ if "lifecycleScale(" in lightwell_renderer:
 mote_renderer = (client_render_dir / "HolyMoteRenderer.java").read_text(encoding="utf-8")
 for token in (
     '"spell_projectile/lightwell_orb"',
-    "LightTexture.FULL_BRIGHT",
+    "PaladinSpellModelRenderTypes.glow()",
+    "directionYaw",
+    "directionPitch",
+    "age * 2.0F",
+    "packedLight",
 ):
     if token not in mote_renderer:
         errors.append(f"Holy Mote renderer missing {token}")
