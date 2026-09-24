@@ -147,6 +147,11 @@ public final class PaladinLevitateSpell extends AbstractSpell {
 
         long gameTime = serverLevel.getGameTime();
 
+        PaladinVfx.levitateChannel(
+                serverLevel,
+                player
+        );
+
         while (state.isDue(gameTime)) {
             applyLift(player);
             state.markDue();
