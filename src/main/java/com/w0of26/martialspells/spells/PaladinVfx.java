@@ -378,17 +378,6 @@ public final class PaladinVfx {
     }
 
     /**
-     * Item glow is source-rendered, not a particle aura. Kept as a compatibility
-     * no-op while the event caller is removed by the exact glow renderer pass.
-     */
-    public static void blessedWeaponAura(
-            ServerLevel level,
-            LivingEntity caster,
-            int stacks
-    ) {
-    }
-
-    /**
      * Continuous Holy Light casting particles from Spell Engine launch point:
      * magic_spark PIPE x3 every tick plus one FIREWORK every second tick.
      */
