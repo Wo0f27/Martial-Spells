@@ -25,8 +25,8 @@ P4/P5 remain locked until explicit P3 runtime PASS.
   three-second soft landing after Levitate ends.
 - Penance: Epic Holy, required sticky hostile target within 20 blocks,
   1.5-second source duration, three midpoint projectile releases, velocity
-  0.8, 16 degrees/tick homing, source 0.55 damage and 0.2 knockback with the
-  source 0.5 channel multiplier.
+  0.8, 16 degrees/tick homing, a 20-block projectile travel cap, source 0.55
+  damage and 0.2 knockback with the source 0.5 channel multiplier.
 - Each successful Penance bolt radiates only the absorption action to friendly
   living entities in an eight-block spherical area with no distance falloff.
 - Penance absorption lasts six seconds and grants two absorption health per
@@ -72,12 +72,16 @@ Runtime checks:
 6. A full Levitate channel gives four distinct upward kicks. Each kick resets
    movement rather than accelerating from the prior kick.
 7. Releasing Levitate stops further ascent; the five-second Levitate effect
-   remains and the player descends under Slow Falling, retaining about three
-   seconds of soft landing after Levitate itself expires.
+   remains and the player descends under Slow Falling. The source maintains a
+   three-second Slow Falling buffer only when that carrier is refreshed; on a
+   full four-kick channel the executable refresh guard means the post-Levitate
+   tail can be shorter than three seconds. It must still land softly.
 8. Penance requires a hostile target within 20 blocks and keeps that target
    locked through the channel.
 9. A full Penance channel launches exactly three visible particle-traced bolts.
-   They travel at 0.8 blocks/tick and visibly home toward a moving target.
+   They launch along the caster's look, travel at 0.8 blocks/tick, curve toward
+   the locked target at up to 16 degrees/tick, and terminate after 20 blocks of
+   projectile travel if they have not impacted.
 10. Each Penance bolt damages only the hostile primary target. A nearby friendly
     player/entity within eight blocks of the impact receives/refreshes Priest
     Absorption instead of taking splash damage.
