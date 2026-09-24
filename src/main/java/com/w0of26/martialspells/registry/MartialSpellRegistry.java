@@ -62,6 +62,16 @@ public final class MartialSpellRegistry {
     public static final RegistryObject<AbstractSpell> PENANCE =
             SPELLS.register("penance", PaladinPenanceSpell::new);
 
+    public static final RegistryObject<AbstractSpell> PALADIN_BARRIER =
+            SPELLS.register("barrier", PaladinBarrierSpell::new);
+    public static final RegistryObject<AbstractSpell> BATTLE_BANNER =
+            SPELLS.register("battle_banner", PaladinBattleBannerSpell::new);
+    public static final RegistryObject<AbstractSpell> LIGHTWELL =
+            SPELLS.register("lightwell", PaladinLightwellSpell::new);
+    /** Internal helper identity; never bound as a player spell. */
+    public static final RegistryObject<AbstractSpell> LIGHTWELL_ORB =
+            SPELLS.register("lightwell_orb", PaladinLightwellOrbSpell::new);
+
     private MartialSpellRegistry() {}
 
     public static void register(IEventBus modEventBus) {
