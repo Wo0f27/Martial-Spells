@@ -15,7 +15,6 @@ import io.redspace.ironsspellbooks.api.spells.CastType;
 import io.redspace.ironsspellbooks.api.spells.SpellRarity;
 import io.redspace.ironsspellbooks.api.util.Utils;
 import io.redspace.ironsspellbooks.damage.DamageSources;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -103,6 +102,21 @@ public final class PaladinJudgementSpell extends AbstractSpell {
                                         target
                                 )
         );
+    }
+
+    @Override
+    public void onServerCastTick(
+            Level level,
+            int spellLevel,
+            LivingEntity entity,
+            MagicData magicData
+    ) {
+        if (level instanceof ServerLevel serverLevel) {
+            PaladinVfx.holyCasting(
+                    serverLevel,
+                    entity
+            );
+        }
     }
 
     @Override
@@ -235,28 +249,9 @@ public final class PaladinJudgementSpell extends AbstractSpell {
             }
         }
 
-        level.sendParticles(
-                ParticleTypes.END_ROD,
-                center.x,
-                center.y + 0.5D,
-                center.z,
-                100,
-                2.5D,
-                1.5D,
-                2.5D,
-                0.12D
-        );
-
-        level.sendParticles(
-                ParticleTypes.SMOKE,
-                center.x,
-                center.y + 0.25D,
-                center.z,
-                50,
-                2.0D,
-                0.75D,
-                2.0D,
-                0.08D
+        PaladinVfx.judgementImpact(
+                level,
+                center
         );
 
         level.playSound(
