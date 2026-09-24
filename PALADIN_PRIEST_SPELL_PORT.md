@@ -165,18 +165,20 @@ P3 translation:
   comment is not used as a replacement for the executable truncation order.
 - P3 target-side mana values are Holy Light 40, Levitate 25, Penance 45.
   These are balancing values, not upstream reagent fidelity.
-- P1-P3 presentation parity is restored without introducing Spell Engine as a
-  runtime dependency. Generic Spell Engine particle shapes are reconstructed
-  with Forge/vanilla particles using the frozen Holy/Nature palette.
-- Holy Light now renders a dense blocked golden beam path with source-style
-  casting, heal and damage impact effects.
-- Levitate restores the source pillar/pipe Holy particle language while
-  channeling and while its float effect remains active.
+- P1-P4 presentation parity was reopened after direct user comparison exposed
+  approximation drift. The current implementation reproduces the frozen
+  Spell Engine particle motions/shapes and Paladins custom renderers locally,
+  while keeping Spell Engine out of the runtime dependency graph.
+- Holy Light now uses the frozen beacon-beam prism geometry, source color,
+  width, UV flow, rotation and launch point rather than a crossed-line beam.
+- Levitate restores both its source channel Holy particles and its separate
+  persistent vanilla-cloud foot ring.
 - Penance restores the Lightwell-orb source model at 0.9x scale, 0.6-block
   orbit radius and 15-degree/tick spin, paired with a synchronized double-helix
   Holy trail plus source-style damage/shield area impacts.
 
-P3 status: **PASS** after local runtime validation of all P1-P3 spells, including the restored VFX/model layer.
+P3 mechanics status: **PASS**. P1-P3 presentation status:
+**REVALIDATING** after the source-faithful VFX/render pass.
 
 ### P4 — constructs and summons
 Status: **IMPLEMENTED / VALIDATING**
@@ -201,8 +203,9 @@ Status: **IMPLEMENTED / VALIDATING**
   - grants +40% base Attack Speed, Knockback Resistance, Iron's cast/cooldown
     haste translation, and Apothic `DRAW_SPEED` (the Forge RangedWeaponAPI
     ranged-haste backend).
-  - source model/texture/fullbright presentation restored; exact source
-    Blockbench keyframe clips remain final presentation polish.
+  - source model/texture/fullbright presentation and exact frozen `place`
+    and `idle` Blockbench keyframe clips restored; no renderer-wide spawn
+    scaling fallback remains.
 - Lightwell
   - instant; outer 45-second cooldown is fixed and ignores Iron's generic
     cooldown reduction, matching source summon-uptime behavior;
@@ -212,7 +215,8 @@ Status: **IMPLEMENTED / VALIDATING**
   - well source power is `1 + 0.5 * (Iron Holy power / 5)`;
   - Holy Mote cadence starts at 30 ticks and uses Iron's cooldown-reduction
     attribute as the target-system analogue of source Healing Haste;
-  - source base/glow model presentation, bob, lifecycle audio, spawn burst and
+  - source base/glow model presentation, bob, exact spawn/idle/release
+    keyframes, reverse spawn clip on despawn, lifecycle audio, spawn burst and
     active-only existence particles restored.
 - Holy Mote (`lightwell_orb`) internal helper
   - not intended for player binding;
