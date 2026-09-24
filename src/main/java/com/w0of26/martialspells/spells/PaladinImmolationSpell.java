@@ -183,13 +183,29 @@ public final class PaladinImmolationSpell extends AbstractSpell {
                         * SOURCE_DEFAULT_CRITICAL_MULTIPLIER;
             }
 
-            if (DamageSources.applyDamage(
-                    target,
-                    damage,
-                    getDamageSource(caster)
-            )) {
-                target.setSecondsOnFire(
-                        FIRE_DURATION_SECONDS
+            boolean damaged =
+                    DamageSources.applyDamage(
+                            target,
+                            damage,
+                            getDamageSource(caster)
+                    );
+
+            // Frozen FIRE is an independent harmful impact, not conditional
+            // on the preceding DAMAGE impact succeeding.
+            target.setSecondsOnFire(
+                    FIRE_DURATION_SECONDS
+            );
+
+            if (damaged) {
+                serverLevel.playSound(
+                        null,
+                        target.getX(),
+                        target.getY(),
+                        target.getZ(),
+                        MartialSoundRegistry.HOLY_SHOCK_DAMAGE.get(),
+                        SoundSource.PLAYERS,
+                        1.0F,
+                        1.0F
                 );
             }
         }
