@@ -13,7 +13,9 @@ Target:
 - school: `irons_spellbooks:holy`
 - no Spell Engine or Spell Power runtime dependency
 
-P0-P3 remain PASS. P5 stays locked until P4 receives local build and runtime PASS.
+P0-P3 mechanics remain PASS. P1-P4 presentation is being revalidated against
+the frozen upstream after approximation mismatches were identified. P5 stays
+locked until the integrated presentation/runtime gate passes.
 
 ## Frozen P4 contract
 
@@ -67,9 +69,10 @@ P0-P3 remain PASS. P5 stays locked until P4 receives local build and runtime PAS
   Attributes `DRAW_SPEED`; Battle Banner therefore adds its own +40%
   MULTIPLY_BASE draw-speed modifier. This stacks independently instead of
   competing with an existing RangedWeaponAPI Haste status effect.
-- Source banner geometry/texture and fullbright presentation are restored.
-  The exact upstream Blockbench keyframe clips remain final presentation polish;
-  P4 uses the source geometry with lifecycle scaling and a chained flag wave.
+- Source banner geometry/texture/fullbright presentation and the exact frozen
+  Blockbench `place` (2.15 s) and looping `idle` (2.5 s) clips are restored.
+  Spawn plays `place` forward and despawn plays it backward; the old
+  renderer-wide scale approximation is forbidden by the P4 audit.
 
 ### Lightwell
 - Legendary Holy spell.
@@ -95,8 +98,9 @@ P0-P3 remain PASS. P5 stays locked until P4 receives local build and runtime PAS
 - Source spawn/ambient/despawn audio, spawn burst, and active-only existence
   particles are retained.
 - Source base geometry, base texture, glow texture, fullbright emissive layer,
-  and 40-tick floating bob are restored. Exact upstream model keyframe clips
-  remain final presentation polish.
+  floating bob, and exact frozen `spawn`, `idle`, and `spell_release`
+  keyframe clips are restored. Despawn replays the spawn clip in reverse,
+  matching Spell Engine's summoned-entity lifecycle.
 
 ### Holy Mote (`lightwell_orb`)
 - Internal helper spell identity only; not intended for player binding.
