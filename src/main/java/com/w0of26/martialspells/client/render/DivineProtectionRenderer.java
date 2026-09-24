@@ -6,7 +6,6 @@ import com.mojang.math.Axis;
 import com.w0of26.martialspells.MartialSpells;
 import com.w0of26.martialspells.registry.MartialEffectRegistry;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -144,7 +143,7 @@ public final class DivineProtectionRenderer {
                     GLOW_LAYER,
                     poseStack,
                     bufferSource,
-                    LightTexture.FULL_BRIGHT
+                    packedLight
             );
 
             poseStack.popPose();
