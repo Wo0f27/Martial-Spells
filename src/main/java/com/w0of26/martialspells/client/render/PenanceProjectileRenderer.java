@@ -118,16 +118,8 @@ public final class PenanceProjectileRenderer
                 -0.5D
         );
 
-        int glowLight =
-                LightTexture.pack(
-                        12,
-                        12
-                );
         int effectiveLight =
-                Math.max(
-                        packedLight,
-                        glowLight
-                );
+                LightTexture.FULL_BRIGHT;
 
         Minecraft.getInstance()
                 .getItemRenderer()
