@@ -176,6 +176,8 @@ P3 translation:
   orbit radius and 15-degree/tick spin, paired with a synchronized double-helix
   Holy trail plus source-style damage/shield area impacts.
 
+P3 status: **PASS** after local runtime validation of all P1-P3 spells, including the restored VFX/model layer.
+
 ### P4 — constructs and summons
 - Barrier
 - Battle Banner
