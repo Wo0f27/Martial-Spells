@@ -137,6 +137,29 @@ P2 translation:
 - Levitate
 - Penance
 
+P3 translation:
+- Holy Light preserves Spell Engine BEAM semantics: every valid living entity
+  intersecting the current 32-block beam before the first blocking collider is
+  affected on each source-timed pulse; it is not reduced to a first-hit raycast.
+- Channel deliveries use Spell Engine's equal-interval midpoint schedule and
+  authored channel-value multipliers: Holy Light 25 releases over 5 seconds
+  (0.2x output per release), Levitate 4 releases over 1.5 seconds, and Penance
+  3 releases over 1.5 seconds (0.5x damage/knockback per bolt).
+- Levitate preserves reset-velocity +0.15Y releases, horizontal root during the
+  channel, 5-second Levitate refresh, vanilla Slow Falling as the 1.20.1 gravity
+  carrier, and the source's additional 3-second soft landing.
+- Penance preserves its sticky 20-block hostile target, 0.8 projectile speed,
+  16-degree/tick homing, 8-block no-falloff ally absorption pulse, and 6-second
+  absorption duration.
+- Penance follows the executable status-effect integer arithmetic: per bolt
+  stacks are `1 + floor(0.1 * Holy power)`; amplifier cap is
+  `2 + floor(0.3 * Holy power)`. The upstream "exactly one full volley"
+  comment is not used as a replacement for the executable truncation order.
+- P3 target-side mana values are Holy Light 40, Levitate 25, Penance 45.
+  These are balancing values, not upstream reagent fidelity.
+- Exact Holy Light beam rendering and Penance's orbiting Lightwell-orb model
+  remain P5 presentation work; P3 must still avoid missing-model geometry.
+
 ### P4 — constructs and summons
 - Barrier
 - Battle Banner
