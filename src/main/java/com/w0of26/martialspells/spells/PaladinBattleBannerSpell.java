@@ -72,10 +72,12 @@ public final class PaladinBattleBannerSpell extends AbstractSpell {
             LivingEntity caster
     ) {
         float power =
-                getSpellPower(
-                        1,
-                        caster
-                );
+                PaladinHolySpellSupport
+                        .getSourceEquivalentPower(
+                                this,
+                                1,
+                                caster
+                        );
 
         return BASE_RADIUS
                 + EXTRA_RADIUS_POWER_COEFFICIENT
