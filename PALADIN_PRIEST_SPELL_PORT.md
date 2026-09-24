@@ -199,7 +199,8 @@ Status: **IMPLEMENTED / VALIDATING**
     `Iron Holy power / 5`, because Spell Power 1.20.1's default Healing Power
     is 1.0. Baseline radius is therefore 4 blocks and the cap is 7.
   - grants +40% base Attack Speed, Knockback Resistance, Iron's cast/cooldown
-    haste translation, and RangedWeaponAPI draw haste.
+    haste translation, and Apothic `DRAW_SPEED` (the Forge RangedWeaponAPI
+    ranged-haste backend).
   - source model/texture/fullbright presentation restored; exact source
     Blockbench keyframe clips remain final presentation polish.
 - Lightwell
