@@ -70,6 +70,8 @@ foreach ($sound in @(
     Copy-PaladinAsset "sounds/$sound" "src/main/resources/assets/martial_spells/sounds/$sound"
 }
 
+Copy-SpellEngineAsset "textures/misc/item_glow.png" "src/main/resources/assets/martial_spells/textures/misc/paladin_item_glow.png"
+
 # Exact Paladins visuals reference a small subset of Spell Engine's GPLv3
 # particle artwork. These files are intentionally kept under paladin_source/
 # and pinned separately from the Paladins-owned assets above.
