@@ -52,14 +52,6 @@ public final class LightwellRenderer
             MultiBufferSource bufferSource,
             int packedLight
     ) {
-        float scale =
-                entity.lifecycleScale(
-                        partialTick
-                );
-        if (scale <= 0.0F) {
-            return;
-        }
-
         float age =
                 entity.tickCount + partialTick;
         float bob =
@@ -90,12 +82,6 @@ public final class LightwellRenderer
                 -1.5D,
                 0.0D
         );
-        poseStack.scale(
-                scale,
-                scale,
-                scale
-        );
-
         model.setupAnim(
                 entity,
                 0.0F,
