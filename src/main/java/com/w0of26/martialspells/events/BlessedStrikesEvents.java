@@ -124,20 +124,6 @@ public final class BlessedStrikesEvents {
         Player player =
                 event.player;
 
-        MobEffectInstance aura =
-                player.getEffect(
-                        MartialEffectRegistry.BLESSED_STRIKES.get()
-                );
-        if (aura != null
-                && player.level() instanceof ServerLevel serverLevel
-                && serverLevel.getGameTime() % 3L == 0L) {
-            PaladinVfx.blessedWeaponAura(
-                    serverLevel,
-                    player,
-                    aura.getAmplifier() + 1
-            );
-        }
-
         if (!player.getPersistentData().getBoolean(
                 PENDING_CONSUME_TAG
         )) {
