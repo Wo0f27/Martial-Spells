@@ -51,6 +51,7 @@ public final class PenanceProjectile
     ) {
         super(entityType, level);
         setNoGravity(true);
+        noCulling = true;
     }
 
     public PenanceProjectile(
