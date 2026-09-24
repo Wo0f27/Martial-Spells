@@ -1,6 +1,7 @@
 package com.w0of26.martialspells.client;
 
 import com.w0of26.martialspells.MartialSpells;
+import com.w0of26.martialspells.client.render.DivineProtectionRenderer;
 import com.w0of26.martialspells.client.render.PaladinBarrierRenderer;
 import com.w0of26.martialspells.client.render.HolyMoteRenderer;
 import com.w0of26.martialspells.client.render.LightwellRenderer;
@@ -53,6 +54,9 @@ public final class MartialClientEvents {
         MinecraftForge.EVENT_BUS.addListener(
                 NettedEffectRenderer::onRenderLivingPost
         );
+        MinecraftForge.EVENT_BUS.addListener(
+                DivineProtectionRenderer::onRenderLivingPost
+        );
         MartialSpells.LOGGER.info(
                 "Registered W4 Netted Forge render hook"
         );
@@ -82,6 +86,8 @@ public final class MartialClientEvents {
         event.register(NettedEffectRenderer.MODEL);
         event.register(PenanceProjectileRenderer.MODEL);
         event.register(JudgementVisualRenderer.MODEL);
+        event.register(DivineProtectionRenderer.BASE_MODEL);
+        event.register(DivineProtectionRenderer.GLOW_MODEL);
     }
 
     @SubscribeEvent
@@ -109,6 +115,18 @@ public final class MartialClientEvents {
             MartialSpells.LOGGER.error(
                     "Judgement projectile model failed to bake: {}",
                     JudgementVisualRenderer.MODEL
+            );
+        }
+        if (manager.getModel(DivineProtectionRenderer.BASE_MODEL) == manager.getMissingModel()) {
+            MartialSpells.LOGGER.error(
+                    "Divine Protection base model failed to bake: {}",
+                    DivineProtectionRenderer.BASE_MODEL
+            );
+        }
+        if (manager.getModel(DivineProtectionRenderer.GLOW_MODEL) == manager.getMissingModel()) {
+            MartialSpells.LOGGER.error(
+                    "Divine Protection glow model failed to bake: {}",
+                    DivineProtectionRenderer.GLOW_MODEL
             );
         }
         if (manager.getModel(HolyMoteRenderer.MODEL) == manager.getMissingModel()) {
