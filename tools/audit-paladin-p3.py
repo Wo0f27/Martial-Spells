@@ -227,15 +227,160 @@ for token in (
     if token not in entity_registry:
         errors.append(f"Penance entity registration missing {token}")
 
+for token in (
+    'ENTITY_TYPES.register("judgement_visual"',
+    ".updateInterval(1)",
+):
+    if token not in entity_registry:
+        errors.append(f"Judgement visual entity registration missing {token}")
+
 client_events = (root / "src/main/java/com/w0of26/martialspells/client/MartialClientEvents.java").read_text(encoding="utf-8")
-if "PenanceProjectileRenderer::new" not in client_events:
-    errors.append("Penance projectile renderer not registered")
+for token in (
+    "PenanceProjectileRenderer::new",
+    "JudgementVisualRenderer::new",
+    "event.register(PenanceProjectileRenderer.MODEL)",
+    "event.register(JudgementVisualRenderer.MODEL)",
+):
+    if token not in client_events:
+        errors.append(f"Paladin projectile presentation registration missing {token}")
 
 penance_renderer = (root / "src/main/java/com/w0of26/martialspells/client/render/PenanceProjectileRenderer.java").read_text(encoding="utf-8")
-if "extends EntityRenderer<PenanceProjectile>" not in penance_renderer:
-    errors.append("P3 Penance renderer must use the no-geometry EntityRenderer safety surface")
+for token in (
+    "extends EntityRenderer<PenanceProjectile>",
+    '"spell_projectile/lightwell_orb"',
+    "ORBIT_RADIUS = 0.6F",
+    "ORBIT_DEGREES_PER_TICK = 15.0F",
+    "SCALE = 0.9F",
+    "LightTexture.FULL_BRIGHT",
+):
+    if token not in penance_renderer:
+        errors.append(f"Penance source orb renderer missing {token}")
 if "ThrownItemRenderer" in penance_renderer:
-    errors.append("P3 Penance renderer must not substitute a placeholder item cube")
+    errors.append("Penance renderer must not substitute a placeholder item cube")
+
+judgement_visual = (entity_dir / "JudgementVisualEntity.java").read_text(encoding="utf-8")
+for token in (
+    "PaladinJudgementSpell.METEOR_VELOCITY",
+    "Math.toRadians(1.0D)",
+    "METEOR_TRAVEL_TICKS",
+    "PaladinVfx.judgementTrail",
+):
+    if token not in judgement_visual:
+        errors.append(f"Judgement visual entity missing {token}")
+
+judgement_renderer = (root / "src/main/java/com/w0of26/martialspells/client/render/JudgementVisualRenderer.java").read_text(encoding="utf-8")
+for token in (
+    '"spell_projectile/judgement"',
+    "SCALE = 1.2F",
+    "LightTexture.FULL_BRIGHT",
+):
+    if token not in judgement_renderer:
+        errors.append(f"Judgement source model renderer missing {token}")
+
+vfx = (spell_dir / "PaladinVfx.java").read_text(encoding="utf-8")
+for token in (
+    "new Vector3f(1.0F, 1.0F, 0.80F)",
+    "new Vector3f(1.0F, 0.80F, 0.40F)",
+    "new Vector3f(0.40F, 1.0F, 0.40F)",
+    "holyCasting(",
+    "healPillar(",
+    "holyBurst(",
+    "holyGlimmer(",
+    "circleOfHealingRelease(",
+    "immolationRelease(",
+    "divineProtectionPop(",
+    "blessedGather(",
+    "blessedWeaponAura(",
+    "holyBeam(",
+    "levitateChannel(",
+    "penanceHelix(",
+    "penanceAreaPulse(",
+    "judgementImpact(",
+):
+    if token not in vfx:
+        errors.append(f"PaladinVfx missing {token}")
+
+vfx_expectations = {
+    "PaladinHolyShockSpell.java": (
+        "PaladinVfx.holyCasting(",
+        "PaladinVfx.healPillar(",
+        "PaladinVfx.holyGlimmer(",
+        "PaladinVfx.holyBurst(",
+    ),
+    "PaladinFlashHealSpell.java": (
+        "PaladinVfx.holyCasting(",
+        "PaladinVfx.healPillar(",
+    ),
+    "PaladinCircleOfHealingSpell.java": (
+        "PaladinVfx.holyCasting(",
+        "PaladinVfx.circleOfHealingRelease(",
+        "PaladinVfx.healPillar(",
+        "PaladinVfx.holyGlimmer(",
+    ),
+    "PaladinBlessedStrikesSpell.java": (
+        "PaladinVfx.blessedGather(",
+        "PaladinVfx.blessedRelease(",
+    ),
+    "PaladinDivineProtectionSpell.java": (
+        "PaladinVfx.divineProtectionApply(",
+    ),
+    "PaladinJudgementSpell.java": (
+        "PaladinVfx.holyCasting(",
+        "PaladinVfx.judgementImpact(",
+    ),
+    "PaladinImmolationSpell.java": (
+        "PaladinVfx.immolationRelease(",
+        "PaladinVfx.healPillar(",
+        "PaladinVfx.holyBurst(",
+    ),
+    "PaladinHolyBeamSpell.java": (
+        "PaladinVfx.holyBeam(",
+        "PaladinVfx.healPillar(",
+        "PaladinVfx.holyGlimmer(",
+        "PaladinVfx.holyBurst(",
+        "PaladinVfx.holySparksAt(",
+    ),
+    "PaladinLevitateSpell.java": (
+        "PaladinVfx.levitateChannel(",
+    ),
+    "PaladinPenanceSpell.java": (
+        "PaladinVfx.penanceCasting(",
+    ),
+}
+for filename, tokens in vfx_expectations.items():
+    text = (spell_dir / filename).read_text(encoding="utf-8")
+    for token in tokens:
+        if token not in text:
+            errors.append(f"{filename} missing restored VFX call {token}")
+
+blessed_events = (root / "src/main/java/com/w0of26/martialspells/events/BlessedStrikesEvents.java").read_text(encoding="utf-8")
+for token in ("PaladinVfx.holyBurst(", "PaladinVfx.blessedWeaponAura("):
+    if token not in blessed_events:
+        errors.append(f"BlessedStrikesEvents missing restored VFX call {token}")
+
+divine_events = (root / "src/main/java/com/w0of26/martialspells/events/DivineProtectionEvents.java").read_text(encoding="utf-8")
+if "PaladinVfx.divineProtectionPop(" not in divine_events:
+    errors.append("DivineProtectionEvents missing source-style protection pop VFX")
+
+for token in (
+    "PaladinVfx.penanceHelix(",
+    "PaladinVfx.penanceImpact(",
+    "PaladinVfx.penanceShield(",
+    "PaladinVfx.penanceAreaPulse(",
+):
+    if token not in projectile:
+        errors.append(f"PenanceProjectile missing restored VFX call {token}")
+
+if "PaladinVfx.levitateChannel(" not in levitate_effect:
+    errors.append("LevitateEffect missing persistent float VFX")
+
+judgement_manager = (root / "src/main/java/com/w0of26/martialspells/combat/JudgementImpactManager.java").read_text(encoding="utf-8")
+for token in (
+    "new JudgementVisualEntity(",
+    "MartialEntityRegistry.JUDGEMENT_VISUAL.get()",
+):
+    if token not in judgement_manager:
+        errors.append(f"JudgementImpactManager missing model-VFX integration {token}")
 
 lang = json.loads((root / "src/main/resources/assets/martial_spells/lang/en_us.json").read_text(encoding="utf-8"))
 for key in (
@@ -281,6 +426,13 @@ if "2807417a1dd9a65204c002ded487da0e6ae467a1" not in sync_text:
 if "sync-paladin-p2-assets.ps1" not in sync_text:
     errors.append("P3 asset sync must re-assert finalized P2 assets first")
 
+for source_texture in (
+    "textures/spell_projectile/judgement.png",
+    "textures/spell_projectile/lightwell_orb.png",
+):
+    if source_texture not in sync_text:
+        errors.append(f"P3 asset sync missing VFX texture: {source_texture}")
+
 for spell_id in ("holy_beam", "levitate", "penance"):
     path = root / f"src/main/resources/assets/martial_spells/textures/gui/spell_icons/{spell_id}.png"
     if not path.is_file():
@@ -290,6 +442,14 @@ for effect_id in ("levitate", "priest_absorption"):
     path = root / f"src/main/resources/assets/martial_spells/textures/mob_effect/{effect_id}.png"
     if not path.is_file():
         errors.append(f"source effect icon missing; run P3 asset sync: {effect_id}.png")
+
+for projectile_model in ("judgement", "lightwell_orb"):
+    model_path = root / f"src/main/resources/assets/martial_spells/models/spell_projectile/{projectile_model}.json"
+    texture_path = root / f"src/main/resources/assets/martial_spells/textures/spell_projectile/{projectile_model}.png"
+    if not model_path.is_file():
+        errors.append(f"source projectile model missing: {projectile_model}.json")
+    if not texture_path.is_file():
+        errors.append(f"source projectile texture missing; run P3 asset sync: {projectile_model}.png")
 
 for sound in (
     "holy_beam_start_casting.ogg",
@@ -327,7 +487,9 @@ print(" - Penance: 1.5 sec / 3 look-launched homing bolts / 20-block travel cap"
 print(" - Penance: 0.5x per-bolt damage/knockback; 8-block no-falloff ally shield")
 print(" - early release: proportional mana + effective cooldown")
 print(" - target-side mana: 40 / 25 / 45")
-print(" - exact Penance orb model remains P5 presentation work")
+print(" - P1-P3 holy/healing particle language restored without Spell Engine runtime")
+print(" - Penance Lightwell orb model + 15 deg/tick orbit restored")
+print(" - Judgement source projectile model + fullbright meteor visual restored")
 
 if errors:
     print("CP11 P3 AUDIT FAILED")
