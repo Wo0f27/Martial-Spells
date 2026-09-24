@@ -140,12 +140,25 @@ judgement_manager = (combat_dir / "JudgementImpactManager.java").read_text(encod
 for token in (
     "METEOR_TRAVEL_TICKS",
     "METEOR_LAUNCH_HEIGHT",
-    "METEOR_VELOCITY",
     "TickEvent.PlayerTickEvent",
     "spell.resolveImpact",
 ):
     if token not in judgement_manager:
         errors.append(f"JudgementImpactManager missing {token}")
+
+judgement_visual_path = root / "src/main/java/com/w0of26/martialspells/entity/JudgementVisualEntity.java"
+if judgement_visual_path.is_file():
+    judgement_visual = judgement_visual_path.read_text(encoding="utf-8")
+    for token in (
+        "PaladinJudgementSpell.METEOR_VELOCITY",
+        "PaladinJudgementSpell.METEOR_TRAVEL_TICKS",
+    ):
+        if token not in judgement_visual:
+            errors.append(f"JudgementVisualEntity missing {token}")
+else:
+    # Pre-VFX P2 layout kept velocity in the impact manager.
+    if "METEOR_VELOCITY" not in judgement_manager:
+        errors.append("Judgement meteor velocity is not represented in manager or visual entity")
 
 for effect in ("BlessedStrikesEffect.java", "DivineProtectionEffect.java"):
     if not (effect_dir / effect).is_file():
