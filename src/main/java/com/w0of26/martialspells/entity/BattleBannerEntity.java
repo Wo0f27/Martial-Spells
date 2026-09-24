@@ -4,7 +4,6 @@ import com.w0of26.martialspells.registry.MartialEffectRegistry;
 import com.w0of26.martialspells.registry.MartialSoundRegistry;
 import com.w0of26.martialspells.spells.PaladinVfx;
 import io.redspace.ironsspellbooks.api.util.Utils;
-import net.fabric_extras.ranged_weapon.api.StatusEffects_RangedWeapon;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
@@ -155,21 +154,6 @@ public final class BattleBannerEntity extends Entity {
                             false,
                             true,
                             true
-                    ),
-                    owner
-            );
-
-            // Frozen Paladins applies +40% ranged haste. The Forge
-            // RangedWeaponAPI port represents haste as a 10%-per-level
-            // status effect, so amplifier 3 is the exact four-level mapping.
-            target.addEffect(
-                    new MobEffectInstance(
-                            StatusEffects_RangedWeapon.HASTE.effect,
-                            EFFECT_DURATION_TICKS,
-                            3,
-                            false,
-                            false,
-                            false
                     ),
                     owner
             );
