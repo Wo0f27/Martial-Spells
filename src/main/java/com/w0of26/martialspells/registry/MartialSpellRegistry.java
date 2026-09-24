@@ -39,8 +39,6 @@ public final class MartialSpellRegistry {
     public static final RegistryObject<AbstractSpell> LAST_STAND = SPELLS.register("last_stand", LastStandSpell::new);
 
     // CP11 Paladin/Priest Holy spell port.
-    public static final RegistryObject<AbstractSpell> HEAL =
-            SPELLS.register("heal", PaladinHealSpell::new);
     public static final RegistryObject<AbstractSpell> HOLY_SHOCK =
             SPELLS.register("holy_shock", PaladinHolyShockSpell::new);
     public static final RegistryObject<AbstractSpell> FLASH_HEAL =

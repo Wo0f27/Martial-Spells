@@ -25,10 +25,6 @@ lang = json.loads((root / "src/main/resources/assets/martial_spells/lang/en_us.j
 sounds = json.loads((root / "src/main/resources/assets/martial_spells/sounds.json").read_text(encoding="utf-8"))
 
 contract = {
-    "PaladinHealSpell.java": {
-        "id": "heal", "rarity": "COMMON", "cast": "20",
-        "cooldown": "4", "coefficient": "0.50F", "mana": "15",
-    },
     "PaladinHolyShockSpell.java": {
         "id": "holy_shock", "rarity": "UNCOMMON", "cast": "30",
         "cooldown": "3", "coefficient": "0.80F", "mana": "20",
@@ -77,14 +73,18 @@ for token in (
     if token not in support:
         errors.append(f"PaladinHolySpellSupport missing {token}")
 
-heal = (spell_dir / "PaladinHealSpell.java").read_text(encoding="utf-8")
+if (spell_dir / "PaladinHealSpell.java").exists():
+    errors.append("redundant custom PaladinHealSpell.java must remain removed")
+
+if 'SPELLS.register("heal"' in registry:
+    errors.append("redundant martial_spells:heal registration must remain removed")
+
 flash = (spell_dir / "PaladinFlashHealSpell.java").read_text(encoding="utf-8")
 shock = (spell_dir / "PaladinHolyShockSpell.java").read_text(encoding="utf-8")
 circle = (spell_dir / "PaladinCircleOfHealingSpell.java").read_text(encoding="utf-8")
 
-for name, text in (("Heal", heal), ("Flash Heal", flash)):
-    if "targetFriendlyOrSelf" not in text or "Utils.shouldHealEntity" not in text:
-        errors.append(f"{name}: friendly-target/self-fallback contract missing")
+if "targetFriendlyOrSelf" not in flash or "Utils.shouldHealEntity" not in flash:
+    errors.append("Flash Heal: friendly-target/self-fallback contract missing")
 
 for token in (
     "targetAnyOrSelf",
@@ -109,7 +109,6 @@ for token in (
         errors.append(f"Circle of Healing contract missing {token}")
 
 for spell_id, class_name in (
-    ("heal", "PaladinHealSpell::new"),
     ("holy_shock", "PaladinHolyShockSpell::new"),
     ("flash_heal", "PaladinFlashHealSpell::new"),
     ("circle_of_healing", "PaladinCircleOfHealingSpell::new"),
@@ -118,7 +117,6 @@ for spell_id, class_name in (
         errors.append(f"spell registry missing {spell_id}")
 
 for key in (
-    "spell.martial_spells.heal",
     "spell.martial_spells.holy_shock",
     "spell.martial_spells.flash_heal",
     "spell.martial_spells.circle_of_healing",
@@ -136,7 +134,7 @@ sync_text = (root / "tools/sync-paladin-p1-assets.ps1").read_text(encoding="utf-
 if "2807417a1dd9a65204c002ded487da0e6ae467a1" not in sync_text:
     errors.append("P1 asset sync is not pinned to frozen Paladins commit")
 
-for spell_id in ("heal", "holy_shock", "flash_heal", "circle_of_healing"):
+for spell_id in ("holy_shock", "flash_heal", "circle_of_healing"):
     icon = root / f"src/main/resources/assets/martial_spells/textures/gui/spell_icons/{spell_id}.png"
     if not icon.is_file():
         errors.append(f"source icon missing; run P1 asset sync: {spell_id}.png")
@@ -153,12 +151,13 @@ for forbidden in ("spell_engine", "spell-power", "spell_power"):
 
 print("")
 print("CP11 P1 Holy healing summary")
-print(" - spells: 4")
+print(" - custom spells: 3")
 print(" - school: irons_spellbooks:holy")
 print(" - source power reference: 5")
-print(" - exact source coefficients: 0.5 / 0.4+0.8 / 1.2 / 0.4")
-print(" - source icons: 4")
+print(" - exact source coefficients: 0.4+0.8 / 1.2 / 0.4")
+print(" - source icons: 3")
 print(" - source-only impact sounds: 2")
+print(" - upstream Heal: intentionally not ported; native Iron's healing retained")
 
 if errors:
     print("CP11 P1 AUDIT FAILED")

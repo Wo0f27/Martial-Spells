@@ -17,8 +17,14 @@ function Copy-PaladinAsset {
     Invoke-WebRequest -Uri $source -OutFile $target -UseBasicParsing -Headers @{ "User-Agent" = "Martial-Spells-Paladin-P1-sync" }
 }
 
-foreach ($spell in @("heal", "holy_shock", "flash_heal", "circle_of_healing")) {
+foreach ($spell in @("holy_shock", "flash_heal", "circle_of_healing")) {
     Copy-PaladinAsset "textures/spell/$spell.png" "src/main/resources/assets/martial_spells/textures/gui/spell_icons/$spell.png"
+}
+
+$RemovedHealIcon = Join-Path $TargetRoot "src/main/resources/assets/martial_spells/textures/gui/spell_icons/heal.png"
+if (Test-Path $RemovedHealIcon) {
+    Remove-Item -Force $RemovedHealIcon
+    Write-Host "remove redundant custom Heal icon"
 }
 
 foreach ($sound in @("holy_shock_heal.ogg", "holy_shock_damage.ogg")) {

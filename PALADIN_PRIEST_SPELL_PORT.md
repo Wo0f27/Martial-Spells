@@ -23,6 +23,7 @@ The upstream frozen source contains 15 spell JSONs. Fourteen are player-facing; 
 
 ### Holy Wand source binding
 - `heal` — **Heal**, tier 0, Priest Holy, 16-block aimed friendly heal with self fallback.
+- Migration decision: **do not register `martial_spells:heal`**. Iron's already supplies the basic Holy-healing role; the eventual Holy Wand integration will use native `irons_spellbooks:blessing_of_life` as the closest targeted-heal replacement instead of duplicating Heal under a second namespace.
 
 ### Holy Staff source binding
 - `holy_shock` — **Holy Shock**, tier 1, Priest Holy, 16-block aimed dual-purpose heal-or-damage spell.
@@ -101,17 +102,17 @@ Each source spell initially has **max level 1**. Source coefficients, durations,
 Inventory and freeze the exact source/target contract. No gameplay implementation.
 
 ### P1 — Holy healing core
-- Heal
 - Flash Heal
 - Holy Shock
 - Circle of Healing
+- Upstream Heal is intentionally not ported because Iron's already covers the basic targeted/self-healing role.
 
 P1 target normalization:
-- all four spells use a shared Iron's base spell power reference of **5.0**,
+- the three custom spells use a shared Iron's base spell power reference of **5**,
 - frozen source coefficients remain exact multipliers over that reference,
-- unmodified target baselines are therefore Heal 2.5, Flash Heal 6.0, Holy Shock 2.0 heal / 4.0 damage, Circle of Healing 2.0 per target,
+- unmodified target baselines are Flash Heal 6.0, Holy Shock 2.0 heal / 4.0 damage, Circle of Healing 2.0 per target,
 - Iron's generic Spell Power and Holy Spell Power then scale those values normally,
-- P1 mana values are target-side balance values: Heal 15, Holy Shock 20, Flash Heal 30, Circle of Healing 40,
+- P1 mana values are target-side balance values: Holy Shock 20, Flash Heal 30, Circle of Healing 40,
 - those mana values are not claimed as upstream Spell Engine fidelity.
 
 ### P2 — Retribution and protection core
@@ -133,7 +134,7 @@ P1 target normalization:
 
 ### P5 — bindings, presentation and final integration
 - Paladin/Priest grouping
-- source-equivalent Holy Wand -> Heal binding
+- source-equivalent Holy Wand -> native Iron's Blessing of Life binding
 - source-equivalent Holy Staff -> Holy Shock binding
 - spell icons/lang/SFX/models
 - equipment soft integration
