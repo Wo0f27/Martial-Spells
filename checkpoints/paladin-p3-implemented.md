@@ -16,9 +16,11 @@ P4/P5 remain locked until explicit P3 runtime PASS.
 - Early channel release keeps already delivered impacts and applies a
   proportional share of target-side mana and the current effective Iron's
   cooldown.
-- Holy Light: Rare Holy, 32-block live aim, 5-second source duration,
+- Holy Light: Rare Holy, 32-block live BEAM, 5-second source duration,
   25 deliveries, source 0.2 channel multiplier, 0.4 heal / 0.8 damage
-  coefficients and source 0.5 knockback before channel normalization.
+  coefficients and source 0.5 knockback before channel normalization. Every
+  valid entity intersecting the live beam before the first blocking collider is
+  affected; hostile damage preserves Spell Engine's default iframe bypass.
 - Levitate: Rare Holy, 1.5-second source duration, four midpoint releases,
   horizontal movement lock, reset velocity to +0.15Y on each release,
   five-second Levitate refresh, Slow Falling carrier on Minecraft 1.20.1 and
@@ -64,32 +66,37 @@ Runtime checks:
 3. Holding Holy Light on an ally heals in many small pulses; holding it on a
    hostile target deals many small damage pulses. Moving aim during the channel
    changes which entity receives later pulses.
-4. A full Holy Light channel produces 25 deliveries. Releasing around half way
-   keeps delivered impacts and produces roughly half the normal effective
-   cooldown and mana cost.
-5. Levitate appears as a one-level Rare Holy spell and horizontally roots the
+4. Put two or more valid entities directly along the same unobstructed Holy
+   Light beam. Each should receive the same pulse; placing a solid wall between
+   the caster and a farther target must prevent that farther target from being
+   affected.
+5. A full Holy Light channel produces 25 deliveries. Rapid 4-tick damage pulses
+   must all land rather than being swallowed by vanilla hurt i-frames. Releasing
+   around half way keeps delivered impacts and produces roughly half the normal
+   effective cooldown and mana cost.
+6. Levitate appears as a one-level Rare Holy spell and horizontally roots the
    caster while channeling.
-6. A full Levitate channel gives four distinct upward kicks. Each kick resets
+7. A full Levitate channel gives four distinct upward kicks. Each kick resets
    movement rather than accelerating from the prior kick.
-7. Releasing Levitate stops further ascent; the five-second Levitate effect
+8. Releasing Levitate stops further ascent; the five-second Levitate effect
    remains and the player descends under Slow Falling. The source maintains a
    three-second Slow Falling buffer only when that carrier is refreshed; on a
    full four-kick channel the executable refresh guard means the post-Levitate
    tail can be shorter than three seconds. It must still land softly.
-8. Penance requires a hostile target within 20 blocks and keeps that target
+9. Penance requires a hostile target within 20 blocks and keeps that target
    locked through the channel.
-9. A full Penance channel launches exactly three visible particle-traced bolts.
+10. A full Penance channel launches exactly three visible particle-traced bolts.
    They launch along the caster's look, travel at 0.8 blocks/tick, curve toward
    the locked target at up to 16 degrees/tick, and terminate after 20 blocks of
    projectile travel if they have not impacted.
-10. Each Penance bolt damages only the hostile primary target. A nearby friendly
+11. Each Penance bolt damages only the hostile primary target. A nearby friendly
     player/entity within eight blocks of the impact receives/refreshes Priest
     Absorption instead of taking splash damage.
-11. Repeated bolts increase the absorption stack to the one-volley cap; the
+12. Repeated bolts increase the absorption stack to the one-volley cap; the
     effect lasts six seconds. Allies outside eight blocks receive no shield.
-12. Penance's projectile must never display a purple/black missing-model cube.
+13. Penance's projectile must never display a purple/black missing-model cube.
     The final orbiting source orb is intentionally deferred to P5.
-13. Early release of Holy Light, Levitate, and Penance gives proportional mana
+14. Early release of Holy Light, Levitate, and Penance gives proportional mana
     and effective cooldown rather than a free partial cast or the full cooldown.
 
 P3 remains **VALIDATING**, not PASS, until the user explicitly confirms this
