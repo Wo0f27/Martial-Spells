@@ -5,6 +5,7 @@ import com.w0of26.martialspells.registry.MartialEffectRegistry;
 import com.w0of26.martialspells.registry.MartialSpellRegistry;
 import com.w0of26.martialspells.registry.MartialSoundRegistry;
 import com.w0of26.martialspells.spells.PaladinBlessedStrikesSpell;
+import com.w0of26.martialspells.spells.PaladinVfx;
 import io.redspace.ironsspellbooks.damage.DamageSources;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -85,6 +86,13 @@ public final class BlessedStrikesEvents {
             );
 
             if (target.level() instanceof ServerLevel serverLevel) {
+                PaladinVfx.holyBurst(
+                        serverLevel,
+                        target,
+                        30,
+                        0.70D
+                );
+
                 serverLevel.playSound(
                         null,
                         target.getX(),
@@ -115,6 +123,20 @@ public final class BlessedStrikesEvents {
 
         Player player =
                 event.player;
+
+        MobEffectInstance aura =
+                player.getEffect(
+                        MartialEffectRegistry.BLESSED_STRIKES.get()
+                );
+        if (aura != null
+                && player.level() instanceof ServerLevel serverLevel
+                && serverLevel.getGameTime() % 3L == 0L) {
+            PaladinVfx.blessedWeaponAura(
+                    serverLevel,
+                    player,
+                    aura.getAmplifier() + 1
+            );
+        }
 
         if (!player.getPersistentData().getBoolean(
                 PENDING_CONSUME_TAG
