@@ -200,6 +200,17 @@ public final class PaladinHolyBeamSpell extends AbstractSpell {
          * cuts the beam off. Rebuild that behavior on Iron's own intersection
          * helper instead of approximating BEAM with RaycastBuilder#build().
          */
+        Vec3 beamEnd =
+                beamEnd(
+                        level,
+                        caster
+                );
+        PaladinVfx.holyBeam(
+                level,
+                caster,
+                beamEnd
+        );
+
         for (LivingEntity target : targetsOnBeam(
                 level,
                 caster
@@ -213,6 +224,19 @@ public final class PaladinHolyBeamSpell extends AbstractSpell {
                         target,
                         HEAL_COEFFICIENT
                                 * CHANNEL_VALUE_MULTIPLIER
+                );
+
+                PaladinVfx.healPillar(
+                        level,
+                        target,
+                        1
+                );
+                PaladinVfx.holyGlimmer(
+                        level,
+                        target,
+                        1,
+                        0.20D,
+                        0.25D
                 );
 
                 playImpactSound(
@@ -243,6 +267,21 @@ public final class PaladinHolyBeamSpell extends AbstractSpell {
                         caster.getZ() - target.getZ()
                 );
 
+                PaladinVfx.holyBurst(
+                        level,
+                        target,
+                        3,
+                        0.70D
+                );
+                PaladinVfx.holySparksAt(
+                        level,
+                        target.getBoundingBox().getCenter(),
+                        6,
+                        Math.max(0.25D, target.getBbWidth() * 0.5D),
+                        0.20D,
+                        0.40D
+                );
+
                 playImpactSound(
                         level,
                         target,
@@ -250,6 +289,35 @@ public final class PaladinHolyBeamSpell extends AbstractSpell {
                 );
             }
         }
+    }
+
+    private static Vec3 beamEnd(
+            ServerLevel level,
+            ServerPlayer caster
+    ) {
+        Vec3 start = caster.getEyePosition();
+        Vec3 end =
+                start.add(
+                        caster.getLookAngle()
+                                .normalize()
+                                .scale(RANGE)
+                );
+
+        HitResult blockHit =
+                level.clip(
+                        new ClipContext(
+                                start,
+                                end,
+                                ClipContext.Block.COLLIDER,
+                                ClipContext.Fluid.NONE,
+                                caster
+                        )
+                );
+
+        return blockHit.getType()
+                == HitResult.Type.BLOCK
+                ? blockHit.getLocation()
+                : end;
     }
 
     private static List<LivingEntity> targetsOnBeam(
