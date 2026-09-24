@@ -190,8 +190,71 @@ public final class PaladinBarrierRenderer
                             );
                 }
 
+                Matrix4f currentPose =
+                        new Matrix4f(
+                                poseStack.last().pose()
+                        );
+                Matrix3f currentNormal =
+                        new Matrix3f(
+                                poseStack.last().normal()
+                        );
+
                 renderPanel(
-                        poseStack,
+                        currentPose,
+                        currentNormal,
+                        vertices,
+                        sprite,
+                        LightTexture.FULL_BRIGHT,
+                        red,
+                        green,
+                        blue,
+                        alpha
+                );
+
+                poseStack.popPose();
+
+                // Frozen upstream closes the seam between adjacent panels with
+                // a connector wedge. Omitting this is what produced the visible
+                // gaps in the first P4 translation.
+                poseStack.pushPose();
+
+                if (half == 0) {
+                    poseStack.mulPose(
+                            Axis.XP.rotationDegrees(
+                                    180.0F
+                            )
+                    );
+                }
+
+                poseStack.mulPose(
+                        Axis.YP.rotation(
+                                (float) (
+                                        (panel - 1)
+                                                / 3.0D
+                                                * Math.PI
+                                )
+                        )
+                );
+                poseStack.translate(
+                        OFFSET,
+                        0.0D,
+                        0.0D
+                );
+                poseStack.mulPose(
+                        Axis.ZP.rotation(
+                                Z_SLANT
+                        )
+                );
+
+                Matrix4f previousPose =
+                        new Matrix4f(
+                                poseStack.last().pose()
+                        );
+
+                renderConnector(
+                        currentPose,
+                        previousPose,
+                        currentNormal,
                         vertices,
                         sprite,
                         LightTexture.FULL_BRIGHT,
@@ -218,7 +281,8 @@ public final class PaladinBarrierRenderer
     }
 
     private static void renderPanel(
-            PoseStack poseStack,
+            Matrix4f pose,
+            Matrix3f normal,
             VertexConsumer vertices,
             TextureAtlasSprite sprite,
             int packedLight,
@@ -227,11 +291,6 @@ public final class PaladinBarrierRenderer
             float blue,
             float alpha
     ) {
-        Matrix4f pose =
-                poseStack.last().pose();
-        Matrix3f normal =
-                poseStack.last().normal();
-
         float u1 = sprite.getU0();
         float u2 = sprite.getU1();
         float v1 = sprite.getV0();
@@ -298,6 +357,149 @@ public final class PaladinBarrierRenderer
                 u2,
                 v1,
                 u2,
+                v2
+        );
+    }
+
+    private static void renderConnector(
+            Matrix4f currentPose,
+            Matrix4f previousPose,
+            Matrix3f normal,
+            VertexConsumer vertices,
+            TextureAtlasSprite sprite,
+            int packedLight,
+            float red,
+            float green,
+            float blue,
+            float alpha
+    ) {
+        float u1 = sprite.getU0();
+        float u2 = sprite.getU1();
+        float v1 = sprite.getV0();
+        float v2 = sprite.getV1();
+
+        // Same degenerate-quad triangle used upstream: current panel top/foot
+        // joined to the neighbouring panel's foot. Drawn both directions so
+        // the dome is visible identically from inside and outside.
+        vertex(
+                currentPose,
+                normal,
+                vertices,
+                packedLight,
+                0.0F,
+                RADIUS,
+                SIZE,
+                red,
+                green,
+                blue,
+                0.0F,
+                u2,
+                v2
+        );
+        vertex(
+                currentPose,
+                normal,
+                vertices,
+                packedLight,
+                0.0F,
+                0.0F,
+                SIZE,
+                red,
+                green,
+                blue,
+                alpha,
+                u2,
+                v1
+        );
+        vertex(
+                previousPose,
+                normal,
+                vertices,
+                packedLight,
+                0.0F,
+                0.0F,
+                -SIZE,
+                red,
+                green,
+                blue,
+                alpha,
+                u1,
+                v1
+        );
+        vertex(
+                currentPose,
+                normal,
+                vertices,
+                packedLight,
+                0.0F,
+                RADIUS,
+                SIZE,
+                red,
+                green,
+                blue,
+                0.0F,
+                u1,
+                v2
+        );
+
+        vertex(
+                currentPose,
+                normal,
+                vertices,
+                packedLight,
+                0.0F,
+                RADIUS,
+                SIZE,
+                red,
+                green,
+                blue,
+                0.0F,
+                u2,
+                v2
+        );
+        vertex(
+                previousPose,
+                normal,
+                vertices,
+                packedLight,
+                0.0F,
+                0.0F,
+                -SIZE,
+                red,
+                green,
+                blue,
+                alpha,
+                u1,
+                v1
+        );
+        vertex(
+                currentPose,
+                normal,
+                vertices,
+                packedLight,
+                0.0F,
+                0.0F,
+                SIZE,
+                red,
+                green,
+                blue,
+                alpha,
+                u2,
+                v1
+        );
+        vertex(
+                currentPose,
+                normal,
+                vertices,
+                packedLight,
+                0.0F,
+                RADIUS,
+                SIZE,
+                red,
+                green,
+                blue,
+                0.0F,
+                u1,
                 v2
         );
     }
