@@ -3,7 +3,7 @@ package com.w0of26.martialspells.events;
 import com.w0of26.martialspells.MartialSpells;
 import com.w0of26.martialspells.registry.MartialEffectRegistry;
 import com.w0of26.martialspells.registry.MartialSoundRegistry;
-import net.minecraft.core.particles.ParticleTypes;
+import com.w0of26.martialspells.spells.PaladinVfx;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -72,16 +72,9 @@ public final class DivineProtectionEvents {
         }
 
         if (target.level() instanceof ServerLevel serverLevel) {
-            serverLevel.sendParticles(
-                    ParticleTypes.END_ROD,
-                    target.getX(),
-                    target.getY() + target.getBbHeight() * 0.5D,
-                    target.getZ(),
-                    25,
-                    target.getBbWidth() * 0.65D,
-                    target.getBbHeight() * 0.45D,
-                    target.getBbWidth() * 0.65D,
-                    0.12D
+            PaladinVfx.divineProtectionPop(
+                    serverLevel,
+                    target
             );
 
             serverLevel.playSound(
