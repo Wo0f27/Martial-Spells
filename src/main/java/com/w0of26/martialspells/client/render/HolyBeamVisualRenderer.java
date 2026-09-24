@@ -2,31 +2,53 @@ package com.w0of26.martialspells.client.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Axis;
 import com.w0of26.martialspells.entity.HolyBeamVisualEntity;
 import com.w0of26.martialspells.spells.PaladinHolyBeamSpell;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Matrix4f;
 
 /**
- * Continuous source-style golden beam for Holy Light.
+ * Source-faithful Spell Engine 1.20.1 beam renderer for frozen Paladins Holy
+ * Light.
  *
- * <p>Spell Engine's original beam used color 0xFFCC66FF and flow 1.5. The
- * Forge translation renders a fullbright additive crossed beam in the same
- * gold palette, while PaladinVfx supplies the flowing spark layer.</p>
+ * <p>The upstream spell uses Minecraft's beacon-beam texture, a 0.1-wide
+ * white center, two wider #FFCC66 outer layers, flow 1.5 and a continuously
+ * rotating rectangular prism. This renderer mirrors BeamRenderer's geometry
+ * and UV math locally so Spell Engine remains absent at runtime.</p>
  */
 public final class HolyBeamVisualRenderer
         extends EntityRenderer<HolyBeamVisualEntity> {
-    private static final double OUTER_WIDTH = 0.055D;
-    private static final double INNER_WIDTH = 0.020D;
+    private static final ResourceLocation BEAM_TEXTURE =
+            ResourceLocation.fromNamespaceAndPath(
+                    "minecraft",
+                    "textures/entity/beacon_beam.png"
+            );
+
+    private static final float WIDTH = 0.10F;
+    private static final float FLOW = 1.50F;
+
+    private static final int INNER_RED = 255;
+    private static final int INNER_GREEN = 255;
+    private static final int INNER_BLUE = 255;
+    private static final int INNER_ALPHA = 255;
+
+    private static final int OUTER_RED = 255;
+    private static final int OUTER_GREEN = 204;
+    private static final int OUTER_BLUE = 102;
+    private static final int OUTER_ALPHA = 255;
 
     public HolyBeamVisualRenderer(
             EntityRendererProvider.Context context
@@ -44,21 +66,27 @@ public final class HolyBeamVisualRenderer
             MultiBufferSource bufferSource,
             int packedLight
     ) {
-        Entity owner =
+        Entity resolvedOwner =
                 beam.level().getEntity(
                         beam.getOwnerEntityId()
                 );
-        if (owner == null) {
+        if (!(resolvedOwner instanceof LivingEntity owner)) {
             return;
         }
 
-        Vec3 start =
-                owner.getEyePosition(partialTick);
         Vec3 look =
-                owner.getViewVector(partialTick)
-                        .normalize();
+                owner == Minecraft.getInstance().player
+                        ? owner.getLookAngle().normalize()
+                        : owner.getViewVector(partialTick).normalize();
+
+        Vec3 launchPoint =
+                sourceLaunchPoint(
+                        owner,
+                        look
+                );
+
         Vec3 maxEnd =
-                start.add(
+                launchPoint.add(
                         look.scale(
                                 PaladinHolyBeamSpell.RANGE
                         )
@@ -67,7 +95,7 @@ public final class HolyBeamVisualRenderer
         HitResult blockHit =
                 beam.level().clip(
                         new ClipContext(
-                                start,
+                                launchPoint,
                                 maxEnd,
                                 ClipContext.Block.COLLIDER,
                                 ClipContext.Fluid.NONE,
@@ -75,70 +103,94 @@ public final class HolyBeamVisualRenderer
                         )
                 );
 
-        Vec3 end =
+        float length =
                 blockHit.getType()
                         == HitResult.Type.BLOCK
-                        ? blockHit.getLocation()
-                        : maxEnd;
+                        ? (float) launchPoint.distanceTo(
+                                blockHit.getLocation()
+                        )
+                        : PaladinHolyBeamSpell.RANGE;
 
-        Vec3 beamOrigin =
-                beam.getPosition(partialTick);
-        Vec3 localStart =
-                start.subtract(beamOrigin);
-        Vec3 localEnd =
-                end.subtract(beamOrigin);
-        Vec3 delta =
-                localEnd.subtract(localStart);
-        if (delta.lengthSqr() <= 1.0E-8D) {
+        if (length <= 1.0E-5F) {
             return;
         }
 
-        Vec3 direction =
-                delta.normalize();
-        Vec3 reference =
-                Math.abs(direction.y) < 0.95D
-                        ? new Vec3(0.0D, 1.0D, 0.0D)
-                        : new Vec3(1.0D, 0.0D, 0.0D);
-        Vec3 side =
-                direction.cross(reference)
-                        .normalize();
-        Vec3 up =
-                side.cross(direction)
-                        .normalize();
+        /*
+         * BeamRenderer translates to the caster's interpolated position, then
+         * to shoulder height. Its final +0.5 forward launch offset is applied
+         * after the beam-direction rotation as a local-Y translation.
+         */
+        Vec3 ownerPosition =
+                owner.getPosition(partialTick);
+        Vec3 beamPosition =
+                beam.getPosition(partialTick);
+        float launchHeight =
+                owner.getEyeHeight()
+                        - owner.getBbHeight() * 0.15F;
 
-        VertexConsumer vertices =
-                bufferSource.getBuffer(
-                        RenderType.lightning()
+        poseStack.pushPose();
+        poseStack.translate(
+                ownerPosition.x - beamPosition.x,
+                ownerPosition.y - beamPosition.y
+                        + launchHeight,
+                ownerPosition.z - beamPosition.z
+        );
+
+        float inclination =
+                (float) Math.acos(
+                        Mth.clamp(
+                                look.y,
+                                -1.0D,
+                                1.0D
+                        )
                 );
-        Matrix4f matrix =
-                poseStack.last().pose();
+        float azimuth =
+                (float) Math.atan2(
+                        look.z,
+                        look.x
+                );
 
-        renderCross(
-                matrix,
-                vertices,
-                localStart,
-                localEnd,
-                side,
-                up,
-                OUTER_WIDTH,
-                255,
-                204,
-                102,
-                145
+        poseStack.mulPose(
+                Axis.YP.rotationDegrees(
+                        (1.5707964F - azimuth)
+                                * 57.295776F
+                )
         );
-        renderCross(
-                matrix,
-                vertices,
-                localStart,
-                localEnd,
-                side,
-                up,
-                INNER_WIDTH,
-                255,
-                255,
-                214,
-                230
+        poseStack.mulPose(
+                Axis.XP.rotationDegrees(
+                        inclination
+                                * 57.295776F
+                )
         );
+        poseStack.translate(
+                0.0D,
+                0.50D,
+                0.0D
+        );
+
+        float absoluteTime =
+                (float) Math.floorMod(
+                        beam.level().getGameTime(),
+                        40L
+                )
+                        + partialTick;
+
+        poseStack.mulPose(
+                Axis.YP.rotationDegrees(
+                        absoluteTime * 2.25F
+                                - 45.0F
+                )
+        );
+
+        renderBeam(
+                poseStack,
+                bufferSource,
+                beam.level().getGameTime(),
+                partialTick,
+                length
+        );
+
+        poseStack.popPose();
 
         super.render(
                 beam,
@@ -146,116 +198,299 @@ public final class HolyBeamVisualRenderer
                 partialTick,
                 poseStack,
                 bufferSource,
-                packedLight
+                LightTexture.FULL_BRIGHT
         );
     }
 
-    private static void renderCross(
-            Matrix4f matrix,
-            VertexConsumer vertices,
-            Vec3 start,
-            Vec3 end,
-            Vec3 side,
-            Vec3 up,
-            double width,
-            int red,
-            int green,
-            int blue,
-            int alpha
+    private static Vec3 sourceLaunchPoint(
+            LivingEntity owner,
+            Vec3 look
     ) {
-        renderQuad(
-                matrix,
-                vertices,
-                start,
-                end,
-                side.scale(width),
-                red,
-                green,
-                blue,
-                alpha
-        );
-        renderQuad(
-                matrix,
-                vertices,
-                start,
-                end,
-                up.scale(width),
-                red,
-                green,
-                blue,
-                alpha
-        );
+        return owner.position()
+                .add(
+                        0.0D,
+                        owner.getEyeHeight()
+                                - owner.getBbHeight()
+                                * 0.15D,
+                        0.0D
+                )
+                .add(
+                        look.scale(0.50D)
+                );
     }
 
-    private static void renderQuad(
-            Matrix4f matrix,
-            VertexConsumer vertices,
-            Vec3 start,
-            Vec3 end,
-            Vec3 offset,
-            int red,
-            int green,
-            int blue,
-            int alpha
+    private static void renderBeam(
+            PoseStack poseStack,
+            MultiBufferSource buffers,
+            long gameTime,
+            float partialTick,
+            float height
     ) {
-        vertex(
-                matrix,
-                vertices,
-                start.add(offset),
-                red,
-                green,
-                blue,
-                alpha
+        float shift =
+                (float) Math.floorMod(
+                        gameTime,
+                        40L
+                )
+                        + partialTick;
+
+        float offset =
+                Mth.frac(
+                        shift * 0.20F
+                                - Mth.floor(
+                                        shift * 0.10F
+                                )
+                )
+                        * -FLOW;
+
+        VertexConsumer inner =
+                buffers.getBuffer(
+                        RenderType.beaconBeam(
+                                BEAM_TEXTURE,
+                                false
+                        )
+                );
+        VertexConsumer outer =
+                buffers.getBuffer(
+                        RenderType.beaconBeam(
+                                BEAM_TEXTURE,
+                                true
+                        )
+                );
+
+        renderBeamLayer(
+                poseStack,
+                inner,
+                INNER_RED,
+                INNER_GREEN,
+                INNER_BLUE,
+                INNER_ALPHA,
+                height,
+                WIDTH,
+                offset
         );
-        vertex(
-                matrix,
-                vertices,
-                end.add(offset),
-                red,
-                green,
-                blue,
-                alpha
+
+        renderBeamLayer(
+                poseStack,
+                outer,
+                OUTER_RED,
+                OUTER_GREEN,
+                OUTER_BLUE,
+                Math.round(
+                        OUTER_ALPHA * 0.75F
+                ),
+                height,
+                WIDTH * 1.50F,
+                offset * 0.90F
         );
-        vertex(
-                matrix,
-                vertices,
-                end.subtract(offset),
-                red,
-                green,
-                blue,
-                alpha
-        );
-        vertex(
-                matrix,
-                vertices,
-                start.subtract(offset),
-                red,
-                green,
-                blue,
-                alpha
+
+        renderBeamLayer(
+                poseStack,
+                outer,
+                OUTER_RED,
+                OUTER_GREEN,
+                OUTER_BLUE,
+                OUTER_ALPHA / 3,
+                height,
+                WIDTH * 2.0F,
+                offset * 0.80F
         );
     }
 
-    private static void vertex(
-            Matrix4f matrix,
+    private static void renderBeamLayer(
+            PoseStack poseStack,
             VertexConsumer vertices,
-            Vec3 point,
             int red,
             int green,
             int blue,
-            int alpha
+            int alpha,
+            float height,
+            float width,
+            float offset
+    ) {
+        PoseStack.Pose matrix =
+                poseStack.last();
+
+        renderBeamFace(
+                matrix,
+                vertices,
+                red,
+                green,
+                blue,
+                alpha,
+                height,
+                0.0F,
+                width,
+                width,
+                0.0F,
+                0.0F,
+                1.0F,
+                height,
+                offset
+        );
+        renderBeamFace(
+                matrix,
+                vertices,
+                red,
+                green,
+                blue,
+                alpha,
+                height,
+                0.0F,
+                -width,
+                -width,
+                0.0F,
+                0.0F,
+                1.0F,
+                height,
+                offset
+        );
+        renderBeamFace(
+                matrix,
+                vertices,
+                red,
+                green,
+                blue,
+                alpha,
+                height,
+                width,
+                0.0F,
+                0.0F,
+                -width,
+                0.0F,
+                1.0F,
+                height,
+                offset
+        );
+        renderBeamFace(
+                matrix,
+                vertices,
+                red,
+                green,
+                blue,
+                alpha,
+                height,
+                -width,
+                0.0F,
+                0.0F,
+                width,
+                0.0F,
+                1.0F,
+                height,
+                offset
+        );
+    }
+
+    private static void renderBeamFace(
+            PoseStack.Pose matrix,
+            VertexConsumer vertices,
+            int red,
+            int green,
+            int blue,
+            int alpha,
+            float height,
+            float x1,
+            float z1,
+            float x2,
+            float z2,
+            float u1,
+            float u2,
+            float v1,
+            float v2
+    ) {
+        renderBeamVertex(
+                matrix,
+                vertices,
+                red,
+                green,
+                blue,
+                alpha,
+                height,
+                x1,
+                z1,
+                u2,
+                v1
+        );
+        renderBeamVertex(
+                matrix,
+                vertices,
+                red,
+                green,
+                blue,
+                alpha,
+                0.0F,
+                x1,
+                z1,
+                u2,
+                v2
+        );
+        renderBeamVertex(
+                matrix,
+                vertices,
+                red,
+                green,
+                blue,
+                alpha,
+                0.0F,
+                x2,
+                z2,
+                u1,
+                v2
+        );
+        renderBeamVertex(
+                matrix,
+                vertices,
+                red,
+                green,
+                blue,
+                alpha,
+                height,
+                x2,
+                z2,
+                u1,
+                v1
+        );
+    }
+
+    private static void renderBeamVertex(
+            PoseStack.Pose matrix,
+            VertexConsumer vertices,
+            int red,
+            int green,
+            int blue,
+            int alpha,
+            float y,
+            float x,
+            float z,
+            float u,
+            float v
     ) {
         vertices.vertex(
-                        matrix,
-                        (float) point.x,
-                        (float) point.y,
-                        (float) point.z
+                        matrix.pose(),
+                        x,
+                        y,
+                        z
                 )
                 .color(
                         red,
                         green,
                         blue,
                         alpha
+                )
+                .uv(
+                        u,
+                        v
+                )
+                .overlayCoords(
+                        OverlayTexture.NO_OVERLAY
+                )
+                .uv2(
+                        LightTexture.FULL_BRIGHT
+                )
+                .normal(
+                        matrix.normal(),
+                        0.0F,
+                        1.0F,
+                        0.0F
                 )
                 .endVertex();
     }
@@ -264,6 +499,6 @@ public final class HolyBeamVisualRenderer
     public ResourceLocation getTextureLocation(
             HolyBeamVisualEntity entity
     ) {
-        return InventoryMenu.BLOCK_ATLAS;
+        return BEAM_TEXTURE;
     }
 }
