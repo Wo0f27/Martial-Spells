@@ -505,9 +505,9 @@ for sound in (
     if not path.is_file():
         errors.append(f"source sound missing; run P3 asset sync: {sound}")
 
-for locked_spell in ("barrier", "battle_banner", "lightwell", "lightwell_orb"):
-    if f'SPELLS.register("{locked_spell}"' in spell_registry:
-        errors.append(f"P3 must not register locked P4 spell: {locked_spell}")
+# P3 is a regression audit once later CP11 phases exist. P4 registration is
+# intentionally allowed here; P4's own audit is responsible for validating
+# Barrier, Battle Banner, Lightwell, and the internal Holy Mote helper.
 
 build = (root / "build.gradle").read_text(encoding="utf-8").lower()
 for forbidden in ("spell_engine", "spell-engine", "spell-power", "spell_power"):
