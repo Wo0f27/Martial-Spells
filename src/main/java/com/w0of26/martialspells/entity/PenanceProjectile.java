@@ -266,6 +266,10 @@ public final class PenanceProjectile
             return;
         }
 
+        int previousInvulnerableTime =
+                target.invulnerableTime;
+        target.invulnerableTime = 0;
+
         boolean damaged =
                 DamageSources.applyDamage(
                         target,
@@ -274,6 +278,9 @@ public final class PenanceProjectile
                                 .get()
                                 .getDamageSource(owner)
                 );
+
+        target.invulnerableTime =
+                previousInvulnerableTime;
 
         if (!damaged) {
             discard();
