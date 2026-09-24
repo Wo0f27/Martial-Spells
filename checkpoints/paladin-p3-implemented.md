@@ -41,10 +41,16 @@ P4/P5 remain locked until explicit P3 runtime PASS.
   Iron's balance values and are not claimed as upstream reagent fidelity.
 - Source spell/effect icons and Paladins-owned P3 sounds are synchronized from
   the frozen commit.
-- Exact Holy Light beam rendering, Spell Engine generic wind/healing loop
-  presentation, and Penance's orbiting Lightwell-orb composite model remain P5
-  presentation work. P3 uses a particle-visible Penance projectile with a
-  no-geometry renderer so a missing-model cube can never appear.
+- P1-P3 visual parity is now part of the P3 validation gate. Spell Engine's
+  generic Holy/healing particle language is reconstructed with Forge/vanilla
+  particles so no Spell Engine runtime dependency is added.
+- Holy Light now draws a blocked golden beam path and source-style heal/damage
+  impacts; Levitate has persistent Holy lift particles.
+- Penance now renders the frozen Lightwell-orb model at source scale/orbit/spin
+  with a synchronized double-helix Holy trail and source-style shield pulse.
+- Judgement now renders the frozen projectile model on a presentation-only
+  meteor entity while its previously validated P2 damage/timing logic remains
+  server-authoritative.
 
 ## Validation gate
 
@@ -85,7 +91,7 @@ Runtime checks:
    tail can be shorter than three seconds. It must still land softly.
 9. Penance requires a hostile target within 20 blocks and keeps that target
    locked through the channel.
-10. A full Penance channel launches exactly three visible particle-traced bolts.
+10. A full Penance channel launches exactly three visible Lightwell-orb bolts.
    They launch along the caster's look, travel at 0.8 blocks/tick, curve toward
    the locked target at up to 16 degrees/tick, and terminate after 20 blocks of
    projectile travel if they have not impacted.
@@ -94,10 +100,17 @@ Runtime checks:
     Absorption instead of taking splash damage.
 12. Repeated bolts increase the absorption stack to the one-volley cap; the
     effect lasts six seconds. Allies outside eight blocks receive no shield.
-13. Penance's projectile must never display a purple/black missing-model cube.
-    The final orbiting source orb is intentionally deferred to P5.
+13. Penance's projectile must render the actual orbiting Lightwell orb with a
+    double-helix Holy trail and must never display a purple/black missing-model
+    cube. Judgement must likewise render its source meteor model rather than the
+    old END_ROD-only placeholder.
 14. Early release of Holy Light, Levitate, and Penance gives proportional mana
     and effective cooldown rather than a free partial cast or the full cooldown.
+15. Recheck P1/P2 presentation: Holy Shock has distinct heal/damage impacts;
+    Flash Heal has a healing pillar; Circle of Healing visibly marks its radius;
+    Blessed Strikes draws light into the weapon and maintains a seal aura;
+    Divine Protection has apply/pop glimmer; Immolation erupts as a radial
+    Holy-fire effect; Judgement has its model, trail and large impact burst.
 
 P3 remains **VALIDATING**, not PASS, until the user explicitly confirms this
 runtime gate.
