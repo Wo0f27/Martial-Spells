@@ -156,6 +156,9 @@ P3 translation:
   launch point, initial caster-look launch direction, 0.8 projectile speed,
   16-degree/tick homing, 20-block projectile travel cap, 8-block no-falloff
   ally absorption pulse, and 6-second absorption duration.
+- Holy Light and Penance preserve Spell Engine damage's default
+  `bypass_iframes = true` behavior, so source-timed multi-hit deliveries are
+  not swallowed by vanilla hurt invulnerability.
 - Penance follows the executable status-effect integer arithmetic: per bolt
   stacks are `1 + floor(0.1 * Holy power)`; amplifier cap is
   `2 + floor(0.3 * Holy power)`. The upstream "exactly one full volley"
