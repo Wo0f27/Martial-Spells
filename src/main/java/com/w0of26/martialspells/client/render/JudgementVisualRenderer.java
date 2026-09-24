@@ -6,7 +6,6 @@ import com.mojang.math.Axis;
 import com.w0of26.martialspells.MartialSpells;
 import com.w0of26.martialspells.entity.JudgementVisualEntity;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
