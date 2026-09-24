@@ -75,6 +75,14 @@ public final class JudgementVisualRenderer
         poseStack.mulPose(
                 Axis.XP.rotationDegrees(directionPitch)
         );
+        // Frozen JSON leaves rotate_degrees_per_tick at Spell Engine's
+        // ProjectileModelComposite default: 2 degrees/tick.
+        poseStack.mulPose(
+                Axis.ZP.rotationDegrees(
+                        (entity.tickCount + partialTick)
+                                * 2.0F
+                )
+        );
         poseStack.scale(
                 SCALE,
                 SCALE,
