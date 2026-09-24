@@ -8,7 +8,6 @@ import com.w0of26.martialspells.spells.PaladinHolyBeamSpell;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -244,17 +243,17 @@ public final class HolyBeamVisualRenderer
 
         VertexConsumer inner =
                 buffers.getBuffer(
-                        RenderType.beaconBeam(
-                                BEAM_TEXTURE,
-                                false
-                        )
+                        PaladinSpellModelRenderTypes
+                                .holyBeamInner(
+                                        BEAM_TEXTURE
+                                )
                 );
         VertexConsumer outer =
                 buffers.getBuffer(
-                        RenderType.beaconBeam(
-                                BEAM_TEXTURE,
-                                true
-                        )
+                        PaladinSpellModelRenderTypes
+                                .holyBeamOuter(
+                                        BEAM_TEXTURE
+                                )
                 );
 
         renderBeamLayer(
