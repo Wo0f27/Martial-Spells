@@ -46,14 +46,6 @@ public final class BattleBannerRenderer
             MultiBufferSource bufferSource,
             int packedLight
     ) {
-        float scale =
-                entity.lifecycleScale(
-                        partialTick
-                );
-        if (scale <= 0.0F) {
-            return;
-        }
-
         poseStack.pushPose();
         poseStack.mulPose(
                 Axis.YP.rotationDegrees(
@@ -70,12 +62,6 @@ public final class BattleBannerRenderer
                 -1.5D,
                 0.0D
         );
-        poseStack.scale(
-                scale,
-                scale,
-                scale
-        );
-
         model.setupAnim(
                 entity,
                 0.0F,
