@@ -224,15 +224,16 @@ public final class PaladinHolyBeamSpell extends AbstractSpell {
             }
 
             boolean damaged =
-                    PaladinHolySpellSupport.damage(
-                            this,
-                            level,
-                            spellLevel,
-                            caster,
-                            target,
-                            DAMAGE_COEFFICIENT
-                                    * CHANNEL_VALUE_MULTIPLIER
-                    );
+                    PaladinHolySpellSupport
+                            .damageBypassingIframes(
+                                    this,
+                                    level,
+                                    spellLevel,
+                                    caster,
+                                    target,
+                                    DAMAGE_COEFFICIENT
+                                            * CHANNEL_VALUE_MULTIPLIER
+                            );
 
             if (damaged) {
                 target.knockback(
