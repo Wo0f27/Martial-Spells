@@ -57,6 +57,7 @@ for token in (
     "HEAL_COEFFICIENT",
     "* CHANNEL_VALUE_MULTIPLIER",
     "DAMAGE_COEFFICIENT",
+    "damageBypassingIframes",
     "targetsOnBeam(",
     "Utils.checkEntityIntersecting",
     "target.getPickRadius()",
@@ -148,7 +149,10 @@ for token in (
     "applyHoming()",
     "HOMING_DEGREES_PER_TICK",
     "PROJECTILE_VELOCITY",
+    "previousInvulnerableTime =",
+    "target.invulnerableTime = 0",
     "DamageSources.applyDamage",
+    "target.invulnerableTime =",
     "MartialSpellRegistry.PENANCE",
     "Utils.shouldHealEntity",
     "ABSORPTION_RADIUS",
@@ -161,6 +165,15 @@ for token in (
 ):
     if token not in projectile:
         errors.append(f"PenanceProjectile missing {token}")
+
+holy_support = (spell_dir / "PaladinHolySpellSupport.java").read_text(encoding="utf-8")
+for token in (
+    "damageBypassingIframes(",
+    "previousInvulnerableTime",
+    "target.invulnerableTime = 0",
+):
+    if token not in holy_support:
+        errors.append(f"PaladinHolySpellSupport missing P3 iframe-bypass token: {token}")
 
 absorption_effect = (effect_dir / "PriestAbsorptionEffect.java").read_text(encoding="utf-8")
 if "MobEffectCategory.BENEFICIAL" not in absorption_effect:
