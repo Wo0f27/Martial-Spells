@@ -5,7 +5,6 @@ import com.w0of26.martialspells.entity.JudgementVisualEntity;
 import com.w0of26.martialspells.registry.MartialSpellRegistry;
 import com.w0of26.martialspells.registry.MartialEntityRegistry;
 import com.w0of26.martialspells.spells.PaladinJudgementSpell;
-import com.w0of26.martialspells.spells.PaladinVfx;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -22,8 +21,9 @@ import java.util.UUID;
  * Lightweight server-authoritative translation of Judgement's frozen meteor.
  *
  * The upstream projectile launches 12 blocks above the target at 1.2
- * blocks/tick, which yields a ten-tick descent. P2 preserves that timing and
- * homing target position while P5 owns the exact authored projectile model.
+ * blocks/tick, which yields a ten-tick descent. P2 damage/timing remains
+ * server-authoritative while JudgementVisualEntity restores the authored
+ * projectile model and travel presentation without owning gameplay impact.
  */
 @Mod.EventBusSubscriber(modid = MartialSpells.MOD_ID)
 public final class JudgementImpactManager {
@@ -142,11 +142,6 @@ public final class JudgementImpactManager {
 
         Vec3 impact =
                 storedPosition(data);
-
-        double meteorY =
-                impact.y
-                        + remaining
-                        * PaladinJudgementSpell.METEOR_VELOCITY;
 
         if (remaining > 0) {
             data.putInt(
