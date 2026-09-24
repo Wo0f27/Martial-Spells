@@ -1,6 +1,7 @@
 package com.w0of26.martialspells.spells;
 
 import io.redspace.ironsspellbooks.api.events.SpellCooldownAddedEvent;
+import io.redspace.ironsspellbooks.api.events.SpellOnCastEvent;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
 import io.redspace.ironsspellbooks.api.spells.CastSource;
@@ -106,17 +107,34 @@ final class PaladinChannelSupport {
             CastSource castSource,
             float progress
     ) {
-        if (!castSource.consumesMana()
-                || (player.isCreative()
-                && !ServerConfigs.CREATIVE_MANA_COST.get())
-                || progress <= 0.0F) {
+        if (progress <= 0.0F) {
             return;
         }
 
         int proportionalMana = Math.round(
                 spell.getManaCost(spellLevel) * progress
         );
-        if (proportionalMana <= 0) {
+
+        /*
+         * A full Iron's cast always exposes SpellOnCastEvent before consuming
+         * mana. Partial P3 channels do the same, with the proportional cost as
+         * the event's original cost so mana-cost integrations still work.
+         */
+        SpellOnCastEvent event =
+                new SpellOnCastEvent(
+                        player,
+                        spell.getSpellId(),
+                        spellLevel,
+                        proportionalMana,
+                        spell.getSchoolType(),
+                        castSource
+                );
+        MinecraftForge.EVENT_BUS.post(event);
+
+        if (!castSource.consumesMana()
+                || (player.isCreative()
+                && !ServerConfigs.CREATIVE_MANA_COST.get())
+                || event.getManaCost() <= 0) {
             return;
         }
 
@@ -126,7 +144,8 @@ final class PaladinChannelSupport {
         magicData.setMana(
                 Math.max(
                         0.0F,
-                        magicData.getMana() - proportionalMana
+                        magicData.getMana()
+                                - event.getManaCost()
                 )
         );
 
