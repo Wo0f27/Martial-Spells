@@ -176,6 +176,10 @@ public final class PaladinLevitateSpell extends AbstractSpell {
                 )
         );
         player.hasImpulse = true;
+        // Force the server-authoritative reset-velocity kick back to the
+        // owning client immediately; unlike a normal Iron's onCast impulse,
+        // P3 channel impacts do not get an OnClientCast packet per release.
+        player.hurtMarked = true;
 
         player.addEffect(
                 new MobEffectInstance(
