@@ -1,6 +1,12 @@
 package com.w0of26.martialspells.client;
 
 import com.w0of26.martialspells.MartialSpells;
+import com.w0of26.martialspells.client.render.PaladinBarrierRenderer;
+import com.w0of26.martialspells.client.render.HolyMoteRenderer;
+import com.w0of26.martialspells.client.render.LightwellRenderer;
+import com.w0of26.martialspells.client.render.BattleBannerRenderer;
+import com.w0of26.martialspells.client.model.LightwellModel;
+import com.w0of26.martialspells.client.model.BattleBannerModel;
 import com.w0of26.martialspells.client.model.BearTrapModel;
 import com.w0of26.martialspells.client.particle.BarrageTrailParticle;
 import com.w0of26.martialspells.client.particle.ChargeSparkParticle;
@@ -62,6 +68,10 @@ public final class MartialClientEvents {
         event.registerEntityRenderer(MartialEntityRegistry.PENANCE_PROJECTILE.get(), PenanceProjectileRenderer::new);
         event.registerEntityRenderer(MartialEntityRegistry.JUDGEMENT_VISUAL.get(), JudgementVisualRenderer::new);
         event.registerEntityRenderer(MartialEntityRegistry.HOLY_BEAM_VISUAL.get(), HolyBeamVisualRenderer::new);
+        event.registerEntityRenderer(MartialEntityRegistry.PALADIN_BARRIER.get(), PaladinBarrierRenderer::new);
+        event.registerEntityRenderer(MartialEntityRegistry.BATTLE_BANNER.get(), BattleBannerRenderer::new);
+        event.registerEntityRenderer(MartialEntityRegistry.LIGHTWELL.get(), LightwellRenderer::new);
+        event.registerEntityRenderer(MartialEntityRegistry.HOLY_MOTE.get(), HolyMoteRenderer::new);
     }
 
     @SubscribeEvent
@@ -70,6 +80,7 @@ public final class MartialClientEvents {
         event.register(NettedEffectRenderer.MODEL);
         event.register(PenanceProjectileRenderer.MODEL);
         event.register(JudgementVisualRenderer.MODEL);
+        event.register(HolyMoteRenderer.MODEL);
     }
 
     @SubscribeEvent
@@ -99,11 +110,19 @@ public final class MartialClientEvents {
                     JudgementVisualRenderer.MODEL
             );
         }
+        if (manager.getModel(HolyMoteRenderer.MODEL) == manager.getMissingModel()) {
+            MartialSpells.LOGGER.error(
+                    "Holy Mote projectile model failed to bake: {}",
+                    HolyMoteRenderer.MODEL
+            );
+        }
     }
 
     @SubscribeEvent
     public static void registerLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {
         event.registerLayerDefinition(BearTrapModel.LAYER, BearTrapModel::createBodyLayer);
+        event.registerLayerDefinition(BattleBannerModel.LAYER, BattleBannerModel::createBodyLayer);
+        event.registerLayerDefinition(LightwellModel.LAYER, LightwellModel::createBodyLayer);
     }
 
     @SubscribeEvent
