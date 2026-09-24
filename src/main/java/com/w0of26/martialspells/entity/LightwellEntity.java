@@ -6,6 +6,7 @@ import com.w0of26.martialspells.registry.MartialSpellRegistry;
 import com.w0of26.martialspells.spells.PaladinVfx;
 import io.redspace.ironsspellbooks.api.registry.AttributeRegistry;
 import io.redspace.ironsspellbooks.api.util.Utils;
+import io.redspace.ironsspellbooks.registries.SoundRegistry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
@@ -207,6 +208,15 @@ public final class LightwellEntity extends Entity {
                 target
         );
         level.addFreshEntity(mote);
+
+        level.playSound(
+                null,
+                blockPosition(),
+                SoundRegistry.HOLY_CAST.get(),
+                SoundSource.PLAYERS,
+                0.65F,
+                1.15F
+        );
     }
 
     private int effectiveMoteCooldown(
