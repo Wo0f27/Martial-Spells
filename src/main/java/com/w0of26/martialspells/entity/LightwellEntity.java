@@ -12,6 +12,7 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.AnimationState;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -39,7 +40,19 @@ public final class LightwellEntity extends Entity {
                     + DESPAWN_TICKS;
     public static final double HEAL_RANGE = 12.0D;
     public static final int BASE_MOTE_COOLDOWN_TICKS = 30;
+    public static final int SPELL_RELEASE_ANIMATION_TICKS = 15;
+    private static final byte SPELL_RELEASE_EVENT = 61;
 
+    public final AnimationState spawnAnimationState =
+            new AnimationState();
+    public final AnimationState despawnAnimationState =
+            new AnimationState();
+    public final AnimationState idleAnimationState =
+            new AnimationState();
+    public final AnimationState spellReleaseAnimationState =
+            new AnimationState();
+
+    private int clientReleaseAnimationStopTick = -1;
     private UUID ownerId;
     private float healingPower = 1.0F;
     private int moteCooldown;
@@ -51,6 +64,7 @@ public final class LightwellEntity extends Entity {
         super(type, level);
         noPhysics = true;
         noCulling = true;
+        spawnAnimationState.startIfStopped(0);
     }
 
     public LightwellEntity(
@@ -72,8 +86,12 @@ public final class LightwellEntity extends Entity {
     public void tick() {
         super.tick();
 
-        if (level().isClientSide
-                || !(level() instanceof ServerLevel serverLevel)) {
+        if (level().isClientSide) {
+            setupAnimationStates();
+            return;
+        }
+
+        if (!(level() instanceof ServerLevel serverLevel)) {
             return;
         }
 
@@ -208,6 +226,10 @@ public final class LightwellEntity extends Entity {
                 target
         );
         level.addFreshEntity(mote);
+        level.broadcastEntityEvent(
+                this,
+                SPELL_RELEASE_EVENT
+        );
 
         level.playSound(
                 null,
@@ -217,6 +239,63 @@ public final class LightwellEntity extends Entity {
                 0.65F,
                 1.15F
         );
+    }
+
+    private void setupAnimationStates() {
+        boolean spawning =
+                tickCount < SPAWN_TICKS;
+        boolean active =
+                tickCount >= SPAWN_TICKS
+                        && tickCount
+                        < SPAWN_TICKS + ACTIVE_TICKS;
+        boolean despawning =
+                tickCount >= SPAWN_TICKS + ACTIVE_TICKS
+                        && tickCount < TOTAL_TICKS;
+
+        spawnAnimationState.animateWhen(
+                spawning,
+                tickCount
+        );
+
+        if (despawning
+                && !despawnAnimationState.isStarted()) {
+            // Matches Spell Engine SummonedEntity: start at the future phase
+            // end, then sample the spawn clip with playback speed -1.
+            despawnAnimationState.start(
+                    TOTAL_TICKS
+            );
+        } else if (!despawning) {
+            despawnAnimationState.stop();
+        }
+
+        idleAnimationState.animateWhen(
+                active,
+                tickCount
+        );
+
+        if (spellReleaseAnimationState.isStarted()
+                && tickCount
+                >= clientReleaseAnimationStopTick) {
+            spellReleaseAnimationState.stop();
+            clientReleaseAnimationStopTick = -1;
+        }
+    }
+
+    @Override
+    public void handleEntityEvent(
+            byte id
+    ) {
+        if (id == SPELL_RELEASE_EVENT) {
+            spellReleaseAnimationState.start(
+                    tickCount
+            );
+            clientReleaseAnimationStopTick =
+                    tickCount
+                            + SPELL_RELEASE_ANIMATION_TICKS;
+            return;
+        }
+
+        super.handleEntityEvent(id);
     }
 
     private int effectiveMoteCooldown(
