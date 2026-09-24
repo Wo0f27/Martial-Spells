@@ -80,7 +80,6 @@ public final class MartialClientEvents {
         event.register(NettedEffectRenderer.MODEL);
         event.register(PenanceProjectileRenderer.MODEL);
         event.register(JudgementVisualRenderer.MODEL);
-        event.register(HolyMoteRenderer.MODEL);
     }
 
     @SubscribeEvent
