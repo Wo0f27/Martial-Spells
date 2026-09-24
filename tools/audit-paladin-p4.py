@@ -128,8 +128,6 @@ for token in (
     "EFFECT_DURATION_TICKS = 2 * 20",
     "radius * 0.30D",
     "BATTLE_BANNER.get()",
-    "StatusEffects_RangedWeapon.HASTE.effect",
-    "3,",
     "PaladinVfx.bannerPresence(",
     "BATTLE_BANNER_PRESENCE",
 ):
@@ -143,6 +141,7 @@ for token in (
     "Attributes.KNOCKBACK_RESISTANCE",
     "AttributeRegistry.CAST_TIME_REDUCTION.get()",
     "AttributeRegistry.COOLDOWN_REDUCTION.get()",
+    "ALObjects.Attributes.DRAW_SPEED.get()",
     "AttributeModifier.Operation.MULTIPLY_BASE",
 ):
     if token not in banner_effect:
