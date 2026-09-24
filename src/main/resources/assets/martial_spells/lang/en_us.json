@@ -279,5 +279,22 @@
   "ui.martial_spells.judgement_control_limit": "Stun Health Limit: %s target max health",
   "spell.martial_spells.immolation": "Immolation",
   "spell.martial_spells.immolation.description": "Erupt in holy fire, burning nearby enemies while healing yourself and nearby allies.",
-  "spell.martial_spells.immolation.guide": "Instantly affects a 5-block area with half-height vertical reach. Allies are healed; enemies take Holy damage and burn for 4 seconds. Undead receive the source +50% power bonus and guaranteed default critical multiplier."
+  "spell.martial_spells.immolation.guide": "Instantly affects a 5-block area with half-height vertical reach. Allies are healed; enemies take Holy damage and burn for 4 seconds. Undead receive the source +50% power bonus and guaranteed default critical multiplier.",
+  "spell.martial_spells.holy_beam": "Holy Light",
+  "spell.martial_spells.holy_beam.description": "Channel a beam of holy light that heals allies and damages enemies in your aim.",
+  "spell.martial_spells.holy_beam.guide": "Channel for up to 5 seconds. Twenty-five midpoint pulses trace your current aim out to 32 blocks. Friendly targets are healed and hostile targets take Holy damage; every pulse preserves Spell Engine's 0.2-second channel multiplier. Releasing early keeps completed pulses and applies proportional mana and cooldown.",
+  "spell.martial_spells.levitate": "Levitate",
+  "spell.martial_spells.levitate.description": "Channel holy light to rise into the air, then drift gently back down.",
+  "spell.martial_spells.levitate.guide": "Channel for up to 1.5 seconds while horizontally rooted. Four source-timed releases reset your motion to a +0.15 vertical lift and refresh Levitate for 5 seconds. Levitate maintains Slow Falling and leaves 3 seconds of soft landing after it expires. Releasing early applies proportional mana and cooldown.",
+  "effect.martial_spells.levitate": "Levitate",
+  "effect.martial_spells.levitate.description": "You drift gently through the air.",
+  "spell.martial_spells.penance": "Penance",
+  "spell.martial_spells.penance.description": "Channel three homing holy bolts into an enemy, shielding nearby allies as each bolt lands.",
+  "spell.martial_spells.penance.guide": "Lock a hostile target within 20 blocks and channel for up to 1.5 seconds. Three midpoint releases fire 0.8-speed homing bolts with a 16-degree-per-tick turn cap. Each hit deals the source-normalized Holy damage and radiates a no-falloff absorption pulse to allies within 8 blocks for 6 seconds. Releasing early applies proportional mana and cooldown.",
+  "effect.martial_spells.priest_absorption": "Absorption",
+  "effect.martial_spells.priest_absorption.description": "Absorbs some damage you would take.",
+  "ui.martial_spells.priest_channel": "Channel: %ss; %s releases",
+  "ui.martial_spells.levitate_linger": "Levitate: %s seconds",
+  "ui.martial_spells.levitate_soft_landing": "Soft Landing: +%s seconds",
+  "ui.martial_spells.penance_absorption": "Absorption per Bolt: %s; radius %s blocks; %ss"
 }
