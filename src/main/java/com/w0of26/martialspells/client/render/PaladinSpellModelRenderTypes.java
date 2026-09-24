@@ -13,6 +13,8 @@ public final class PaladinSpellModelRenderTypes
         extends RenderType {
     private static RenderType glow;
     private static RenderType radiate;
+    private static RenderType holyBeamInner;
+    private static RenderType holyBeamOuter;
 
     private PaladinSpellModelRenderTypes(
             String name,
@@ -81,6 +83,99 @@ public final class PaladinSpellModelRenderTypes
                     );
         }
         return glow;
+    }
+
+    /**
+     * Spell Engine 1.10.5 CustomLayers.beam(texture, false, true):
+     * translucent beacon-beam shader used by Holy Light's white inner core.
+     */
+    public static RenderType holyBeamInner(
+            net.minecraft.resources.ResourceLocation texture
+    ) {
+        if (holyBeamInner == null) {
+            holyBeamInner =
+                    create(
+                            "martial_spells_holy_beam_inner",
+                            DefaultVertexFormat.NEW_ENTITY,
+                            VertexFormat.Mode.QUADS,
+                            256,
+                            false,
+                            true,
+                            CompositeState.builder()
+                                    .setShaderState(
+                                            RENDERTYPE_BEACON_BEAM_SHADER
+                                    )
+                                    .setTextureState(
+                                            new TextureStateShard(
+                                                    texture,
+                                                    false,
+                                                    false
+                                            )
+                                    )
+                                    .setTransparencyState(
+                                            TRANSLUCENT_TRANSPARENCY
+                                    )
+                                    .setCullState(
+                                            NO_CULL
+                                    )
+                                    .setWriteMaskState(
+                                            COLOR_DEPTH_WRITE
+                                    )
+                                    .setOverlayState(
+                                            OVERLAY
+                                    )
+                                    .createCompositeState(false)
+                    );
+        }
+        return holyBeamInner;
+    }
+
+    /**
+     * Spell Engine 1.10.5 spellObject(texture, GLOW, true):
+     * translucent beacon-shader shell used for Holy Light's golden outer beam.
+     */
+    public static RenderType holyBeamOuter(
+            net.minecraft.resources.ResourceLocation texture
+    ) {
+        if (holyBeamOuter == null) {
+            holyBeamOuter =
+                    create(
+                            "martial_spells_holy_beam_outer",
+                            DefaultVertexFormat.NEW_ENTITY,
+                            VertexFormat.Mode.QUADS,
+                            256,
+                            true,
+                            true,
+                            CompositeState.builder()
+                                    .setShaderState(
+                                            RENDERTYPE_BEACON_BEAM_SHADER
+                                    )
+                                    .setTextureState(
+                                            new TextureStateShard(
+                                                    texture,
+                                                    false,
+                                                    false
+                                            )
+                                    )
+                                    .setTransparencyState(
+                                            TRANSLUCENT_TRANSPARENCY
+                                    )
+                                    .setCullState(
+                                            NO_CULL
+                                    )
+                                    .setWriteMaskState(
+                                            COLOR_WRITE
+                                    )
+                                    .setOverlayState(
+                                            OVERLAY
+                                    )
+                                    .setOutputState(
+                                            PARTICLES_TARGET
+                                    )
+                                    .createCompositeState(false)
+                    );
+        }
+        return holyBeamOuter;
     }
 
     /**
