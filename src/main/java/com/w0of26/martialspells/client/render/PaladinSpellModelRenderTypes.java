@@ -88,6 +88,10 @@ public final class PaladinSpellModelRenderTypes
     /**
      * Spell Engine 1.10.5 CustomLayers.beam(texture, false, true):
      * translucent beacon-beam shader used by Holy Light's white inner core.
+     *
+     * <p>The frozen layer uses the beacon BLOCK vertex layout rather than the
+     * entity layout. BeamRenderer still supplies overlay data through the
+     * generic VertexConsumer API, exactly as upstream does on 1.20.1.</p>
      */
     public static RenderType holyBeamInner(
             net.minecraft.resources.ResourceLocation texture
@@ -96,7 +100,7 @@ public final class PaladinSpellModelRenderTypes
             holyBeamInner =
                     create(
                             "martial_spells_holy_beam_inner",
-                            DefaultVertexFormat.NEW_ENTITY,
+                            DefaultVertexFormat.BLOCK,
                             VertexFormat.Mode.QUADS,
                             256,
                             false,
@@ -120,9 +124,6 @@ public final class PaladinSpellModelRenderTypes
                                     )
                                     .setWriteMaskState(
                                             COLOR_DEPTH_WRITE
-                                    )
-                                    .setOverlayState(
-                                            OVERLAY
                                     )
                                     .createCompositeState(false)
                     );
