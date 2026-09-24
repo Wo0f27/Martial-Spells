@@ -8,6 +8,7 @@ import com.w0of26.martialspells.entity.CaltropFieldEntity;
 import com.w0of26.martialspells.entity.EntanglingArrow;
 import com.w0of26.martialspells.entity.ThrowNetProjectile;
 import com.w0of26.martialspells.entity.ShatteringThrowProjectile;
+import com.w0of26.martialspells.entity.PenanceProjectile;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -84,6 +85,16 @@ public final class MartialEntityRegistry {
                     .clientTrackingRange(128)
                     .updateInterval(2)
                     .build(MartialSpells.MOD_ID + ":shattering_throw"));
+
+    /** Frozen Spell Engine projectile dimensions/tracking for Penance. */
+    public static final RegistryObject<EntityType<PenanceProjectile>> PENANCE_PROJECTILE =
+            ENTITY_TYPES.register("penance_projectile", () -> EntityType.Builder
+                    .<PenanceProjectile>of(PenanceProjectile::new, MobCategory.MISC)
+                    .sized(0.25F, 0.25F)
+                    .fireImmune()
+                    .clientTrackingRange(128)
+                    .updateInterval(2)
+                    .build(MartialSpells.MOD_ID + ":penance_projectile"));
 
     private MartialEntityRegistry() {}
 
