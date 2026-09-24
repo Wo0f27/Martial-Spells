@@ -27,7 +27,7 @@ import java.util.UUID;
  * Internal Lightwell Holy Mote.
  *
  * <p>Source executable values: velocity 1.0, +30 degree launch pitch,
- * 16 degrees/tick homing after 15% of the 12-block spell range, and one
+ * 16 degrees/tick homing after 15% of the initial target distance, and one
  * terrain bounce.</p>
  */
 public final class HolyMoteProjectile extends ThrowableProjectile {
@@ -51,7 +51,6 @@ public final class HolyMoteProjectile extends ThrowableProjectile {
             Level level
     ) {
         super(type, level);
-        setNoGravity(true);
         setNoGravity(true);
         noCulling = true;
     }
