@@ -198,6 +198,11 @@ public final class PaladinHolyBeamSpell extends AbstractSpell {
             return;
         }
 
+        PaladinVfx.holyBeamCasting(
+                serverLevel,
+                player
+        );
+
         long gameTime = serverLevel.getGameTime();
 
         while (state.isDue(gameTime)) {
@@ -238,11 +243,20 @@ public final class PaladinHolyBeamSpell extends AbstractSpell {
                         level,
                         caster
                 );
-        PaladinVfx.holyBeam(
-                level,
-                caster,
-                beamEnd
-        );
+        Vec3 maximumEnd =
+                caster.getEyePosition()
+                        .add(
+                                caster.getLookAngle()
+                                        .normalize()
+                                        .scale(RANGE)
+                        );
+        if (beamEnd.distanceToSqr(maximumEnd) > 1.0E-6D) {
+            PaladinVfx.holyBeam(
+                    level,
+                    caster,
+                    beamEnd
+            );
+        }
 
         for (LivingEntity target : targetsOnBeam(
                 level,
