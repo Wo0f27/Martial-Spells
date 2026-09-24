@@ -66,7 +66,7 @@ for filename, cfg in contract.items():
 
 support = (spell_dir / "PaladinHolySpellSupport.java").read_text(encoding="utf-8")
 for token in (
-    "SOURCE_POWER_REFERENCE = 5.0F",
+    "SOURCE_POWER_REFERENCE = 5",
     "Utils.shouldHealEntity",
     "Utils.preCastTargetHelper",
     "TargetEntityCastData",
@@ -155,7 +155,7 @@ print("")
 print("CP11 P1 Holy healing summary")
 print(" - spells: 4")
 print(" - school: irons_spellbooks:holy")
-print(" - source power reference: 5.0")
+print(" - source power reference: 5")
 print(" - exact source coefficients: 0.5 / 0.4+0.8 / 1.2 / 0.4")
 print(" - source icons: 4")
 print(" - source-only impact sounds: 2")
