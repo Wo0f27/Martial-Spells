@@ -6,7 +6,7 @@ $ErrorActionPreference = "Stop"
 
 $SourceCommit = "2807417a1dd9a65204c002ded487da0e6ae467a1"
 $SourceRoot = "https://raw.githubusercontent.com/ZsoltMolnarrr/Paladins/$SourceCommit/common/src/main/resources/assets/paladins"
-$SpellEngineCommit = "fea2dc16c1f77d2e583149354b67227d589c9a4d"
+$SpellEngineCommit = "d057c13"
 $SpellEngineRoot = "https://raw.githubusercontent.com/ZsoltMolnarrr/SpellEngine/$SpellEngineCommit/common/src/main/resources/assets/spell_engine"
 $TargetRoot = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot ".."))
 
