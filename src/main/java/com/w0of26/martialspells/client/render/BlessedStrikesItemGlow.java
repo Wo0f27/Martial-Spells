@@ -3,30 +3,32 @@ package com.w0of26.martialspells.client.render;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.VertexMultiConsumer;
 import com.w0of26.martialspells.registry.MartialEffectRegistry;
+import net.minecraft.Util;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
+import org.joml.Matrix4f;
 
 import javax.annotation.Nullable;
 
 /**
- * Source-faithful Blessed Strikes held-item glow state.
+ * Blessed Strikes held-item glow state.
  *
- * <p>Frozen Paladins resolves Holy #FFFFCC glow at 0.2 opacity per stored
- * blessing, capped at full intensity at five stacks. Render-layer construction
- * lives in BlessedStrikesGlowRenderTypes so Forge 1.20.1's protected vanilla
- * render-state constants are accessed legally.</p>
+ * <p>Source semantics retained: Holy #FFFFCC, opacity 0.2 per blessing,
+ * maximum five blessings, source glow texture scale 8 and gain 3.</p>
  */
 public final class BlessedStrikesItemGlow {
     private static final float OPACITY_PER_STACK =
             0.20F;
+    private static final float TEXTURE_SCALE =
+            8.0F;
     private static final int MAX_STACKS =
             5;
 
-    private static int currentStackIndex = -1;
     private static float currentOpacity;
 
     private BlessedStrikesItemGlow() {
@@ -36,7 +38,6 @@ public final class BlessedStrikesItemGlow {
             @Nullable LivingEntity holder,
             ItemStack stack
     ) {
-        currentStackIndex = -1;
         currentOpacity = 0.0F;
 
         if (holder == null
@@ -65,8 +66,6 @@ public final class BlessedStrikesItemGlow {
                         )
                 );
 
-        currentStackIndex =
-                stacks - 1;
         currentOpacity =
                 Math.min(
                         1.0F,
@@ -76,18 +75,13 @@ public final class BlessedStrikesItemGlow {
     }
 
     public static void end() {
-        currentStackIndex = -1;
         currentOpacity = 0.0F;
     }
 
-    /**
-     * Same source behavior as Spell Engine ItemGlowRendering.light: increase
-     * only block light, proportionally to effect opacity, and preserve skylight.
-     */
     public static int light(
             int packedLight
     ) {
-        if (currentStackIndex < 0) {
+        if (currentOpacity <= 0.0F) {
             return packedLight;
         }
 
@@ -107,27 +101,59 @@ public final class BlessedStrikesItemGlow {
         );
     }
 
-    /**
-     * Add the source glow consumer beside the normal item consumer. The fixed
-     * buffer ordering mixin ensures the EQUAL-depth glow flushes after the item.
-     */
     public static VertexConsumer glowing(
             MultiBufferSource buffers,
             VertexConsumer original
     ) {
-        if (currentStackIndex < 0) {
+        if (currentOpacity <= 0.0F) {
             return original;
         }
 
+        VertexConsumer glow =
+                new BlessedStrikesGlowVertexConsumer(
+                        buffers.getBuffer(
+                                BlessedStrikesGlowRenderTypes
+                                        .itemGlow()
+                        ),
+                        currentOpacity
+                );
+
         return VertexMultiConsumer.create(
-                buffers.getBuffer(
-                        BlessedStrikesGlowRenderTypes
-                                .itemGlow(
-                                        currentStackIndex
-                                )
-                ),
+                glow,
                 original
         );
+    }
+
+    public static Matrix4f textureMatrix() {
+        long time =
+                (long) (
+                        Util.getMillis()
+                                * Minecraft.getInstance()
+                                .options
+                                .glintSpeed()
+                                .get()
+                                * 8.0D
+                );
+
+        float x =
+                (float) (time % 110000L)
+                        / 110000.0F;
+        float y =
+                (float) (time % 30000L)
+                        / 30000.0F;
+
+        return new Matrix4f()
+                .translation(
+                        -x,
+                        y,
+                        0.0F
+                )
+                .rotateZ(
+                        (float) (
+                                Math.PI / 18.0D
+                        )
+                )
+                .scale(TEXTURE_SCALE);
     }
 
     private static boolean isHeldEquipment(
