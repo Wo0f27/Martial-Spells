@@ -234,11 +234,21 @@ public final class PaladinJudgementSpell extends AbstractSpell {
                 damage *= UNDEAD_POWER_MULTIPLIER;
             }
 
-            DamageSources.applyDamage(
-                    target,
-                    damage,
-                    getDamageSource(caster)
-            );
+            boolean damaged =
+                    DamageSources.applyDamage(
+                            target,
+                            damage,
+                            getDamageSource(caster)
+                    );
+
+            if (damaged) {
+                PaladinVfx.holyBurst(
+                        level,
+                        target,
+                        25,
+                        1.0D
+                );
+            }
 
             if (target.getMaxHealth() <= controlLimit) {
                 StunService.apply(
