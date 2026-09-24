@@ -238,6 +238,14 @@ public final class MartialClientEvents {
                 )
         );
         event.registerSpriteSet(
+                MartialParticleRegistry.PALADIN_AREA_553_CAMERA.get(),
+                sprites -> new PaladinSourceAreaParticle.Provider(
+                        sprites,
+                        PaladinSourceAreaParticle.Facing.CAMERA,
+                        13
+                )
+        );
+        event.registerSpriteSet(
                 MartialParticleRegistry.PALADIN_AREA_637_GROUND.get(),
                 sprites -> new PaladinSourceAreaParticle.Provider(
                         sprites,
