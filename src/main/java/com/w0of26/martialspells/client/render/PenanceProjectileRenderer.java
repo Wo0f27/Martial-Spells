@@ -118,7 +118,7 @@ public final class PenanceProjectileRenderer
         );
 
         int effectiveLight =
-                LightTexture.FULL_BRIGHT;
+                packedLight;
 
         Minecraft.getInstance()
                 .getItemRenderer()
