@@ -130,7 +130,7 @@ P2 translation:
 - Immolation preserves the 5-block / 0.5 vertical-range area, mixed helpful/harmful intent, 1.2 damage coefficient, 0.5 heal coefficient, 4-second burn, +50% undead power, and source guaranteed undead critical at the default source 1.5x critical multiplier.
 - Iron's 1.20.1 exposes no spell-critical-chance or spell-critical-damage attributes. Therefore generic source random crit blending cannot be translated one-for-one; hybrid power weights are exact, while Immolation's explicit guaranteed undead critical is preserved at the frozen source default critical multiplier.
 - Target-side mana: Blessed Strikes consumes 5 mana at channel initiation and each of its five seal ticks (30 for a full channel); Divine Protection 40; Judgement 45; Immolation 60. These are balancing values, not upstream reagent fidelity.
-- Exact Judgement projectile model/rendering remains P5 presentation work; P2 preserves server-authoritative meteor timing and impact behavior.
+- Judgement now restores the frozen source projectile model at 1.2x scale on a presentation-only visual entity while server-authoritative P2 timing/damage remains unchanged.
 
 ### P3 — Priest channel and control
 - Holy Light (`holy_beam`)
@@ -165,8 +165,16 @@ P3 translation:
   comment is not used as a replacement for the executable truncation order.
 - P3 target-side mana values are Holy Light 40, Levitate 25, Penance 45.
   These are balancing values, not upstream reagent fidelity.
-- Exact Holy Light beam rendering and Penance's orbiting Lightwell-orb model
-  remain P5 presentation work; P3 must still avoid missing-model geometry.
+- P1-P3 presentation parity is restored without introducing Spell Engine as a
+  runtime dependency. Generic Spell Engine particle shapes are reconstructed
+  with Forge/vanilla particles using the frozen Holy/Nature palette.
+- Holy Light now renders a dense blocked golden beam path with source-style
+  casting, heal and damage impact effects.
+- Levitate restores the source pillar/pipe Holy particle language while
+  channeling and while its float effect remains active.
+- Penance restores the Lightwell-orb source model at 0.9x scale, 0.6-block
+  orbit radius and 15-degree/tick spin, paired with a synchronized double-helix
+  Holy trail plus source-style damage/shield area impacts.
 
 ### P4 — constructs and summons
 - Barrier
@@ -174,11 +182,11 @@ P3 translation:
 - Lightwell
 - Holy Mote (`lightwell_orb`) internal helper
 
-### P5 — bindings, presentation and final integration
+### P5 — bindings and final integration
 - Paladin/Priest grouping
 - source-equivalent Holy Wand -> native Iron's Blessing of Life binding
 - source-equivalent Holy Staff -> Holy Shock binding
-- spell icons/lang/SFX/models
+- final icon/lang/SFX/model regression and polish
 - equipment soft integration
 - full client/server/package regression
 
