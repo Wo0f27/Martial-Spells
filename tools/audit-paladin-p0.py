@@ -15,7 +15,6 @@ else:
 for required in (
     "2807417a1dd9a65204c002ded487da0e6ae467a1",
     "v1.20.1-3.16.3",
-    "14 player-facing",
     "lightwell_orb",
     "SchoolRegistry.HOLY_RESOURCE",
     "max level 1",
@@ -24,6 +23,13 @@ for required in (
 ):
     if required.lower() not in text.lower():
         errors.append(f"CP11 P0 contract missing: {required}")
+
+if not (
+    "fourteen are player-facing" in text.lower()
+    or "14 player-facing" in text.lower()
+    or "player-facing spells: 14" in text.lower()
+):
+    errors.append("CP11 P0 contract missing player-facing spell count: 14")
 
 expected = {
     "heal", "holy_shock", "flash_heal", "blessed_strikes",
