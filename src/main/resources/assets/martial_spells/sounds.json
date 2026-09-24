@@ -190,5 +190,50 @@
       "martial_spells:penance_release_2",
       "martial_spells:penance_release_3"
     ]
+  },
+  "holy_barrier_activate": {
+    "sounds": [
+      "martial_spells:holy_barrier_activate"
+    ]
+  },
+  "holy_barrier_idle": {
+    "sounds": [
+      "martial_spells:holy_barrier_idle"
+    ]
+  },
+  "holy_barrier_impact": {
+    "sounds": [
+      "martial_spells:holy_barrier_impact"
+    ]
+  },
+  "holy_barrier_deactivate": {
+    "sounds": [
+      "martial_spells:holy_barrier_deactivate"
+    ]
+  },
+  "battle_banner_release": {
+    "sounds": [
+      "martial_spells:battle_banner_release"
+    ]
+  },
+  "battle_banner_presence": {
+    "sounds": [
+      "martial_spells:battle_banner_presence"
+    ]
+  },
+  "lightwell_spawn": {
+    "sounds": [
+      "martial_spells:lightwell_spawn"
+    ]
+  },
+  "lightwell_ambient": {
+    "sounds": [
+      "martial_spells:lightwell_ambient"
+    ]
+  },
+  "lightwell_despawn": {
+    "sounds": [
+      "martial_spells:lightwell_despawn"
+    ]
   }
 }
