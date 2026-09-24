@@ -261,19 +261,31 @@ public final class PaladinPenanceSpell extends AbstractSpell {
                                         * power
                         );
 
+        Vec3 look =
+                caster.getLookAngle()
+                        .normalize();
+
+        // Frozen Spell Engine LaunchGeometry.launchPoint: 0.5 blocks
+        // forward from the shoulder-height launch origin.
         Vec3 launchPoint =
-                caster.getEyePosition()
+                caster.position()
                         .add(
-                                caster.getLookAngle()
-                                        .normalize()
-                                        .scale(0.35D)
+                                0.0D,
+                                caster.getEyeHeight()
+                                        - caster.getBbHeight()
+                                        * 0.15D,
+                                0.0D
+                        )
+                        .add(
+                                look.scale(0.5D)
                         );
 
-        Vec3 direction =
-                target.getBoundingBox()
-                        .getCenter()
-                        .subtract(launchPoint)
-                        .normalize();
+        /*
+         * Source direct_towards_target defaults false. The bolt launches
+         * along the caster's look direction and only then curves toward the
+         * sticky target through its 16-degree/tick homing.
+         */
+        Vec3 direction = look;
 
         PenanceProjectile projectile =
                 new PenanceProjectile(
