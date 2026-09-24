@@ -18,6 +18,8 @@ import com.w0of26.martialspells.client.particle.ShatterBloodParticle;
 import com.w0of26.martialspells.client.particle.LastStandSparkParticle;
 import com.w0of26.martialspells.client.particle.LastStandSmokeParticle;
 import com.w0of26.martialspells.client.particle.LastStandAuraParticle;
+import com.w0of26.martialspells.client.particle.PaladinSourceMagicParticle;
+import com.w0of26.martialspells.client.particle.PaladinSourceAreaParticle;
 import com.w0of26.martialspells.client.render.BarrageArrowRenderer;
 import com.w0of26.martialspells.client.render.BearTrapRenderer;
 import com.w0of26.martialspells.client.render.CaltropFieldRenderer;
@@ -136,6 +138,103 @@ public final class MartialClientEvents {
         event.registerSpriteSet(MartialParticleRegistry.LAST_STAND_SPARK.get(), LastStandSparkParticle.Provider::new);
         event.registerSpriteSet(MartialParticleRegistry.LAST_STAND_SMOKE.get(), LastStandSmokeParticle.Provider::new);
         event.registerSpriteSet(MartialParticleRegistry.LAST_STAND_AURA.get(), LastStandAuraParticle.Provider::new);
+
+        event.registerSpriteSet(
+                MartialParticleRegistry.PALADIN_SPARK_FLOAT.get(),
+                sprites -> new PaladinSourceMagicParticle.Provider(
+                        sprites,
+                        PaladinSourceMagicParticle.Motion.FLOAT,
+                        1.0F, 1.0F, 0.80F, 0.75F
+                )
+        );
+        event.registerSpriteSet(
+                MartialParticleRegistry.PALADIN_SPARK_DECELERATE.get(),
+                sprites -> new PaladinSourceMagicParticle.Provider(
+                        sprites,
+                        PaladinSourceMagicParticle.Motion.DECELERATE,
+                        1.0F, 1.0F, 0.80F, 0.75F
+                )
+        );
+        event.registerSpriteSet(
+                MartialParticleRegistry.PALADIN_SPARK_ASCEND.get(),
+                sprites -> new PaladinSourceMagicParticle.Provider(
+                        sprites,
+                        PaladinSourceMagicParticle.Motion.ASCEND,
+                        1.0F, 1.0F, 0.80F, 0.75F
+                )
+        );
+        event.registerSpriteSet(
+                MartialParticleRegistry.PALADIN_HOLY_FLOAT.get(),
+                sprites -> new PaladinSourceMagicParticle.Provider(
+                        sprites,
+                        PaladinSourceMagicParticle.Motion.FLOAT,
+                        1.0F, 1.0F, 0.80F, 0.75F
+                )
+        );
+        event.registerSpriteSet(
+                MartialParticleRegistry.PALADIN_HOLY_DECELERATE.get(),
+                sprites -> new PaladinSourceMagicParticle.Provider(
+                        sprites,
+                        PaladinSourceMagicParticle.Motion.DECELERATE,
+                        1.0F, 1.0F, 0.80F, 0.75F
+                )
+        );
+        event.registerSpriteSet(
+                MartialParticleRegistry.PALADIN_HOLY_BURST.get(),
+                sprites -> new PaladinSourceMagicParticle.Provider(
+                        sprites,
+                        PaladinSourceMagicParticle.Motion.BURST,
+                        1.0F, 1.0F, 0.80F, 0.75F
+                )
+        );
+        event.registerSpriteSet(
+                MartialParticleRegistry.PALADIN_HEAL_ASCEND.get(),
+                sprites -> new PaladinSourceMagicParticle.Provider(
+                        sprites,
+                        PaladinSourceMagicParticle.Motion.ASCEND,
+                        0.40F, 1.0F, 0.40F, 0.75F
+                )
+        );
+        event.registerSpriteSet(
+                MartialParticleRegistry.PALADIN_SPELL_FLOAT.get(),
+                sprites -> new PaladinSourceMagicParticle.Provider(
+                        sprites,
+                        PaladinSourceMagicParticle.Motion.FLOAT,
+                        1.0F, 1.0F, 0.80F, 1.0F
+                )
+        );
+        event.registerSpriteSet(
+                MartialParticleRegistry.PALADIN_SPELL_DECELERATE.get(),
+                sprites -> new PaladinSourceMagicParticle.Provider(
+                        sprites,
+                        PaladinSourceMagicParticle.Motion.DECELERATE,
+                        1.0F, 1.0F, 0.80F, 1.0F
+                )
+        );
+        event.registerSpriteSet(
+                MartialParticleRegistry.PALADIN_STRIPE_FLOAT.get(),
+                sprites -> new PaladinSourceMagicParticle.Provider(
+                        sprites,
+                        PaladinSourceMagicParticle.Motion.FLOAT,
+                        1.0F, 1.0F, 0.80F, 1.0F
+                )
+        );
+        event.registerSpriteSet(
+                MartialParticleRegistry.PALADIN_AREA_637_GROUND.get(),
+                sprites -> new PaladinSourceAreaParticle.Provider(
+                        sprites,
+                        PaladinSourceAreaParticle.Facing.GROUND,
+                        15
+                )
+        );
+        event.registerSpriteSet(
+                MartialParticleRegistry.PALADIN_AREA_676_CAMERA.get(),
+                sprites -> new PaladinSourceAreaParticle.Provider(
+                        sprites,
+                        PaladinSourceAreaParticle.Facing.CAMERA,
+                        17
+                )
+        );
     }
 
     @SubscribeEvent
