@@ -4,9 +4,9 @@ import com.w0of26.martialspells.registry.MartialEffectRegistry;
 import com.w0of26.martialspells.registry.MartialSoundRegistry;
 import com.w0of26.martialspells.registry.MartialSpellRegistry;
 import com.w0of26.martialspells.spells.PaladinPenanceSpell;
+import com.w0of26.martialspells.spells.PaladinVfx;
 import io.redspace.ironsspellbooks.api.util.Utils;
 import io.redspace.ironsspellbooks.damage.DamageSources;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
@@ -110,16 +110,11 @@ public final class PenanceProjectile
                 distanceTraveled +=
                         (float) stepDistance;
 
-                serverLevel.sendParticles(
-                        ParticleTypes.END_ROD,
-                        getX(),
-                        getY(),
-                        getZ(),
-                        2,
-                        0.04D,
-                        0.04D,
-                        0.04D,
-                        0.01D
+                PaladinVfx.penanceHelix(
+                        serverLevel,
+                        position(),
+                        getDeltaMovement(),
+                        tickCount
                 );
             }
         }
@@ -332,17 +327,14 @@ public final class PenanceProjectile
                 1.0F
         );
 
-        serverLevel.sendParticles(
-                ParticleTypes.END_ROD,
-                target.getX(),
-                target.getY()
-                        + target.getBbHeight() * 0.5D,
-                target.getZ(),
-                18,
-                0.35D,
-                0.25D,
-                0.35D,
-                0.10D
+        PaladinVfx.penanceImpact(
+                serverLevel,
+                target
+        );
+        PaladinVfx.penanceAreaPulse(
+                serverLevel,
+                target.position(),
+                PaladinPenanceSpell.ABSORPTION_RADIUS
         );
 
         discard();
@@ -436,17 +428,9 @@ public final class PenanceProjectile
                     )
             );
 
-            level.sendParticles(
-                    ParticleTypes.END_ROD,
-                    ally.getX(),
-                    ally.getY()
-                            + ally.getBbHeight() * 0.5D,
-                    ally.getZ(),
-                    8,
-                    0.25D,
-                    0.20D,
-                    0.25D,
-                    0.05D
+            PaladinVfx.penanceShield(
+                    level,
+                    ally
             );
         }
     }
