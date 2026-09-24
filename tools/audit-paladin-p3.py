@@ -335,7 +335,9 @@ for token in (
     "RENDERTYPE_BEACON_BEAM_SHADER",
     "RENDERTYPE_ENTITY_TRANSLUCENT_EMISSIVE_SHADER",
     "holyBeamInner(",
+    "DefaultVertexFormat.BLOCK",
     "holyBeamOuter(",
+    "DefaultVertexFormat.NEW_ENTITY",
     "PARTICLES_TARGET",
 ):
     if token not in spell_model_layers:
