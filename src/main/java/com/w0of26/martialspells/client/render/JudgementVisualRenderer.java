@@ -8,7 +8,6 @@ import com.w0of26.martialspells.entity.JudgementVisualEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -88,7 +87,7 @@ public final class JudgementVisualRenderer
                         .getModel(MODEL);
         VertexConsumer vertices =
                 bufferSource.getBuffer(
-                        Sheets.translucentCullBlockSheet()
+                        PaladinSpellModelRenderTypes.radiate()
                 );
 
         poseStack.translate(
