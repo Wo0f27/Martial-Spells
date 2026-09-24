@@ -1,13 +1,13 @@
 # CP11 P3 — Priest channel and control
 
-Status: **IMPLEMENTED / VALIDATING**
+Status: **PASS**
 
 Frozen source: `ZsoltMolnarrr/Paladins` commit
 `2807417a1dd9a65204c002ded487da0e6ae467a1`.
 
 P0-P2 are frozen as PASS. P3 adds only Holy Light (`holy_beam`),
 Levitate, and Penance plus the two required effects and Penance projectile.
-P4/P5 remain locked until explicit P3 runtime PASS.
+P3 runtime validation was confirmed after the P1-P3 VFX restoration pass. P4 is now unlocked; P5 remains reserved for final integration/polish.
 
 ## Frozen behavior implemented
 
@@ -112,5 +112,5 @@ Runtime checks:
     Divine Protection has apply/pop glimmer; Immolation erupts as a radial
     Holy-fire effect; Judgement has its model, trail and large impact burst.
 
-P3 remains **VALIDATING**, not PASS, until the user explicitly confirms this
-runtime gate.
+P3 is **PASS**. The user runtime-tested all P1-P3 Paladin/Priest spells after
+the VFX restoration pass and confirmed they behaved as intended.
