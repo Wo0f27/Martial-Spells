@@ -245,10 +245,21 @@ public final class PaladinPenanceSpell extends AbstractSpell {
                                         * power
                         );
 
+        /*
+         * Preserve Spell Engine's executable flooring order exactly:
+         * cap = 2 + floor(0.3 * power). This is intentionally not derived
+         * from three times the already-floored per-bolt increment; those two
+         * formulas diverge at some non-decimal power values.
+         */
         int shieldAmplifierCap =
                 CHANNEL_TICKS
-                        * shieldStacksPerBolt
-                        - 1;
+                        * SHIELD_STACKS_PER_BOLT
+                        - 1
+                        + (int) Math.floor(
+                                SHIELD_POWER_COEFFICIENT
+                                        * CHANNEL_TICKS
+                                        * power
+                        );
 
         Vec3 launchPoint =
                 caster.getEyePosition()
