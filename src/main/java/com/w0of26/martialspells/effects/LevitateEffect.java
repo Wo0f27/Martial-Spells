@@ -1,11 +1,9 @@
 package com.w0of26.martialspells.effects;
 
-import com.w0of26.martialspells.spells.PaladinVfx;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
 
 /**
@@ -55,14 +53,6 @@ public final class LevitateEffect extends MobEffect {
                 entity.getEffect(
                         MobEffects.SLOW_FALLING
                 );
-
-        if (entity.level() instanceof ServerLevel serverLevel
-                && serverLevel.getGameTime() % 4L == 0L) {
-            PaladinVfx.levitateChannel(
-                    serverLevel,
-                    entity
-            );
-        }
 
         if (slowFalling == null
                 || slowFalling.getDuration()
