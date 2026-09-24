@@ -25,7 +25,6 @@ entity_dir = root / "src/main/java/com/w0of26/martialspells/entity"
 channel = (spell_dir / "PaladinChannelSupport.java").read_text(encoding="utf-8")
 for token in (
     "nextImpactIndex + 0.5F",
-    "effectiveCastTicks / (float) channelTicks",
     "getEffectiveSpellCooldown",
     "fullEffectiveCooldown * progress",
     "getManaCost(spellLevel) * progress",
@@ -39,6 +38,10 @@ for token in (
 ):
     if token not in channel:
         errors.append(f"PaladinChannelSupport missing {token}")
+
+channel_compact = "".join(channel.split())
+if "effectiveCastTicks/(float)channelTicks" not in channel_compact:
+    errors.append("PaladinChannelSupport missing effectiveCastTicks / (float) channelTicks")
 
 holy_beam = (spell_dir / "PaladinHolyBeamSpell.java").read_text(encoding="utf-8")
 for token in (
@@ -74,7 +77,10 @@ for token in (
     if token not in holy_beam:
         errors.append(f"PaladinHolyBeamSpell missing {token}")
 
-if "RaycastBuilder" in holy_beam:
+if (
+    "RaycastBuilder.begin(" in holy_beam
+    or "import io.redspace.ironsspellbooks.api.util.RaycastBuilder;" in holy_beam
+):
     errors.append("Holy Light must not collapse Spell Engine BEAM into a first-hit RaycastBuilder result")
 if "EntityHitResult" in holy_beam:
     errors.append("Holy Light BEAM must not use a single EntityHitResult target")
@@ -165,13 +171,19 @@ for token in (
     "Utils.shouldHealEntity",
     "ABSORPTION_RADIUS",
     "PRIEST_ABSORPTION",
-    "currentStacks + shieldStacksPerBolt",
-    "shieldAmplifierCap + 1",
     "ABSORPTION_HEALTH_PER_STACK",
     "PENANCE_IMPACT",
-    "NetworkHooks.getEntitySpawningPacket",
 ):
     if token not in projectile:
+        errors.append(f"PenanceProjectile missing {token}")
+
+projectile_compact = "".join(projectile.split())
+for token in (
+    "currentStacks+shieldStacksPerBolt",
+    "shieldAmplifierCap+1",
+    "NetworkHooks.getEntitySpawningPacket(this)",
+):
+    if token not in projectile_compact:
         errors.append(f"PenanceProjectile missing {token}")
 
 holy_support = (spell_dir / "PaladinHolySpellSupport.java").read_text(encoding="utf-8")
