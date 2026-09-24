@@ -8,6 +8,7 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -175,7 +176,7 @@ public final class PaladinBarrierEntity extends Entity {
         }
     }
 
-    private LivingEntity resolveOwner(
+    public LivingEntity resolveOwner(
             ServerLevel level
     ) {
         if (ownerId == null) {
@@ -187,6 +188,44 @@ public final class PaladinBarrierEntity extends Entity {
         return entity instanceof LivingEntity living
                 ? living
                 : null;
+    }
+
+    public boolean isProtected(
+            Entity other
+    ) {
+        if (!(level() instanceof ServerLevel serverLevel)) {
+            return false;
+        }
+        LivingEntity owner = resolveOwner(serverLevel);
+        return owner != null
+                && other instanceof LivingEntity living
+                && Utils.shouldHealEntity(owner, living);
+    }
+
+    @Override
+    public boolean canBeCollidedWith() {
+        return true;
+    }
+
+    @Override
+    public boolean hurt(
+            DamageSource source,
+            float amount
+    ) {
+        if (!level().isClientSide
+                && level() instanceof ServerLevel serverLevel) {
+            serverLevel.playSound(
+                    null,
+                    blockPosition(),
+                    MartialSoundRegistry.HOLY_BARRIER_IMPACT.get(),
+                    SoundSource.PLAYERS,
+                    1.0F,
+                    1.0F
+            );
+        }
+        // Source Barrier has no health pool: impacts provide feedback but do
+        // not shorten the spell-created barrier lifetime.
+        return false;
     }
 
     public boolean isExpiring() {
