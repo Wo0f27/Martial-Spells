@@ -298,13 +298,34 @@ for token in (
 
 holy_beam_renderer = (root / "src/main/java/com/w0of26/martialspells/client/render/HolyBeamVisualRenderer.java").read_text(encoding="utf-8")
 for token in (
-    "RenderType.lightning()",
-    "OUTER_WIDTH = 0.055D",
-    "INNER_WIDTH = 0.020D",
-    "PaladinHolyBeamSpell.RANGE",
+    '"textures/entity/beacon_beam.png"',
+    "RenderType.beaconBeam(",
+    "WIDTH = 0.10F",
+    "FLOW = 1.50F",
+    "OUTER_RED = 255",
+    "OUTER_GREEN = 204",
+    "OUTER_BLUE = 102",
+    "WIDTH * 1.50F",
+    "WIDTH * 2.0F",
+    "absoluteTime * 2.25F",
+    "owner.getEyeHeight()",
+    "owner.getBbHeight() * 0.15F",
+    "look.scale(0.50D)",
 ):
     if token not in holy_beam_renderer:
-        errors.append(f"Holy Light beam renderer missing {token}")
+        errors.append(f"Holy Light source beam renderer missing {token}")
+if "RenderType.lightning()" in holy_beam_renderer:
+    errors.append("Holy Light must not fall back to the old crossed lightning-beam approximation")
+
+for token in (
+    "sourceBeamStart(",
+    "caster.getEyeHeight()",
+    "caster.getBbHeight()",
+    "look.scale(0.50D)",
+    "PaladinVfx.holyBeamCasting(",
+):
+    if token not in holy_beam:
+        errors.append(f"Holy Light source launch/presentation missing {token}")
 
 judgement_renderer = (root / "src/main/java/com/w0of26/martialspells/client/render/JudgementVisualRenderer.java").read_text(encoding="utf-8")
 for token in (
@@ -315,11 +336,48 @@ for token in (
     if token not in judgement_renderer:
         errors.append(f"Judgement source model renderer missing {token}")
 
+particle_registry = (root / "src/main/java/com/w0of26/martialspells/registry/MartialParticleRegistry.java").read_text(encoding="utf-8")
+for token in (
+    "PALADIN_SPARK_FLOAT",
+    "PALADIN_SPARK_DECELERATE",
+    "PALADIN_SPARK_ASCEND",
+    "PALADIN_HOLY_FLOAT",
+    "PALADIN_HOLY_DECELERATE",
+    "PALADIN_HOLY_BURST",
+    "PALADIN_HEAL_ASCEND",
+    "PALADIN_SPELL_FLOAT",
+    "PALADIN_SPELL_DECELERATE",
+    "PALADIN_STRIPE_FLOAT",
+    "PALADIN_AREA_553_CAMERA",
+    "PALADIN_AREA_637_GROUND",
+    "PALADIN_AREA_676_CAMERA",
+):
+    if token not in particle_registry:
+        errors.append(f"source-style Paladin particle registry missing {token}")
+
+source_magic_particle = (root / "src/main/java/com/w0of26/martialspells/client/particle/PaladinSourceMagicParticle.java").read_text(encoding="utf-8")
+for token in (
+    "enum Motion",
+    "FLOAT",
+    "DECELERATE",
+    "ASCEND",
+    "BURST",
+):
+    if token not in source_magic_particle:
+        errors.append(f"PaladinSourceMagicParticle missing Spell Engine motion {token}")
+
+source_area_particle = (root / "src/main/java/com/w0of26/martialspells/client/particle/PaladinSourceAreaParticle.java").read_text(encoding="utf-8")
+for token in (
+    "Facing.CAMERA",
+    "Facing.GROUND",
+    "encodedFollowId",
+    "followEntityId",
+):
+    if token not in source_area_particle:
+        errors.append(f"PaladinSourceAreaParticle missing {token}")
+
 vfx = (spell_dir / "PaladinVfx.java").read_text(encoding="utf-8")
 for token in (
-    "new Vector3f(1.0F, 1.0F, 0.80F)",
-    "new Vector3f(1.0F, 0.80F, 0.40F)",
-    "new Vector3f(0.40F, 1.0F, 0.40F)",
     "holyCasting(",
     "healPillar(",
     "holyBurst(",
@@ -328,15 +386,23 @@ for token in (
     "immolationRelease(",
     "divineProtectionPop(",
     "blessedGather(",
-    "blessedWeaponAura(",
+    "blessedRelease(",
+    "holyBeamCasting(",
     "holyBeam(",
     "levitateChannel(",
     "penanceHelix(",
     "penanceAreaPulse(",
+    "judgementTrail(",
     "judgementImpact(",
 ):
     if token not in vfx:
-        errors.append(f"PaladinVfx missing {token}")
+        errors.append(f"PaladinVfx missing source-style helper {token}")
+for forbidden in (
+    "new Vector3f(",
+    "blessedWeaponAura(",
+):
+    if forbidden in vfx:
+        errors.append(f"PaladinVfx still contains approximation-era fallback {forbidden}")
 
 vfx_expectations = {
     "PaladinHolyShockSpell.java": (
@@ -372,11 +438,11 @@ vfx_expectations = {
         "PaladinVfx.holyBurst(",
     ),
     "PaladinHolyBeamSpell.java": (
+        "PaladinVfx.holyBeamCasting(",
         "PaladinVfx.holyBeam(",
         "PaladinVfx.healPillar(",
         "PaladinVfx.holyGlimmer(",
         "PaladinVfx.holyBurst(",
-        "PaladinVfx.holySparksAt(",
     ),
     "PaladinLevitateSpell.java": (
         "PaladinVfx.levitateChannel(",
@@ -389,16 +455,90 @@ for filename, tokens in vfx_expectations.items():
     text = (spell_dir / filename).read_text(encoding="utf-8")
     for token in tokens:
         if token not in text:
-            errors.append(f"{filename} missing restored VFX call {token}")
+            errors.append(f"{filename} missing source-style VFX call {token}")
 
 blessed_events = (root / "src/main/java/com/w0of26/martialspells/events/BlessedStrikesEvents.java").read_text(encoding="utf-8")
-for token in ("PaladinVfx.holyBurst(", "PaladinVfx.blessedWeaponAura("):
-    if token not in blessed_events:
-        errors.append(f"BlessedStrikesEvents missing restored VFX call {token}")
+if "PaladinVfx.holyBurst(" not in blessed_events:
+    errors.append("BlessedStrikesEvents missing source Holy impact burst")
+if "blessedWeaponAura(" in blessed_events:
+    errors.append("Blessed Strikes must not use the old particle weapon-aura approximation")
+
+blessed_glow = (root / "src/main/java/com/w0of26/martialspells/client/render/BlessedStrikesItemGlow.java").read_text(encoding="utf-8")
+for token in (
+    "OPACITY_PER_STACK = 0.20F",
+    "GAIN = 3.0F",
+    "TEXTURE_SCALE = 8.0F",
+    "MAX_STACKS = 5",
+    '"textures/misc/paladin_item_glow.png"',
+    "1.0F, 1.0F, 0.80F",
+    "VertexMultiConsumer.create(",
+):
+    if token not in blessed_glow:
+        errors.append(f"Blessed Strikes source item glow missing {token}")
+
+blessed_mixin = (root / "src/main/java/com/w0of26/martialspells/mixin/client/BlessedStrikesItemRendererMixin.java").read_text(encoding="utf-8")
+for token in (
+    '@Mixin(ItemRenderer.class)',
+    "renderStatic(",
+    "getFoilBuffer",
+    "getFoilBufferDirect",
+    "BlessedStrikesItemGlow.begin(",
+    "BlessedStrikesItemGlow.glowing(",
+):
+    if token not in blessed_mixin:
+        errors.append(f"Blessed Strikes item-render hook missing {token}")
+
+mixins_json = json.loads((root / "src/main/resources/martial_spells.mixins.json").read_text(encoding="utf-8"))
+if "client.BlessedStrikesItemRendererMixin" not in mixins_json.get("client", []):
+    errors.append("Blessed Strikes item-render mixin is not registered")
 
 divine_events = (root / "src/main/java/com/w0of26/martialspells/events/DivineProtectionEvents.java").read_text(encoding="utf-8")
 if "PaladinVfx.divineProtectionPop(" not in divine_events:
     errors.append("DivineProtectionEvents missing source-style protection pop VFX")
+
+divine_renderer = (root / "src/main/java/com/w0of26/martialspells/client/render/DivineProtectionRenderer.java").read_text(encoding="utf-8")
+for token in (
+    '"spell_effect/divine_protection"',
+    '"spell_effect/divine_protection_glow"',
+    "HORIZONTAL_OFFSET = 0.35F",
+    "ORBITING_SPEED = 2.25F",
+    "effect.getAmplifier()",
+    "LightTexture.FULL_BRIGHT",
+):
+    if token not in divine_renderer:
+        errors.append(f"Divine Protection source orbit renderer missing {token}")
+
+client_events = (root / "src/main/java/com/w0of26/martialspells/client/MartialClientEvents.java").read_text(encoding="utf-8")
+for token in (
+    "DivineProtectionRenderer::onRenderLivingPost",
+    "PALADIN_AREA_553_CAMERA",
+    "PaladinSourceMagicParticle.Motion.FLOAT",
+    "PaladinSourceMagicParticle.Motion.DECELERATE",
+    "PaladinSourceMagicParticle.Motion.ASCEND",
+    "PaladinSourceMagicParticle.Motion.BURST",
+):
+    if token not in client_events:
+        errors.append(f"Paladin source presentation registration missing {token}")
+
+status_vfx = (root / "src/main/java/com/w0of26/martialspells/client/PaladinStatusVfxClientEvents.java").read_text(encoding="utf-8")
+for token in (
+    "MartialEffectRegistry.LEVITATE.get()",
+    "ParticleTypes.CLOUD",
+    "entity.tickCount % 3",
+    "MartialEffectRegistry",
+    ".PRIEST_ABSORPTION",
+    "PALADIN_AREA_553_CAMERA",
+    "entity.tickCount % 30",
+    '"turtlecore",',
+    '"stunned"',
+    "ParticleTypes.CRIT",
+    "* 18.0D",
+):
+    if token not in status_vfx:
+        errors.append(f"persistent Paladin status VFX missing {token}")
+
+if "PaladinVfx.levitateChannel(" in levitate_effect:
+    errors.append("LevitateEffect must not use the old persistent Holy-particle approximation; source uses client cloud spawner")
 
 for token in (
     "PaladinVfx.penanceHelix(",
@@ -409,9 +549,6 @@ for token in (
     if token not in projectile:
         errors.append(f"PenanceProjectile missing restored VFX call {token}")
 
-if "PaladinVfx.levitateChannel(" not in levitate_effect:
-    errors.append("LevitateEffect missing persistent float VFX")
-
 judgement_manager = (root / "src/main/java/com/w0of26/martialspells/combat/JudgementImpactManager.java").read_text(encoding="utf-8")
 for token in (
     "new JudgementVisualEntity(",
@@ -419,6 +556,22 @@ for token in (
 ):
     if token not in judgement_manager:
         errors.append(f"JudgementImpactManager missing model-VFX integration {token}")
+
+# Exact source-art assets owned by P2/P3 sync.
+for rel in (
+    "textures/spell_effect/divine_protection.png",
+    "textures/spell_effect/divine_protection_glow.png",
+    "textures/misc/paladin_item_glow.png",
+    "textures/particle/paladin_source/magic/holy.png",
+    "textures/particle/paladin_source/magic/heal.png",
+):
+    if not (root / "src/main/resources/assets/martial_spells" / rel).is_file():
+        errors.append(f"source-faithful Paladin VFX asset missing; rerun P3 asset sync: {rel}")
+
+for frame in range(13):
+    rel = f"textures/particle/paladin_source/zone/effect_553_{frame}.png"
+    if not (root / "src/main/resources/assets/martial_spells" / rel).is_file():
+        errors.append(f"Priest Absorption aura frame missing; rerun P3 asset sync: {rel}")
 
 lang = json.loads((root / "src/main/resources/assets/martial_spells/lang/en_us.json").read_text(encoding="utf-8"))
 for key in (
