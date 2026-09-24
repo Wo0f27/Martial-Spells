@@ -42,6 +42,33 @@ public final class MartialParticleRegistry {
     public static final RegistryObject<SimpleParticleType> LAST_STAND_AURA =
             PARTICLES.register("last_stand_aura", () -> new SimpleParticleType(false));
 
+    // Frozen Paladins / Spell Engine visual subset. These remain Martial
+    // Spells-owned particle types; no Spell Engine runtime dependency exists.
+    public static final RegistryObject<SimpleParticleType> PALADIN_SPARK_FLOAT =
+            PARTICLES.register("paladin_spark_float", () -> new SimpleParticleType(false));
+    public static final RegistryObject<SimpleParticleType> PALADIN_SPARK_DECELERATE =
+            PARTICLES.register("paladin_spark_decelerate", () -> new SimpleParticleType(false));
+    public static final RegistryObject<SimpleParticleType> PALADIN_SPARK_ASCEND =
+            PARTICLES.register("paladin_spark_ascend", () -> new SimpleParticleType(false));
+    public static final RegistryObject<SimpleParticleType> PALADIN_HOLY_FLOAT =
+            PARTICLES.register("paladin_holy_float", () -> new SimpleParticleType(false));
+    public static final RegistryObject<SimpleParticleType> PALADIN_HOLY_DECELERATE =
+            PARTICLES.register("paladin_holy_decelerate", () -> new SimpleParticleType(false));
+    public static final RegistryObject<SimpleParticleType> PALADIN_HOLY_BURST =
+            PARTICLES.register("paladin_holy_burst", () -> new SimpleParticleType(false));
+    public static final RegistryObject<SimpleParticleType> PALADIN_HEAL_ASCEND =
+            PARTICLES.register("paladin_heal_ascend", () -> new SimpleParticleType(false));
+    public static final RegistryObject<SimpleParticleType> PALADIN_SPELL_FLOAT =
+            PARTICLES.register("paladin_spell_float", () -> new SimpleParticleType(false));
+    public static final RegistryObject<SimpleParticleType> PALADIN_SPELL_DECELERATE =
+            PARTICLES.register("paladin_spell_decelerate", () -> new SimpleParticleType(false));
+    public static final RegistryObject<SimpleParticleType> PALADIN_STRIPE_FLOAT =
+            PARTICLES.register("paladin_stripe_float", () -> new SimpleParticleType(false));
+    public static final RegistryObject<SimpleParticleType> PALADIN_AREA_637_GROUND =
+            PARTICLES.register("paladin_area_637_ground", () -> new SimpleParticleType(false));
+    public static final RegistryObject<SimpleParticleType> PALADIN_AREA_676_CAMERA =
+            PARTICLES.register("paladin_area_676_camera", () -> new SimpleParticleType(false));
+
     private MartialParticleRegistry() {}
 
     public static void register(IEventBus modEventBus) {
