@@ -98,7 +98,7 @@ public final class BlessedStrikesGlowRenderTypes
                                         COLOR_WRITE
                                 )
                                 .setCullState(
-                                        CULL
+                                        NO_CULL
                                 )
                                 .setDepthTestState(
                                         EQUAL_DEPTH_TEST
