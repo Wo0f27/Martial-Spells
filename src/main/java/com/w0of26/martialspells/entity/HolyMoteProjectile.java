@@ -33,7 +33,8 @@ import java.util.UUID;
 public final class HolyMoteProjectile extends ThrowableProjectile {
     public static final float VELOCITY = 1.0F;
     public static final float HOMING_DEGREES_PER_TICK = 16.0F;
-    public static final double HOMING_START_DISTANCE = 12.0D * 0.15D;
+    public static final double RANGE = 12.0D;
+    public static final double HOMING_START_RELATIVE_DISTANCE = 0.15D;
     public static final int MAX_AGE_TICKS = 20 * 10;
 
     private static final double EPSILON = 1.0E-8D;
@@ -42,6 +43,7 @@ public final class HolyMoteProjectile extends ThrowableProjectile {
     private UUID summonerId;
     private float healing;
     private float distanceTraveled;
+    private float homingStartDistance;
     private int bouncesRemaining = 1;
 
     public HolyMoteProjectile(
@@ -49,7 +51,8 @@ public final class HolyMoteProjectile extends ThrowableProjectile {
             Level level
     ) {
         super(type, level);
-        setNoGravity(false);
+        setNoGravity(true);
+        setNoGravity(true);
         noCulling = true;
     }
 
@@ -72,11 +75,6 @@ public final class HolyMoteProjectile extends ThrowableProjectile {
     protected void defineSynchedData() {
     }
 
-    @Override
-    protected float getGravity() {
-        return 0.03F;
-    }
-
     public void launchToward(
             LivingEntity target
     ) {
@@ -86,6 +84,11 @@ public final class HolyMoteProjectile extends ThrowableProjectile {
                 target.getBoundingBox()
                         .getCenter()
                         .subtract(start);
+        homingStartDistance =
+                (float) (
+                        desired.length()
+                                * HOMING_START_RELATIVE_DISTANCE
+                );
 
         double horizontal =
                 Math.sqrt(
@@ -144,8 +147,14 @@ public final class HolyMoteProjectile extends ThrowableProjectile {
         }
 
         if (!level().isClientSide
+                && distanceTraveled >= RANGE) {
+            discard();
+            return;
+        }
+
+        if (!level().isClientSide
                 && distanceTraveled
-                >= HOMING_START_DISTANCE) {
+                >= homingStartDistance) {
             applyHoming();
         }
 
@@ -432,6 +441,10 @@ public final class HolyMoteProjectile extends ThrowableProjectile {
                 "Distance",
                 distanceTraveled
         );
+        tag.putFloat(
+                "HomingStart",
+                homingStartDistance
+        );
         tag.putInt(
                 "Bounces",
                 bouncesRemaining
@@ -456,6 +469,10 @@ public final class HolyMoteProjectile extends ThrowableProjectile {
                 tag.getFloat("Healing");
         distanceTraveled =
                 tag.getFloat("Distance");
+        homingStartDistance =
+                tag.contains("HomingStart")
+                        ? tag.getFloat("HomingStart")
+                        : 0.0F;
         bouncesRemaining =
                 tag.contains("Bounces")
                         ? tag.getInt("Bounces")
