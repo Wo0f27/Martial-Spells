@@ -1,28 +1,28 @@
 package com.w0of26.martialspells.events;
 
 import com.w0of26.martialspells.MartialSpells;
+import com.w0of26.martialspells.entity.PaladinBarrierEntity;
 import com.w0of26.martialspells.registry.MartialEffectRegistry;
 import com.w0of26.martialspells.registry.MartialSpellRegistry;
 import com.w0of26.martialspells.spells.PaladinLightwellSpell;
 import io.redspace.ironsspellbooks.api.events.SpellCooldownAddedEvent;
-import io.redspace.ironsspellbooks.datagen.DamageTypeTagGenerator;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.damagesource.DamageTypes;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.attributes.Attribute;
-import net.minecraft.world.entity.ai.attributes.AttributeInstance;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraftforge.event.entity.ProjectileImpactEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
-import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.registries.ForgeRegistries;
 
-import java.util.UUID;
+import java.util.List;
 
 /** Cross-system integration hooks required by frozen Paladins P4 mechanics. */
 @Mod.EventBusSubscriber(
@@ -34,32 +34,34 @@ public final class PaladinP4Events {
             PaladinLightwellSpell.BASE_COOLDOWN_SECONDS * 20;
 
     private static final TagKey<DamageType> COMMON_MAGIC =
-            TagKey.create(
-                    Registries.DAMAGE_TYPE,
-                    ResourceLocation.fromNamespaceAndPath(
-                            "c",
-                            "is_magic"
-                    )
+            damageTag(
+                    "c",
+                    "is_magic"
             );
 
     private static final TagKey<DamageType> FORGE_MAGIC =
-            TagKey.create(
-                    Registries.DAMAGE_TYPE,
-                    ResourceLocation.fromNamespaceAndPath(
-                            "forge",
-                            "is_magic"
-                    )
+            damageTag(
+                    "forge",
+                    "is_magic"
             );
 
-    private static final ResourceLocation RANGED_HASTE_ID =
-            ResourceLocation.fromNamespaceAndPath(
-                    "ranged_weapon",
-                    "haste"
-            );
-
-    private static final UUID RANGED_HASTE_MODIFIER_ID =
-            UUID.fromString(
-                    "8a6eef4f-6de9-4f0a-bf3c-cb39a4ff8b05"
+    /*
+     * Iron's Forge 1.20.1 publishes each spell school as a damage-type tag.
+     * The frozen Paladins barrier points at the common magic umbrella. Spell
+     * Engine normally receives that umbrella from Spell Power; CP11 has no
+     * Spell Power runtime, so explicitly include Iron's school tags here.
+     */
+    private static final List<TagKey<DamageType>> IRONS_MAGIC =
+            List.of(
+                    damageTag("irons_spellbooks", "fire_magic"),
+                    damageTag("irons_spellbooks", "ice_magic"),
+                    damageTag("irons_spellbooks", "lightning_magic"),
+                    damageTag("irons_spellbooks", "holy_magic"),
+                    damageTag("irons_spellbooks", "ender_magic"),
+                    damageTag("irons_spellbooks", "blood_magic"),
+                    damageTag("irons_spellbooks", "evocation_magic"),
+                    damageTag("irons_spellbooks", "nature_magic"),
+                    damageTag("irons_spellbooks", "eldritch_magic")
             );
 
     private PaladinP4Events() {
@@ -72,30 +74,53 @@ public final class PaladinP4Events {
         LivingEntity target =
                 event.getEntity();
 
-        if (!target.hasEffect(
-                MartialEffectRegistry
-                        .BARRIER_PROTECTED
-                        .get()
-        )) {
+        if (target.level().isClientSide
+                || !target.hasEffect(
+                        MartialEffectRegistry
+                                .BARRIER_PROTECTED
+                                .get()
+                )) {
             return;
         }
 
-        var source =
-                event.getSource();
+        if (barrierProtectsAgainst(
+                event.getSource()
+        )) {
+            event.setCanceled(true);
+        }
+    }
 
-        if (source.is(DamageTypes.PLAYER_ATTACK)
-                || source.is(DamageTypeTags.IS_EXPLOSION)
-                || source.is(COMMON_MAGIC)
-                || source.is(FORGE_MAGIC)
-                || source.is(DamageTypeTagGenerator.FIRE_MAGIC)
-                || source.is(DamageTypeTagGenerator.ICE_MAGIC)
-                || source.is(DamageTypeTagGenerator.LIGHTNING_MAGIC)
-                || source.is(DamageTypeTagGenerator.HOLY_MAGIC)
-                || source.is(DamageTypeTagGenerator.ENDER_MAGIC)
-                || source.is(DamageTypeTagGenerator.BLOOD_MAGIC)
-                || source.is(DamageTypeTagGenerator.EVOCATION_MAGIC)
-                || source.is(DamageTypeTagGenerator.ELDRITCH_MAGIC)
-                || source.is(DamageTypeTagGenerator.NATURE_MAGIC)) {
+    /**
+     * Spell Engine's TwoWayCollisionChecker lets friendly projectiles pass
+     * through Barrier while hostile projectiles collide. Forge's projectile
+     * impact event is the dependency-free equivalent for vanilla-style
+     * projectile raycasts.
+     */
+    @SubscribeEvent
+    public static void onProjectileImpact(
+            ProjectileImpactEvent event
+    ) {
+        if (!(event.getRayTraceResult()
+                instanceof EntityHitResult hit)
+                || !(hit.getEntity()
+                instanceof PaladinBarrierEntity barrier)) {
+            return;
+        }
+
+        Projectile projectile =
+                event.getProjectile();
+
+        if (projectile.level().isClientSide) {
+            return;
+        }
+
+        Entity shooter =
+                projectile.getOwner();
+
+        if (shooter instanceof LivingEntity livingShooter
+                && barrier.isProtected(
+                        livingShooter
+                )) {
             event.setCanceled(true);
         }
     }
@@ -117,65 +142,37 @@ public final class PaladinP4Events {
         }
     }
 
-    /**
-     * RangedWeaponAPI integration without a hard dependency. Upstream Battle
-     * Banner grants +40% ranged haste in addition to melee/spell haste.
-     */
-    @SubscribeEvent
-    public static void onLivingTick(
-            LivingEvent.LivingTickEvent event
+    private static boolean barrierProtectsAgainst(
+            DamageSource source
     ) {
-        LivingEntity living =
-                event.getEntity();
-
-        if (living.level().isClientSide) {
-            return;
+        if (source.is(DamageTypes.PLAYER_ATTACK)
+                || source.is(DamageTypeTags.IS_EXPLOSION)
+                || source.is(DamageTypes.MAGIC)
+                || source.is(DamageTypes.INDIRECT_MAGIC)
+                || source.is(COMMON_MAGIC)
+                || source.is(FORGE_MAGIC)) {
+            return true;
         }
 
-        Attribute rangedHaste =
-                ForgeRegistries.ATTRIBUTES.getValue(
-                        RANGED_HASTE_ID
-                );
-        if (rangedHaste == null) {
-            return;
-        }
-
-        AttributeInstance instance =
-                living.getAttribute(
-                        rangedHaste
-                );
-        if (instance == null) {
-            return;
-        }
-
-        boolean active =
-                living.hasEffect(
-                        MartialEffectRegistry
-                                .BATTLE_BANNER
-                                .get()
-                );
-
-        AttributeModifier existing =
-                instance.getModifier(
-                        RANGED_HASTE_MODIFIER_ID
-                );
-
-        if (active) {
-            if (existing == null) {
-                instance.addTransientModifier(
-                        new AttributeModifier(
-                                RANGED_HASTE_MODIFIER_ID,
-                                MartialSpells.MOD_ID
-                                        + ".battle_banner_ranged_haste",
-                                0.40D,
-                                AttributeModifier.Operation.MULTIPLY_BASE
-                        )
-                );
+        for (TagKey<DamageType> magicTag : IRONS_MAGIC) {
+            if (source.is(magicTag)) {
+                return true;
             }
-        } else if (existing != null) {
-            instance.removeModifier(
-                    RANGED_HASTE_MODIFIER_ID
-            );
         }
+
+        return false;
+    }
+
+    private static TagKey<DamageType> damageTag(
+            String namespace,
+            String path
+    ) {
+        return TagKey.create(
+                Registries.DAMAGE_TYPE,
+                ResourceLocation.fromNamespaceAndPath(
+                        namespace,
+                        path
+                )
+        );
     }
 }
