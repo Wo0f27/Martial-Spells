@@ -174,7 +174,8 @@ public final class HolyMoteProjectile extends ThrowableProjectile {
 
             PaladinVfx.holyMoteTrail(
                     serverLevel,
-                    position()
+                    position(),
+                    getDeltaMovement()
             );
         }
     }
