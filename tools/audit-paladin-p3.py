@@ -93,6 +93,8 @@ for token in (
     "new Vec3(",
     "0.0D,",
     "UPWARD_VELOCITY",
+    "player.hasImpulse = true",
+    "player.hurtMarked = true",
     "MartialEffectRegistry.LEVITATE.get()",
     "AttributeModifier.Operation.MULTIPLY_TOTAL",
     "HOLY_WARD_IMPACT",
