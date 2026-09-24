@@ -114,6 +114,30 @@ public final class MartialSoundRegistry {
     public static final RegistryObject<SoundEvent> IMMOLATION_RELEASE =
             register("immolation_release");
 
+    public static final RegistryObject<SoundEvent> HOLY_BEAM_START_CASTING =
+            register("holy_beam_start_casting");
+
+    public static final RegistryObject<SoundEvent> HOLY_BEAM_CASTING =
+            register("holy_beam_casting");
+
+    public static final RegistryObject<SoundEvent> HOLY_BEAM_RELEASE =
+            register("holy_beam_release");
+
+    public static final RegistryObject<SoundEvent> HOLY_BEAM_HEAL =
+            register("holy_beam_heal");
+
+    public static final RegistryObject<SoundEvent> HOLY_BEAM_DAMAGE =
+            register("holy_beam_damage");
+
+    public static final RegistryObject<SoundEvent> HOLY_WARD_IMPACT =
+            register("holy_ward_impact");
+
+    public static final RegistryObject<SoundEvent> PENANCE_RELEASE =
+            register("penance_release");
+
+    public static final RegistryObject<SoundEvent> PENANCE_IMPACT =
+            register("penance_impact");
+
     private MartialSoundRegistry() {}
 
     private static RegistryObject<SoundEvent> register(String path) {
