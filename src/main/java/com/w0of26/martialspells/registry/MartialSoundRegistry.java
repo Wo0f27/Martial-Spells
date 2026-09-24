@@ -138,6 +138,25 @@ public final class MartialSoundRegistry {
     public static final RegistryObject<SoundEvent> PENANCE_IMPACT =
             register("penance_impact");
 
+    public static final RegistryObject<SoundEvent> HOLY_BARRIER_ACTIVATE =
+            register("holy_barrier_activate");
+    public static final RegistryObject<SoundEvent> HOLY_BARRIER_IDLE =
+            register("holy_barrier_idle");
+    public static final RegistryObject<SoundEvent> HOLY_BARRIER_IMPACT =
+            register("holy_barrier_impact");
+    public static final RegistryObject<SoundEvent> HOLY_BARRIER_DEACTIVATE =
+            register("holy_barrier_deactivate");
+    public static final RegistryObject<SoundEvent> BATTLE_BANNER_RELEASE =
+            register("battle_banner_release");
+    public static final RegistryObject<SoundEvent> BATTLE_BANNER_PRESENCE =
+            register("battle_banner_presence");
+    public static final RegistryObject<SoundEvent> LIGHTWELL_SPAWN =
+            register("lightwell_spawn");
+    public static final RegistryObject<SoundEvent> LIGHTWELL_AMBIENT =
+            register("lightwell_ambient");
+    public static final RegistryObject<SoundEvent> LIGHTWELL_DESPAWN =
+            register("lightwell_despawn");
+
     private MartialSoundRegistry() {}
 
     private static RegistryObject<SoundEvent> register(String path) {
