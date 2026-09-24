@@ -109,7 +109,7 @@ public final class JudgementVisualRenderer
                 .renderModelLists(
                         model,
                         ItemStack.EMPTY,
-                        LightTexture.FULL_BRIGHT,
+                        packedLight,
                         OverlayTexture.NO_OVERLAY,
                         poseStack,
                         vertices
@@ -123,7 +123,7 @@ public final class JudgementVisualRenderer
                 partialTick,
                 poseStack,
                 bufferSource,
-                LightTexture.FULL_BRIGHT
+                packedLight
         );
     }
 
