@@ -50,8 +50,12 @@ P0-P3 remain PASS. P5 stays locked until P4 receives local build and runtime PAS
 - Aura refresh every 10 ticks.
 - Aura effect duration: 2 seconds.
 - Base radius 3 blocks.
-- Extra radius: `1 * min(4, effective Holy power)`, matching Spell Engine's
-  executable `combinedRadius` arithmetic.
+- Extra radius: `1 * min(4, source-equivalent Holy power)`, matching Spell
+  Engine's executable `combinedRadius` arithmetic.
+- Spell Power 1.20.1 uses 1.0 as default Healing Power while Iron's uses the
+  CP11 reference power 5.0, so P4 source-unit formulas normalize with
+  `Iron Holy power / 5`. Baseline Banner radius is therefore 4 blocks rather
+  than incorrectly starting at the 7-block cap.
 - Vertical range is 30% of resolved radius.
 - Friendly targets receive:
   - +40% base Attack Speed,
@@ -81,7 +85,9 @@ P0-P3 remain PASS. P5 stays locked until P4 receives local build and runtime PAS
 - Target is reacquired after each mote launch; the translation chooses the
   nearest currently wounded friendly each time.
 - Translated well healing power:
-  `1.0 + 0.5 * owner effective Holy power`.
+  `1.0 + 0.5 * owner source-equivalent Holy power`, where source-equivalent
+  power is `Iron Holy power / 5`. At the unmodified CP11 reference this is
+  1.5 source power and each Mote heals 0.525 before external heal modifiers.
 - Internal Holy Mote cadence starts at 30 ticks / 1.5 seconds and is modified
   by the owner's Iron's cooldown-reduction attribute as the target-system
   analogue of source Healing Haste.
