@@ -1,5 +1,6 @@
 package com.w0of26.martialspells.effects;
 
+import dev.shadowsoffire.attributeslib.api.ALObjects;
 import io.redspace.ironsspellbooks.api.registry.AttributeRegistry;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
@@ -11,7 +12,9 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
  *
  * <p>The source applies +40% attack speed, Healing Haste, knockback
  * resistance, and ranged haste. Iron's splits spell haste into cast-time and
- * cooldown reduction, so both receive the same +40% MULTIPLY_BASE modifier.</p>
+ * cooldown reduction, while the Forge RangedWeaponAPI port implements ranged
+ * haste through Apothic Attributes DRAW_SPEED. Each receives an independent
+ * +40% MULTIPLY_BASE modifier.</p>
  */
 public final class BattleBannerEffect extends MobEffect {
     public static final double SOURCE_MULTIPLIER = 0.40D;
@@ -43,6 +46,12 @@ public final class BattleBannerEffect extends MobEffect {
         addAttributeModifier(
                 AttributeRegistry.COOLDOWN_REDUCTION.get(),
                 "8a6eef4f-6de9-4f0a-bf3c-cb39a4ff8b04",
+                SOURCE_MULTIPLIER,
+                AttributeModifier.Operation.MULTIPLY_BASE
+        );
+        addAttributeModifier(
+                ALObjects.Attributes.DRAW_SPEED.get(),
+                "8a6eef4f-6de9-4f0a-bf3c-cb39a4ff8b05",
                 SOURCE_MULTIPLIER,
                 AttributeModifier.Operation.MULTIPLY_BASE
         );
