@@ -187,6 +187,11 @@ public final class PaladinPenanceSpell extends AbstractSpell {
         long gameTime =
                 serverLevel.getGameTime();
 
+        PaladinVfx.penanceCasting(
+                serverLevel,
+                player
+        );
+
         while (state.channel.isDue(gameTime)) {
             launchBolt(
                     serverLevel,
