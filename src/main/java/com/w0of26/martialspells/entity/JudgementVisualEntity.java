@@ -33,6 +33,7 @@ public final class JudgementVisualEntity extends Entity {
     ) {
         super(type, level);
         noPhysics = true;
+        noCulling = true;
     }
 
     public JudgementVisualEntity(
