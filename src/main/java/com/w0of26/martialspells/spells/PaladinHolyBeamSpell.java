@@ -280,13 +280,14 @@ public final class PaladinHolyBeamSpell extends AbstractSpell {
                         ? blockHit.getLocation()
                         : end;
 
+        // Spell Engine searches the full range cube, then performs the
+        // actual line/bounding-box intersection per candidate.
         AABB searchBox =
                 caster.getBoundingBox()
-                        .expandTowards(
-                                rayEnd.subtract(start)
-                        )
                         .inflate(
-                                PaladinHolySpellSupport.AIM_ASSIST
+                                RANGE,
+                                RANGE,
+                                RANGE
                         );
 
         List<TargetHit> hits =
@@ -312,7 +313,7 @@ public final class PaladinHolyBeamSpell extends AbstractSpell {
                             target,
                             start,
                             rayEnd,
-                            PaladinHolySpellSupport.AIM_ASSIST
+                            target.getPickRadius()
                     );
 
             if (hit.getType()
