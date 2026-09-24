@@ -11,6 +11,10 @@ import com.w0of26.martialspells.entity.ShatteringThrowProjectile;
 import com.w0of26.martialspells.entity.PenanceProjectile;
 import com.w0of26.martialspells.entity.JudgementVisualEntity;
 import com.w0of26.martialspells.entity.HolyBeamVisualEntity;
+import com.w0of26.martialspells.entity.HolyMoteProjectile;
+import com.w0of26.martialspells.entity.LightwellEntity;
+import com.w0of26.martialspells.entity.BattleBannerEntity;
+import com.w0of26.martialspells.entity.PaladinBarrierEntity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -106,6 +110,42 @@ public final class MartialEntityRegistry {
                     .clientTrackingRange(128)
                     .updateInterval(1)
                     .build(MartialSpells.MOD_ID + ":judgement_visual"));
+
+    public static final RegistryObject<EntityType<PaladinBarrierEntity>> PALADIN_BARRIER =
+            ENTITY_TYPES.register("paladin_barrier", () -> EntityType.Builder
+                    .<PaladinBarrierEntity>of(PaladinBarrierEntity::new, MobCategory.MISC)
+                    .sized(8.0F, 4.0F)
+                    .fireImmune()
+                    .clientTrackingRange(128)
+                    .updateInterval(20)
+                    .build(MartialSpells.MOD_ID + ":paladin_barrier"));
+
+    public static final RegistryObject<EntityType<BattleBannerEntity>> BATTLE_BANNER =
+            ENTITY_TYPES.register("battle_banner", () -> EntityType.Builder
+                    .<BattleBannerEntity>of(BattleBannerEntity::new, MobCategory.MISC)
+                    .sized(6.0F, 0.5F)
+                    .fireImmune()
+                    .clientTrackingRange(128)
+                    .updateInterval(20)
+                    .build(MartialSpells.MOD_ID + ":battle_banner"));
+
+    public static final RegistryObject<EntityType<LightwellEntity>> LIGHTWELL =
+            ENTITY_TYPES.register("lightwell", () -> EntityType.Builder
+                    .<LightwellEntity>of(LightwellEntity::new, MobCategory.MISC)
+                    .sized(0.9F, 1.4F)
+                    .fireImmune()
+                    .clientTrackingRange(64)
+                    .updateInterval(3)
+                    .build(MartialSpells.MOD_ID + ":lightwell"));
+
+    public static final RegistryObject<EntityType<HolyMoteProjectile>> HOLY_MOTE =
+            ENTITY_TYPES.register("holy_mote", () -> EntityType.Builder
+                    .<HolyMoteProjectile>of(HolyMoteProjectile::new, MobCategory.MISC)
+                    .sized(0.25F, 0.25F)
+                    .fireImmune()
+                    .clientTrackingRange(128)
+                    .updateInterval(2)
+                    .build(MartialSpells.MOD_ID + ":holy_mote"));
 
     public static final RegistryObject<EntityType<PenanceProjectile>> PENANCE_PROJECTILE =
             ENTITY_TYPES.register("penance_projectile", () -> EntityType.Builder
