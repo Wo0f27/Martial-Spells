@@ -64,6 +64,8 @@ public final class MartialParticleRegistry {
             PARTICLES.register("paladin_spell_decelerate", () -> new SimpleParticleType(false));
     public static final RegistryObject<SimpleParticleType> PALADIN_STRIPE_FLOAT =
             PARTICLES.register("paladin_stripe_float", () -> new SimpleParticleType(false));
+    public static final RegistryObject<SimpleParticleType> PALADIN_AREA_553_CAMERA =
+            PARTICLES.register("paladin_area_553_camera", () -> new SimpleParticleType(false));
     public static final RegistryObject<SimpleParticleType> PALADIN_AREA_637_GROUND =
             PARTICLES.register("paladin_area_637_ground", () -> new SimpleParticleType(false));
     public static final RegistryObject<SimpleParticleType> PALADIN_AREA_676_CAMERA =
