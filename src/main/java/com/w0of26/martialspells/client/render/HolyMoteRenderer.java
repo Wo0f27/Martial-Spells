@@ -107,7 +107,7 @@ public final class HolyMoteRenderer
                 .renderModelLists(
                         model,
                         ItemStack.EMPTY,
-                        LightTexture.FULL_BRIGHT,
+                        packedLight,
                         OverlayTexture.NO_OVERLAY,
                         poseStack,
                         vertices
@@ -121,7 +121,7 @@ public final class HolyMoteRenderer
                 partialTick,
                 poseStack,
                 bufferSource,
-                LightTexture.FULL_BRIGHT
+                packedLight
         );
     }
 
