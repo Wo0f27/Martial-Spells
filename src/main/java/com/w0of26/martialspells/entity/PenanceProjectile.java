@@ -188,6 +188,7 @@ public final class PenanceProjectile
                                     .PROJECTILE_VELOCITY
                     )
             );
+            hasImpulse = true;
             return;
         }
 
@@ -206,6 +207,7 @@ public final class PenanceProjectile
                                     .PROJECTILE_VELOCITY
                     )
             );
+            hasImpulse = true;
             return;
         }
 
@@ -231,6 +233,7 @@ public final class PenanceProjectile
                                 .PROJECTILE_VELOCITY
                 )
         );
+        hasImpulse = true;
     }
 
     @Override
