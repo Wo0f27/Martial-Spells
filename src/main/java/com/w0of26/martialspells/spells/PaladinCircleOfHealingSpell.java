@@ -65,6 +65,21 @@ public final class PaladinCircleOfHealingSpell extends AbstractSpell {
     }
 
     @Override
+    public void onServerCastTick(
+            Level level,
+            int spellLevel,
+            LivingEntity entity,
+            MagicData magicData
+    ) {
+        if (level instanceof ServerLevel serverLevel) {
+            PaladinVfx.holyCasting(
+                    serverLevel,
+                    entity
+            );
+        }
+    }
+
+    @Override
     public void onCast(
             Level level,
             int spellLevel,
@@ -83,6 +98,23 @@ public final class PaladinCircleOfHealingSpell extends AbstractSpell {
                 caster,
                 caster,
                 HEAL_COEFFICIENT
+        );
+        PaladinVfx.healPillar(
+                serverLevel,
+                caster,
+                15
+        );
+        PaladinVfx.holyGlimmer(
+                serverLevel,
+                caster,
+                15,
+                0.20D,
+                0.25D
+        );
+        PaladinVfx.circleOfHealingRelease(
+                serverLevel,
+                caster,
+                RANGE
         );
 
         double verticalRange =
@@ -121,6 +153,18 @@ public final class PaladinCircleOfHealingSpell extends AbstractSpell {
                     caster,
                     target,
                     HEAL_COEFFICIENT
+            );
+            PaladinVfx.healPillar(
+                    serverLevel,
+                    target,
+                    15
+            );
+            PaladinVfx.holyGlimmer(
+                    serverLevel,
+                    target,
+                    15,
+                    0.20D,
+                    0.25D
             );
         }
 
