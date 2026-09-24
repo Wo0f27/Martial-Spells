@@ -20,6 +20,7 @@ import com.w0of26.martialspells.client.render.EntanglingArrowRenderer;
 import com.w0of26.martialspells.client.render.NettedEffectRenderer;
 import com.w0of26.martialspells.client.render.ThrowNetRenderer;
 import com.w0of26.martialspells.client.render.ShatteringThrowRenderer;
+import com.w0of26.martialspells.client.render.PenanceProjectileRenderer;
 import com.w0of26.martialspells.registry.MartialEntityRegistry;
 import com.w0of26.martialspells.registry.MartialParticleRegistry;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
@@ -56,6 +57,7 @@ public final class MartialClientEvents {
         event.registerEntityRenderer(MartialEntityRegistry.BEAR_TRAP.get(), BearTrapRenderer::new);
         event.registerEntityRenderer(MartialEntityRegistry.THROW_NET.get(), ThrowNetRenderer::new);
         event.registerEntityRenderer(MartialEntityRegistry.SHATTERING_THROW.get(), ShatteringThrowRenderer::new);
+        event.registerEntityRenderer(MartialEntityRegistry.PENANCE_PROJECTILE.get(), PenanceProjectileRenderer::new);
     }
 
     @SubscribeEvent
