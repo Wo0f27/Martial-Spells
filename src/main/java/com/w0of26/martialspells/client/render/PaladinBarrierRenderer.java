@@ -12,7 +12,6 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
@@ -115,22 +114,19 @@ public final class PaladinBarrierRenderer
                     );
                 }
 
-                poseStack.translate(
-                        OFFSET,
-                        0.0D,
-                        0.0D
-                );
-                poseStack.rotateAround(
+                poseStack.mulPose(
                         Axis.YP.rotation(
                                 (float) (
                                         panel
                                                 / 3.0D
                                                 * Math.PI
                                 )
-                        ),
-                        -OFFSET,
-                        0.0F,
-                        0.0F
+                        )
+                );
+                poseStack.translate(
+                        OFFSET,
+                        0.0D,
+                        0.0D
                 );
                 poseStack.mulPose(
                         Axis.ZP.rotation(
@@ -458,6 +454,6 @@ public final class PaladinBarrierRenderer
     public ResourceLocation getTextureLocation(
             PaladinBarrierEntity entity
     ) {
-        return TextureAtlas.LOCATION_BLOCKS;
+        return InventoryMenu.BLOCK_ATLAS;
     }
 }
