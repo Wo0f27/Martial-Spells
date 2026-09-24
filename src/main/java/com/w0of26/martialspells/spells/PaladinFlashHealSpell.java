@@ -12,6 +12,7 @@ import io.redspace.ironsspellbooks.api.util.Utils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 
@@ -78,6 +79,21 @@ public final class PaladinFlashHealSpell extends AbstractSpell {
     }
 
     @Override
+    public void onServerCastTick(
+            Level level,
+            int spellLevel,
+            LivingEntity entity,
+            MagicData magicData
+    ) {
+        if (level instanceof ServerLevel serverLevel) {
+            PaladinVfx.holyCasting(
+                    serverLevel,
+                    entity
+            );
+        }
+    }
+
+    @Override
     public void onCast(
             Level level,
             int spellLevel,
@@ -101,6 +117,14 @@ public final class PaladinFlashHealSpell extends AbstractSpell {
                     target,
                     HEAL_COEFFICIENT
             );
+
+            if (level instanceof ServerLevel serverLevel) {
+                PaladinVfx.healPillar(
+                        serverLevel,
+                        target,
+                        30
+                );
+            }
         }
 
         super.onCast(
