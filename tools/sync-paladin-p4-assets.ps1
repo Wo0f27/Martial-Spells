@@ -82,6 +82,10 @@ foreach ($frame in 0..7) {
     Copy-SpellEngineAsset "textures/particle/magic/vertical_stripe_$frame.png" "src/main/resources/assets/martial_spells/textures/particle/paladin_source/magic/vertical_stripe_$frame.png"
 }
 
+foreach ($frame in 0..12) {
+    Copy-SpellEngineAsset "textures/particle/zone/effect_553_$frame.png" "src/main/resources/assets/martial_spells/textures/particle/paladin_source/zone/effect_553_$frame.png"
+}
+
 foreach ($frame in 0..14) {
     Copy-SpellEngineAsset "textures/particle/zone/effect_637_$frame.png" "src/main/resources/assets/martial_spells/textures/particle/paladin_source/zone/effect_637_$frame.png"
 }
