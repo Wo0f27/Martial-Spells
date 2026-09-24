@@ -148,5 +148,47 @@
     "sounds": [
       "martial_spells:immolation_release"
     ]
+  },
+  "holy_beam_start_casting": {
+    "sounds": [
+      "martial_spells:holy_beam_start_casting"
+    ]
+  },
+  "holy_beam_casting": {
+    "sounds": [
+      "martial_spells:holy_beam_casting"
+    ]
+  },
+  "holy_beam_release": {
+    "sounds": [
+      "martial_spells:holy_beam_release"
+    ]
+  },
+  "holy_beam_heal": {
+    "sounds": [
+      "martial_spells:holy_beam_heal"
+    ]
+  },
+  "holy_beam_damage": {
+    "sounds": [
+      "martial_spells:holy_beam_damage"
+    ]
+  },
+  "holy_ward_impact": {
+    "sounds": [
+      "martial_spells:holy_ward_impact"
+    ]
+  },
+  "penance_impact": {
+    "sounds": [
+      "martial_spells:penance_impact"
+    ]
+  },
+  "penance_release": {
+    "sounds": [
+      "martial_spells:penance_release_1",
+      "martial_spells:penance_release_2",
+      "martial_spells:penance_release_3"
+    ]
   }
 }
