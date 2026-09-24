@@ -153,6 +153,8 @@ for token in (
     "applyHoming()",
     "HOMING_DEGREES_PER_TICK",
     "PROJECTILE_VELOCITY",
+    "distanceTraveled",
+    ">= PaladinPenanceSpell.RANGE",
     "previousInvulnerableTime =",
     "target.invulnerableTime = 0",
     "DamageSources.applyDamage",
