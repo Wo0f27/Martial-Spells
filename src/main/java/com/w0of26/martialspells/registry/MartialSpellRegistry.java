@@ -46,6 +46,15 @@ public final class MartialSpellRegistry {
     public static final RegistryObject<AbstractSpell> CIRCLE_OF_HEALING =
             SPELLS.register("circle_of_healing", PaladinCircleOfHealingSpell::new);
 
+    public static final RegistryObject<AbstractSpell> BLESSED_STRIKES =
+            SPELLS.register("blessed_strikes", PaladinBlessedStrikesSpell::new);
+    public static final RegistryObject<AbstractSpell> DIVINE_PROTECTION =
+            SPELLS.register("divine_protection", PaladinDivineProtectionSpell::new);
+    public static final RegistryObject<AbstractSpell> JUDGEMENT =
+            SPELLS.register("judgement", PaladinJudgementSpell::new);
+    public static final RegistryObject<AbstractSpell> IMMOLATION =
+            SPELLS.register("immolation", PaladinImmolationSpell::new);
+
     private MartialSpellRegistry() {}
 
     public static void register(IEventBus modEventBus) {

@@ -7,6 +7,8 @@ import com.w0of26.martialspells.effects.DiamondBodyEffect;
 import com.w0of26.martialspells.effects.NettedEffect;
 import com.w0of26.martialspells.effects.ShatterEffect;
 import com.w0of26.martialspells.effects.BleedEffect;
+import com.w0of26.martialspells.effects.BlessedStrikesEffect;
+import com.w0of26.martialspells.effects.DivineProtectionEffect;
 import com.w0of26.martialspells.effects.LastStandEffect;
 import com.w0of26.martialspells.effects.DiamondHeartEffect;
 import com.w0of26.martialspells.effects.GuardiansCovenantLinkedEffect;
@@ -160,6 +162,22 @@ public final class MartialEffectRegistry {
             MOB_EFFECTS.register(
                     "last_stand",
                     LastStandEffect::new
+            );
+
+    /** Frozen Paladins Blessed Strikes seal stack. */
+    public static final RegistryObject<MobEffect>
+            BLESSED_STRIKES =
+            MOB_EFFECTS.register(
+                    "blessed_strikes",
+                    BlessedStrikesEffect::new
+            );
+
+    /** Frozen Paladins Divine Protection protected-hit stack. */
+    public static final RegistryObject<MobEffect>
+            DIVINE_PROTECTION =
+            MOB_EFFECTS.register(
+                    "divine_protection",
+                    DivineProtectionEffect::new
             );
 
     private MartialEffectRegistry() {
