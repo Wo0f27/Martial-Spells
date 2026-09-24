@@ -465,16 +465,34 @@ if "blessedWeaponAura(" in blessed_events:
 
 blessed_glow = (root / "src/main/java/com/w0of26/martialspells/client/render/BlessedStrikesItemGlow.java").read_text(encoding="utf-8")
 for token in (
-    "OPACITY_PER_STACK = 0.20F",
-    "GAIN = 3.0F",
-    "TEXTURE_SCALE = 8.0F",
-    "MAX_STACKS = 5",
-    '"textures/misc/paladin_item_glow.png"',
-    "1.0F, 1.0F, 0.80F",
+    "OPACITY_PER_STACK =",
+    "0.20F",
+    "MAX_STACKS =",
+    "5",
     "VertexMultiConsumer.create(",
+    "EquipmentSlot.MAINHAND",
+    "EquipmentSlot.OFFHAND",
 ):
     if token not in blessed_glow:
-        errors.append(f"Blessed Strikes source item glow missing {token}")
+        errors.append(f"Blessed Strikes source item-glow state missing {token}")
+
+blessed_render_types = (root / "src/main/java/com/w0of26/martialspells/client/render/BlessedStrikesGlowRenderTypes.java").read_text(encoding="utf-8")
+for token in (
+    "extends RenderType",
+    '"textures/misc/paladin_item_glow.png"',
+    "TEXTURE_SCALE = 8.0F",
+    "GAIN = 3.0F",
+    "OPACITY_PER_STACK = 0.20F",
+    "RENDERTYPE_GLINT_SHADER",
+    "EQUAL_DEPTH_TEST",
+    "SourceFactor.ONE",
+    "DestFactor.ONE",
+    "1.0F,",
+    "0.80F * intensity",
+    "setShaderGlintAlpha(",
+):
+    if token not in blessed_render_types:
+        errors.append(f"Blessed Strikes source glow RenderType missing {token}")
 
 blessed_mixin = (root / "src/main/java/com/w0of26/martialspells/mixin/client/BlessedStrikesItemRendererMixin.java").read_text(encoding="utf-8")
 for token in (
@@ -488,9 +506,25 @@ for token in (
     if token not in blessed_mixin:
         errors.append(f"Blessed Strikes item-render hook missing {token}")
 
+blessed_buffer_mixin = (root / "src/main/java/com/w0of26/martialspells/mixin/client/BlessedStrikesGlowBufferSourceMixin.java").read_text(encoding="utf-8")
+for token in (
+    "@Mixin(MultiBufferSource.BufferSource.class)",
+    "fixedBuffers",
+    "BlessedStrikesGlowRenderTypes",
+    ".isGlowLayer(renderType)",
+    "new BufferBuilder(",
+    "renderType.bufferSize()",
+):
+    if token not in blessed_buffer_mixin:
+        errors.append(f"Blessed Strikes glow buffer ordering missing {token}")
+
 mixins_json = json.loads((root / "src/main/resources/martial_spells.mixins.json").read_text(encoding="utf-8"))
-if "client.BlessedStrikesItemRendererMixin" not in mixins_json.get("client", []):
-    errors.append("Blessed Strikes item-render mixin is not registered")
+for mixin_id in (
+    "client.BlessedStrikesItemRendererMixin",
+    "client.BlessedStrikesGlowBufferSourceMixin",
+):
+    if mixin_id not in mixins_json.get("client", []):
+        errors.append(f"Blessed Strikes client mixin is not registered: {mixin_id}")
 
 divine_events = (root / "src/main/java/com/w0of26/martialspells/events/DivineProtectionEvents.java").read_text(encoding="utf-8")
 if "PaladinVfx.divineProtectionPop(" not in divine_events:
