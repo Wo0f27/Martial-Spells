@@ -52,7 +52,11 @@ for token in (
     "HEAL_COEFFICIENT",
     "* CHANNEL_VALUE_MULTIPLIER",
     "DAMAGE_COEFFICIENT",
-    "RaycastBuilder",
+    "targetsOnBeam(",
+    "Utils.checkEntityIntersecting",
+    "level.getEntities(",
+    "ClipContext.Block.COLLIDER",
+    "Comparator.comparingDouble",
     "Utils.shouldHealEntity",
     "HOLY_BEAM_START_CASTING",
     "HOLY_BEAM_CASTING",
@@ -62,6 +66,11 @@ for token in (
 ):
     if token not in holy_beam:
         errors.append(f"PaladinHolyBeamSpell missing {token}")
+
+if "RaycastBuilder" in holy_beam:
+    errors.append("Holy Light must not collapse Spell Engine BEAM into a first-hit RaycastBuilder result")
+if "EntityHitResult" in holy_beam:
+    errors.append("Holy Light BEAM must not use a single EntityHitResult target")
 
 levitate = (spell_dir / "PaladinLevitateSpell.java").read_text(encoding="utf-8")
 for token in (
