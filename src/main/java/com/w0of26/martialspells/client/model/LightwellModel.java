@@ -3,8 +3,9 @@ package com.w0of26.martialspells.client.model;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.w0of26.martialspells.MartialSpells;
+import com.w0of26.martialspells.client.animation.LightwellAnimations;
 import com.w0of26.martialspells.entity.LightwellEntity;
-import net.minecraft.client.model.EntityModel;
+import net.minecraft.client.model.HierarchicalModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
@@ -14,10 +15,9 @@ import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.Mth;
 
 public final class LightwellModel
-        extends EntityModel<LightwellEntity> {
+        extends HierarchicalModel<LightwellEntity> {
     public static final ModelLayerLocation LAYER =
             new ModelLayerLocation(
                     ResourceLocation.fromNamespaceAndPath(
@@ -148,6 +148,11 @@ public final class LightwellModel
     }
 
     @Override
+    public ModelPart root() {
+        return root;
+    }
+
+    @Override
     public void setupAnim(
             LightwellEntity entity,
             float limbSwing,
@@ -159,10 +164,36 @@ public final class LightwellModel
         root.getAllParts()
                 .forEach(ModelPart::resetPose);
 
-        light.yRot =
-                ageInTicks * 0.035F;
-        light.xRot =
-                Mth.sin(ageInTicks * 0.08F) * 0.04F;
+        this.animate(
+                entity.spawnAnimationState,
+                LightwellAnimations.spawn,
+                ageInTicks,
+                1.0F
+        );
+        this.animate(
+                entity.despawnAnimationState,
+                LightwellAnimations.spawn,
+                ageInTicks,
+                -1.0F
+        );
+
+        if (entity.spellReleaseAnimationState.isStarted()) {
+            // Source SummonedEntity default release duration is 15 ticks;
+            // the authored Lightwell release clip is exactly 20 ticks.
+            this.animate(
+                    entity.spellReleaseAnimationState,
+                    LightwellAnimations.spell_release,
+                    ageInTicks,
+                    20.0F / LightwellEntity.SPELL_RELEASE_ANIMATION_TICKS
+            );
+        } else {
+            this.animate(
+                    entity.idleAnimationState,
+                    LightwellAnimations.idle,
+                    ageInTicks,
+                    1.0F
+            );
+        }
     }
 
     @Override
