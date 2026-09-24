@@ -699,6 +699,121 @@ public final class PaladinVfx {
         );
     }
 
+    public static void barrierSpawn(
+            ServerLevel level,
+            Vec3 center,
+            double radius
+    ) {
+        holyBurstAt(
+                level,
+                center.add(0.0D, 1.5D, 0.0D),
+                50,
+                1.0D
+        );
+        holySparksAt(
+                level,
+                center.add(0.0D, 1.5D, 0.0D),
+                50,
+                radius * 0.75D,
+                0.20D,
+                0.45D
+        );
+    }
+
+    public static void bannerPresence(
+            ServerLevel level,
+            Vec3 center,
+            double radius
+    ) {
+        RandomSource random = level.random;
+
+        for (int i = 0; i < 15; i++) {
+            double angle =
+                    random.nextDouble() * Math.PI * 2.0D;
+            double r =
+                    Math.min(
+                            radius,
+                            0.4D + random.nextDouble() * 1.4D
+                    );
+
+            velocityParticle(
+                    level,
+                    (i % 4 == 0)
+                            ? ParticleTypes.END_ROD
+                            : HOLY_DUST,
+                    center.x + Math.cos(angle) * r,
+                    center.y + random.nextDouble() * 2.0D,
+                    center.z + Math.sin(angle) * r,
+                    0.0D,
+                    0.02D + random.nextDouble() * 0.10D,
+                    0.0D
+            );
+        }
+    }
+
+    public static void lightwellSpawn(
+            ServerLevel level,
+            Vec3 center
+    ) {
+        holyBurstAt(
+                level,
+                center.add(0.0D, 0.7D, 0.0D),
+                30,
+                0.40D
+        );
+    }
+
+    public static void lightwellAura(
+            ServerLevel level,
+            Vec3 center
+    ) {
+        RandomSource random = level.random;
+
+        for (int i = 0; i < 2; i++) {
+            double angle =
+                    random.nextDouble() * Math.PI * 2.0D;
+            double r =
+                    random.nextDouble() * 0.45D;
+
+            velocityParticle(
+                    level,
+                    (i & 1) == 0
+                            ? HOLY_DUST
+                            : ParticleTypes.END_ROD,
+                    center.x + Math.cos(angle) * r,
+                    center.y + 0.05D,
+                    center.z + Math.sin(angle) * r,
+                    0.0D,
+                    0.02D + random.nextDouble() * 0.10D,
+                    0.0D
+            );
+        }
+    }
+
+    public static void holyMoteTrail(
+            ServerLevel level,
+            Vec3 position
+    ) {
+        RandomSource random = level.random;
+        for (int i = 0; i < 5; i++) {
+            velocityParticle(
+                    level,
+                    (i & 1) == 0
+                            ? HOLY_DUST
+                            : ParticleTypes.END_ROD,
+                    position.x
+                            + (random.nextDouble() - 0.5D) * 0.12D,
+                    position.y
+                            + (random.nextDouble() - 0.5D) * 0.12D,
+                    position.z
+                            + (random.nextDouble() - 0.5D) * 0.12D,
+                    0.0D,
+                    random.nextDouble() * 0.10D,
+                    0.0D
+            );
+        }
+    }
+
     public static void judgementTrail(
             ServerLevel level,
             Vec3 point
