@@ -92,13 +92,6 @@ public final class LightwellEntity extends Entity {
             return;
         }
 
-        if (tickCount % 6 == 0) {
-            PaladinVfx.lightwellAura(
-                    serverLevel,
-                    position()
-            );
-        }
-
         if (tickCount % 60 == 0) {
             serverLevel.playSound(
                     null,
@@ -112,6 +105,13 @@ public final class LightwellEntity extends Entity {
 
         if (!isActive()) {
             return;
+        }
+
+        if (tickCount % 6 == 0) {
+            PaladinVfx.lightwellAura(
+                    serverLevel,
+                    position()
+            );
         }
 
         if (moteCooldown > 0) {
