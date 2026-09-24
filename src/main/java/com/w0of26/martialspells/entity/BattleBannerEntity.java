@@ -224,30 +224,6 @@ public final class BattleBannerEntity extends Entity {
         return radius;
     }
 
-    public float lifecycleScale(
-            float partialTick
-    ) {
-        float age =
-                tickCount + partialTick;
-
-        if (age < SPAWN_TICKS) {
-            return age / SPAWN_TICKS;
-        }
-
-        float despawnStart =
-                SPAWN_TICKS + ACTIVE_TICKS;
-        if (age >= despawnStart) {
-            return Math.max(
-                    0.0F,
-                    1.0F
-                            - (age - despawnStart)
-                            / DESPAWN_TICKS
-            );
-        }
-
-        return 1.0F;
-    }
-
     @Override
     protected void readAdditionalSaveData(
             CompoundTag tag
