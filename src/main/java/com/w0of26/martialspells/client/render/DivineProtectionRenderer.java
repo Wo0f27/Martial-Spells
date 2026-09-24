@@ -47,9 +47,7 @@ public final class DivineProtectionRenderer {
                     TextureAtlas.LOCATION_BLOCKS
             );
     private static final RenderType GLOW_LAYER =
-            RenderType.entityTranslucent(
-                    TextureAtlas.LOCATION_BLOCKS
-            );
+            PaladinSpellModelRenderTypes.radiate();
 
     private DivineProtectionRenderer() {}
 
