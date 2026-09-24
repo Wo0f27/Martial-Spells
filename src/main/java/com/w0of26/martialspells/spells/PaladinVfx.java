@@ -1,36 +1,28 @@
 package com.w0of26.martialspells.spells;
 
-import net.minecraft.core.particles.DustParticleOptions;
+import com.w0of26.martialspells.registry.MartialParticleRegistry;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Vector3f;
 
 /**
- * Forge-native reconstruction of the frozen Paladins holy visual language.
+ * Source-faithful Paladins visual batches translated from frozen
+ * Spell Engine 1.20.1 behavior.
  *
- * <p>The source authored its generic particles through Spell Engine. CP11 does
- * not take Spell Engine as a runtime dependency, so the same shapes/motion
- * intent are rebuilt here using vanilla particle primitives and the exact
- * Paladins color palette.</p>
+ * <p>This class reproduces only the particle vocabulary actually used by
+ * Paladins. Particle motion/appearance lives in the client particle classes;
+ * this class owns the authored batch geometry (SPHERE/PIPE/PILLAR/CIRCLE/LINE),
+ * origins, counts, speed ranges, pre-travel and LOOK alignment.</p>
  */
 public final class PaladinVfx {
-    private static final Vector3f HOLY_COLOR =
-            new Vector3f(1.0F, 1.0F, 0.80F);
-    private static final Vector3f HOLY_WARM_COLOR =
-            new Vector3f(1.0F, 0.80F, 0.40F);
-    private static final Vector3f HEAL_COLOR =
-            new Vector3f(0.40F, 1.0F, 0.40F);
-
-    public static final DustParticleOptions HOLY_DUST =
-            new DustParticleOptions(HOLY_COLOR, 1.0F);
-    public static final DustParticleOptions HOLY_WARM_DUST =
-            new DustParticleOptions(HOLY_WARM_COLOR, 1.0F);
-    public static final DustParticleOptions HEAL_DUST =
-            new DustParticleOptions(HEAL_COLOR, 0.9F);
+    private static final double FEET = 0.10D;
+    private static final double CENTER = 0.50D;
+    private static final double OVER_HEAD = 1.50D;
 
     private PaladinVfx() {
     }
@@ -39,34 +31,19 @@ public final class PaladinVfx {
             ServerLevel level,
             LivingEntity caster
     ) {
-        RandomSource random = caster.getRandom();
-        double baseY = caster.getY() + 0.10D;
-        double radius =
-                Math.max(0.35D, caster.getBbWidth() * 0.75D);
-
-        for (int i = 0; i < 4; i++) {
-            double angle =
-                    random.nextDouble() * Math.PI * 2.0D;
-            double r =
-                    radius * (0.35D + random.nextDouble() * 0.65D);
-            double x =
-                    caster.getX() + Math.cos(angle) * r;
-            double z =
-                    caster.getZ() + Math.sin(angle) * r;
-            double y =
-                    baseY + random.nextDouble() * 0.35D;
-
-            velocityParticle(
-                    level,
-                    HOLY_DUST,
-                    x,
-                    y,
-                    z,
-                    -Math.cos(angle) * 0.015D,
-                    0.035D + random.nextDouble() * 0.035D,
-                    -Math.sin(angle) * 0.015D
-            );
-        }
+        pipe(
+                level,
+                MartialParticleRegistry
+                        .PALADIN_SPARK_FLOAT
+                        .get(),
+                caster,
+                1,
+                0.05D,
+                0.10D,
+                FEET,
+                0.0D,
+                2.0D
+        );
     }
 
     public static void healPillar(
@@ -74,48 +51,19 @@ public final class PaladinVfx {
             LivingEntity target,
             int count
     ) {
-        RandomSource random = target.getRandom();
-        double radius =
-                Math.max(0.20D, target.getBbWidth() * 0.45D);
-
-        for (int i = 0; i < count; i++) {
-            double angle =
-                    random.nextDouble() * Math.PI * 2.0D;
-            double r =
-                    radius * Math.sqrt(random.nextDouble());
-            double x =
-                    target.getX() + Math.cos(angle) * r;
-            double z =
-                    target.getZ() + Math.sin(angle) * r;
-            double y =
-                    target.getY()
-                            + random.nextDouble()
-                            * Math.max(0.4D, target.getBbHeight() * 0.8D);
-
-            velocityParticle(
-                    level,
-                    HEAL_DUST,
-                    x,
-                    y,
-                    z,
-                    0.0D,
-                    0.03D + random.nextDouble() * 0.12D,
-                    0.0D
-            );
-
-            if ((i & 3) == 0) {
-                velocityParticle(
-                        level,
-                        ParticleTypes.END_ROD,
-                        x,
-                        y,
-                        z,
-                        0.0D,
-                        0.025D + random.nextDouble() * 0.07D,
-                        0.0D
-                );
-            }
-        }
+        pillar(
+                level,
+                MartialParticleRegistry
+                        .PALADIN_HEAL_ASCEND
+                        .get(),
+                target,
+                count,
+                0.02D,
+                0.15D,
+                FEET,
+                0.0D,
+                1.0D
+        );
     }
 
     public static void holyBurst(
@@ -124,11 +72,20 @@ public final class PaladinVfx {
             int count,
             double maxSpeed
     ) {
-        holyBurstAt(
+        sphere(
                 level,
-                target.getBoundingBox().getCenter(),
+                MartialParticleRegistry
+                        .PALADIN_HOLY_BURST
+                        .get(),
+                sourceOrigin(
+                        target,
+                        CENTER
+                ),
                 count,
-                maxSpeed
+                0.20D,
+                maxSpeed,
+                0.0D,
+                false
         );
     }
 
@@ -138,29 +95,18 @@ public final class PaladinVfx {
             int count,
             double maxSpeed
     ) {
-        RandomSource random = level.random;
-
-        for (int i = 0; i < count; i++) {
-            Vec3 direction =
-                    randomUnitVector(random);
-            double speed =
-                    0.20D
-                            + random.nextDouble()
-                            * Math.max(0.0D, maxSpeed - 0.20D);
-
-            velocityParticle(
-                    level,
-                    i % 4 == 0
-                            ? ParticleTypes.END_ROD
-                            : HOLY_DUST,
-                    center.x,
-                    center.y,
-                    center.z,
-                    direction.x * speed,
-                    direction.y * speed,
-                    direction.z * speed
-            );
-        }
+        sphere(
+                level,
+                MartialParticleRegistry
+                        .PALADIN_HOLY_BURST
+                        .get(),
+                center,
+                count,
+                0.20D,
+                maxSpeed,
+                0.0D,
+                false
+        );
     }
 
     public static void holyGlimmer(
@@ -172,7 +118,10 @@ public final class PaladinVfx {
     ) {
         holyGlimmerAt(
                 level,
-                target.getBoundingBox().getCenter(),
+                sourceOrigin(
+                        target,
+                        CENTER
+                ),
                 target.getBbWidth(),
                 target.getBbHeight(),
                 count,
@@ -190,42 +139,18 @@ public final class PaladinVfx {
             double minSpeed,
             double maxSpeed
     ) {
-        RandomSource random = level.random;
-
-        for (int i = 0; i < count; i++) {
-            double x =
-                    center.x
-                            + (random.nextDouble() - 0.5D)
-                            * Math.max(0.3D, width);
-            double y =
-                    center.y
-                            + (random.nextDouble() - 0.5D)
-                            * Math.max(0.5D, height);
-            double z =
-                    center.z
-                            + (random.nextDouble() - 0.5D)
-                            * Math.max(0.3D, width);
-
-            Vec3 direction =
-                    randomUnitVector(random);
-            double speed =
-                    minSpeed
-                            + random.nextDouble()
-                            * Math.max(0.0D, maxSpeed - minSpeed);
-
-            velocityParticle(
-                    level,
-                    i % 5 == 0
-                            ? ParticleTypes.FIREWORK
-                            : HOLY_DUST,
-                    x,
-                    y,
-                    z,
-                    direction.x * speed * 0.20D,
-                    Math.abs(direction.y) * speed * 0.20D,
-                    direction.z * speed * 0.20D
-            );
-        }
+        sphere(
+                level,
+                MartialParticleRegistry
+                        .PALADIN_HOLY_DECELERATE
+                        .get(),
+                center,
+                count,
+                minSpeed,
+                maxSpeed,
+                0.0D,
+                false
+        );
     }
 
     public static void holySparksAt(
@@ -236,30 +161,18 @@ public final class PaladinVfx {
             double minSpeed,
             double maxSpeed
     ) {
-        RandomSource random = level.random;
-        for (int i = 0; i < count; i++) {
-            Vec3 direction =
-                    randomUnitVector(random);
-            double r =
-                    random.nextDouble() * radius;
-            double speed =
-                    minSpeed
-                            + random.nextDouble()
-                            * Math.max(0.0D, maxSpeed - minSpeed);
-
-            velocityParticle(
-                    level,
-                    (i & 1) == 0
-                            ? HOLY_DUST
-                            : ParticleTypes.END_ROD,
-                    center.x + direction.x * r,
-                    center.y + direction.y * r,
-                    center.z + direction.z * r,
-                    direction.x * speed * 0.25D,
-                    direction.y * speed * 0.25D,
-                    direction.z * speed * 0.25D
-            );
-        }
+        sphere(
+                level,
+                MartialParticleRegistry
+                        .PALADIN_SPARK_FLOAT
+                        .get(),
+                center,
+                count,
+                minSpeed,
+                maxSpeed,
+                0.0D,
+                false
+        );
     }
 
     public static void circleOfHealingRelease(
@@ -267,46 +180,65 @@ public final class PaladinVfx {
             LivingEntity caster,
             double range
     ) {
-        Vec3 center =
-                new Vec3(
-                        caster.getX(),
-                        caster.getY() + 0.08D,
-                        caster.getZ()
-                );
-
-        groundRings(
+        pillar(
                 level,
-                center,
-                range,
-                3,
-                64,
-                HOLY_WARM_DUST
+                MartialParticleRegistry
+                        .PALADIN_SPARK_DECELERATE
+                        .get(),
+                caster,
+                100,
+                0.30D,
+                0.50D,
+                FEET,
+                range - 0.5D,
+                1.0D
         );
 
-        RandomSource random = caster.getRandom();
-        for (int i = 0; i < 100; i++) {
-            double angle =
-                    random.nextDouble() * Math.PI * 2.0D;
-            double r =
-                    range * Math.sqrt(random.nextDouble());
-            double x =
-                    center.x + Math.cos(angle) * r;
-            double z =
-                    center.z + Math.sin(angle) * r;
+        pillar(
+                level,
+                MartialParticleRegistry
+                        .PALADIN_SPELL_DECELERATE
+                        .get(),
+                caster,
+                50,
+                0.10D,
+                0.50D,
+                FEET,
+                range - 0.5D,
+                1.0D
+        );
 
-            velocityParticle(
-                    level,
-                    (i & 3) == 0
-                            ? ParticleTypes.END_ROD
-                            : HOLY_DUST,
-                    x,
-                    center.y,
-                    z,
-                    0.0D,
-                    0.08D + random.nextDouble() * 0.28D,
-                    0.0D
-            );
-        }
+        pipe(
+                level,
+                MartialParticleRegistry
+                        .PALADIN_HOLY_FLOAT
+                        .get(),
+                caster,
+                50,
+                0.10D,
+                0.20D,
+                FEET,
+                range,
+                1.0D
+        );
+
+        area(
+                level,
+                MartialParticleRegistry
+                        .PALADIN_AREA_637_GROUND
+                        .get(),
+                new Vec3(
+                        caster.getX(),
+                        groundY(
+                                level,
+                                caster.position()
+                        ),
+                        caster.getZ()
+                ),
+                range,
+                0.50D,
+                0
+        );
     }
 
     public static void immolationRelease(
@@ -314,47 +246,51 @@ public final class PaladinVfx {
             LivingEntity caster,
             double range
     ) {
-        Vec3 center =
-                new Vec3(
-                        caster.getX(),
-                        caster.getY() + 0.10D,
-                        caster.getZ()
-                );
-
-        groundRings(
+        sphere(
                 level,
-                center,
-                range,
-                3,
-                72,
-                HOLY_WARM_DUST
+                MartialParticleRegistry
+                        .PALADIN_SPARK_DECELERATE
+                        .get(),
+                sourceOrigin(
+                        caster,
+                        CENTER
+                ),
+                60,
+                0.40D,
+                0.50D,
+                1.0D,
+                false
         );
 
-        for (int i = 0; i < 72; i++) {
-            double angle =
-                    Math.PI * 2.0D * i / 72.0D;
-            double r =
-                    range * (0.25D + 0.75D * ((i % 12) / 11.0D));
-            double x =
-                    center.x + Math.cos(angle) * r;
-            double z =
-                    center.z + Math.sin(angle) * r;
-            double rise =
-                    0.10D + 0.25D * (1.0D - r / range);
+        // Executable source uses Batches.placed rather than area()/GROUND
+        // anchoring: both range-scaled sheets originate at caster centre.
+        Vec3 center =
+                sourceOrigin(
+                        caster,
+                        CENTER
+                );
 
-            velocityParticle(
-                    level,
-                    (i & 2) == 0
-                            ? ParticleTypes.FLAME
-                            : HOLY_DUST,
-                    x,
-                    center.y,
-                    z,
-                    Math.cos(angle) * 0.04D,
-                    rise,
-                    Math.sin(angle) * 0.04D
-            );
-        }
+        area(
+                level,
+                MartialParticleRegistry
+                        .PALADIN_AREA_637_GROUND
+                        .get(),
+                center,
+                range,
+                1.0D,
+                0
+        );
+
+        area(
+                level,
+                MartialParticleRegistry
+                        .PALADIN_AREA_676_CAMERA
+                        .get(),
+                center,
+                range,
+                1.0D,
+                0
+        );
     }
 
     public static void divineProtectionApply(
@@ -370,182 +306,178 @@ public final class PaladinVfx {
         );
     }
 
+    /**
+     * Source Protection.Pop: magic_holy BURST, PIPE, widthFactor 2,
+     * count 25, speed .1-.15.
+     */
     public static void divineProtectionPop(
             ServerLevel level,
             LivingEntity target
     ) {
-        Vec3 center =
-                target.getBoundingBox().getCenter();
-        RandomSource random = target.getRandom();
-        double width =
-                Math.max(0.5D, target.getBbWidth() * 1.2D);
-
-        for (int i = 0; i < 25; i++) {
-            double angle =
-                    random.nextDouble() * Math.PI * 2.0D;
-            double x =
-                    center.x + Math.cos(angle) * width;
-            double z =
-                    center.z + Math.sin(angle) * width;
-            double y =
-                    target.getY()
-                            + random.nextDouble() * target.getBbHeight();
-
-            velocityParticle(
-                    level,
-                    (i & 3) == 0
-                            ? ParticleTypes.END_ROD
-                            : HOLY_DUST,
-                    x,
-                    y,
-                    z,
-                    Math.cos(angle) * 0.10D,
-                    (random.nextDouble() - 0.5D) * 0.05D,
-                    Math.sin(angle) * 0.10D
-            );
-        }
+        pipe(
+                level,
+                MartialParticleRegistry
+                        .PALADIN_HOLY_BURST
+                        .get(),
+                target,
+                25,
+                0.10D,
+                0.15D,
+                CENTER,
+                0.0D,
+                2.0D
+        );
     }
 
+    /**
+     * Frozen sealSparks().batch(invert(true).preTravel(14)).
+     */
     public static void blessedGather(
             ServerLevel level,
             LivingEntity caster
     ) {
-        Vec3 hand =
-                approximateMainHand(caster);
-        RandomSource random = caster.getRandom();
-
-        for (int i = 0; i < 4; i++) {
-            Vec3 direction =
-                    randomUnitVector(random);
-            Vec3 start =
-                    hand.add(
-                            direction.scale(
-                                    0.55D
-                                            + random.nextDouble() * 0.35D
-                            )
-                    );
-            Vec3 velocity =
-                    hand.subtract(start)
-                            .normalize()
-                            .scale(0.05D + random.nextDouble() * 0.04D);
-
-            velocityParticle(
-                    level,
-                    HOLY_DUST,
-                    start.x,
-                    start.y,
-                    start.z,
-                    velocity.x,
-                    velocity.y,
-                    velocity.z
-            );
-        }
+        sphere(
+                level,
+                MartialParticleRegistry
+                        .PALADIN_SPARK_FLOAT
+                        .get(),
+                sourceOrigin(
+                        caster,
+                        OVER_HEAD
+                ),
+                4,
+                0.02D,
+                0.10D,
+                14.0D,
+                true
+        );
     }
 
+    /**
+     * Frozen sealSparks() on each channel release.
+     */
     public static void blessedRelease(
             ServerLevel level,
             LivingEntity caster
     ) {
-        Vec3 hand =
-                approximateMainHand(caster);
-        holySparksAt(
+        sphere(
                 level,
-                hand,
-                12,
-                0.15D,
-                0.05D,
-                0.18D
+                MartialParticleRegistry
+                        .PALADIN_SPARK_FLOAT
+                        .get(),
+                sourceOrigin(
+                        caster,
+                        OVER_HEAD
+                ),
+                4,
+                0.02D,
+                0.10D,
+                0.0D,
+                false
         );
     }
 
+    /**
+     * Item glow is source-rendered, not a particle aura. Kept as a compatibility
+     * no-op while the event caller is removed by the exact glow renderer pass.
+     */
     public static void blessedWeaponAura(
             ServerLevel level,
             LivingEntity caster,
             int stacks
     ) {
-        Vec3 hand =
-                approximateMainHand(caster);
-        int count =
-                Mth.clamp(stacks, 1, 6);
+    }
 
-        for (int i = 0; i < count; i++) {
-            double angle =
-                    (level.getGameTime() * 0.35D)
-                            + Math.PI * 2.0D * i / count;
-            double radius =
-                    0.08D + 0.015D * count;
-            velocityParticle(
+    /**
+     * Continuous Holy Light casting particles from Spell Engine launch point:
+     * magic_spark PIPE x3 every tick plus one FIREWORK every second tick.
+     */
+    public static void holyBeamCasting(
+            ServerLevel level,
+            LivingEntity caster
+    ) {
+        Vec3 launch =
+                launchPoint(caster);
+        Vec3 look =
+                caster.getLookAngle()
+                        .normalize();
+
+        orientedPipe(
+                level,
+                MartialParticleRegistry
+                        .PALADIN_SPARK_FLOAT
+                        .get(),
+                launch,
+                look,
+                caster.getBbWidth(),
+                3,
+                0.10D,
+                0.20D,
+                1.0D,
+                0.0D
+        );
+
+        if ((level.getGameTime() & 1L) == 0L) {
+            orientedPipe(
                     level,
-                    HOLY_WARM_DUST,
-                    hand.x + Math.cos(angle) * radius,
-                    hand.y + 0.03D * Math.sin(angle * 0.5D),
-                    hand.z + Math.sin(angle) * radius,
-                    0.0D,
-                    0.01D,
+                    ParticleTypes.FIREWORK,
+                    launch,
+                    look,
+                    caster.getBbWidth(),
+                    1,
+                    0.10D,
+                    0.20D,
+                    1.0D,
                     0.0D
             );
         }
     }
 
+    /**
+     * Holy Light block-hit VFX. The actual beam core is rendered separately.
+     */
     public static void holyBeam(
             ServerLevel level,
             LivingEntity caster,
             Vec3 end
     ) {
-        Vec3 start =
-                caster.getEyePosition()
-                        .add(
-                                caster.getLookAngle()
-                                        .normalize()
-                                        .scale(0.35D)
-                        );
-        Vec3 delta =
-                end.subtract(start);
-        double length =
-                delta.length();
-        if (length <= 1.0E-5D) {
-            return;
-        }
+        Vec3 look =
+                caster.getLookAngle()
+                        .normalize();
 
-        Vec3 direction =
-                delta.scale(1.0D / length);
-        int steps =
-                Math.max(
-                        1,
-                        (int) Math.ceil(length / 0.45D)
-                );
-
-        for (int i = 0; i <= steps; i++) {
-            Vec3 point =
-                    start.add(
-                            direction.scale(
-                                    Math.min(
-                                            length,
-                                            i * 0.45D
-                                    )
-                            )
-                    );
-            velocityParticle(
-                    level,
-                    (i % 4 == 0)
-                            ? ParticleTypes.END_ROD
-                            : HOLY_WARM_DUST,
-                    point.x,
-                    point.y,
-                    point.z,
-                    0.0D,
-                    0.0D,
-                    0.0D
-            );
-        }
-
-        holySparksAt(
+        orientedCircle(
                 level,
+                MartialParticleRegistry
+                        .PALADIN_SPELL_FLOAT
+                        .get(),
                 end,
-                8,
-                0.25D,
+                look,
+                1,
                 0.10D,
                 0.20D
+        );
+
+        orientedCircle(
+                level,
+                ParticleTypes.FIREWORK,
+                end,
+                look,
+                1,
+                0.10D,
+                0.20D
+        );
+
+        sphere(
+                level,
+                MartialParticleRegistry
+                        .PALADIN_SPARK_FLOAT
+                        .get(),
+                end,
+                5,
+                0.10D,
+                0.20D,
+                0.0D,
+                false
         );
     }
 
@@ -553,44 +485,48 @@ public final class PaladinVfx {
             ServerLevel level,
             LivingEntity caster
     ) {
-        RandomSource random = caster.getRandom();
-        double y =
-                caster.getY() + 0.05D;
-        double radius =
-                Math.max(0.35D, caster.getBbWidth() * 0.65D);
+        pillar(
+                level,
+                MartialParticleRegistry
+                        .PALADIN_SPARK_FLOAT
+                        .get(),
+                caster,
+                4,
+                0.02D,
+                0.12D,
+                FEET,
+                0.5D,
+                1.0D
+        );
 
-        for (int i = 0; i < 6; i++) {
-            double angle =
-                    random.nextDouble() * Math.PI * 2.0D;
-            double r =
-                    radius * random.nextDouble();
-            double x =
-                    caster.getX() + Math.cos(angle) * r;
-            double z =
-                    caster.getZ() + Math.sin(angle) * r;
-
-            velocityParticle(
-                    level,
-                    (i & 1) == 0
-                            ? HOLY_DUST
-                            : ParticleTypes.END_ROD,
-                    x,
-                    y,
-                    z,
-                    0.0D,
-                    0.03D + random.nextDouble() * 0.09D,
-                    0.0D
-            );
-        }
+        pipe(
+                level,
+                MartialParticleRegistry
+                        .PALADIN_SPELL_FLOAT
+                        .get(),
+                caster,
+                2,
+                0.02D,
+                0.10D,
+                FEET,
+                0.5D,
+                1.0D
+        );
     }
 
     public static void penanceCasting(
             ServerLevel level,
             LivingEntity caster
     ) {
-        holyCasting(level, caster);
+        holyCasting(
+                level,
+                caster
+        );
     }
 
+    /**
+     * Exact Batches.helix(3,.16,15,0/180): two outward-moving spark strands.
+     */
     public static void penanceHelix(
             ServerLevel level,
             Vec3 position,
@@ -603,48 +539,48 @@ public final class PaladinVfx {
 
         Vec3 forward =
                 velocity.normalize();
-        Vec3 up =
-                Math.abs(forward.y) < 0.95D
-                        ? new Vec3(0.0D, 1.0D, 0.0D)
-                        : new Vec3(1.0D, 0.0D, 0.0D);
-        Vec3 side =
-                forward.cross(up).normalize();
-        Vec3 normal =
-                side.cross(forward).normalize();
+        Basis basis =
+                basis(forward);
 
-        double baseAngle =
-                Math.toRadians(age * 15.0D);
         for (int strand = 0; strand < 2; strand++) {
-            double strandOffset =
-                    strand == 0 ? 0.0D : Math.PI;
+            double offset =
+                    strand == 0
+                            ? 0.0D
+                            : 180.0D;
+            double angle =
+                    Math.toRadians(
+                            (
+                                    age * 15.0D
+                                            + offset
+                            ) % 360.0D
+                    );
+
+            Vec3 direction =
+                    basis.side
+                            .scale(
+                                    Math.cos(angle)
+                            )
+                            .add(
+                                    basis.up.scale(
+                                            Math.sin(angle)
+                                    )
+                            )
+                            .normalize();
 
             for (int i = 0; i < 3; i++) {
-                double angle =
-                        baseAngle
-                                + strandOffset
-                                - i * 0.35D;
-                Vec3 offset =
-                        side.scale(Math.cos(angle) * 0.16D)
-                                .add(
-                                        normal.scale(
-                                                Math.sin(angle) * 0.16D
-                                        )
-                                )
-                                .subtract(
-                                        forward.scale(i * 0.10D)
-                                );
-                Vec3 point =
-                        position.add(offset);
-
-                velocityParticle(
+                double speed =
+                        randomInRange(
+                                level.random,
+                                0.12D,
+                                0.16D
+                        );
+                emit(
                         level,
-                        HOLY_DUST,
-                        point.x,
-                        point.y,
-                        point.z,
-                        0.0D,
-                        0.0D,
-                        0.0D
+                        MartialParticleRegistry
+                                .PALADIN_SPARK_FLOAT
+                                .get(),
+                        position,
+                        direction.scale(speed)
                 );
             }
         }
@@ -666,13 +602,20 @@ public final class PaladinVfx {
             ServerLevel level,
             LivingEntity ally
     ) {
-        holySparksAt(
+        sphere(
                 level,
-                ally.getBoundingBox().getCenter(),
+                MartialParticleRegistry
+                        .PALADIN_SPARK_DECELERATE
+                        .get(),
+                sourceOrigin(
+                        ally,
+                        CENTER
+                ),
                 12,
-                Math.max(0.45D, ally.getBbWidth()),
                 0.20D,
-                0.25D
+                0.25D,
+                0.0D,
+                false
         );
     }
 
@@ -681,42 +624,67 @@ public final class PaladinVfx {
             Vec3 center,
             double radius
     ) {
-        groundRings(
+        sphere(
                 level,
+                MartialParticleRegistry
+                        .PALADIN_HOLY_DECELERATE
+                        .get(),
                 center,
-                radius,
-                2,
-                56,
-                HOLY_WARM_DUST
+                40,
+                0.40D,
+                0.60D,
+                0.0D,
+                false
         );
-        holySparksAt(
+
+        sphere(
                 level,
-                center.add(0.0D, 0.35D, 0.0D),
+                MartialParticleRegistry
+                        .PALADIN_SPARK_FLOAT
+                        .get(),
+                center,
                 30,
-                radius * 0.45D,
                 0.20D,
-                0.40D
+                0.40D,
+                0.0D,
+                false
         );
     }
 
     public static void barrierSpawn(
             ServerLevel level,
-            Vec3 center,
-            double radius
+            LivingEntity caster
     ) {
-        holyBurstAt(
+        Vec3 origin =
+                sourceOrigin(
+                        caster,
+                        CENTER
+                );
+
+        sphere(
                 level,
-                center.add(0.0D, 1.5D, 0.0D),
+                MartialParticleRegistry
+                        .PALADIN_SPELL_DECELERATE
+                        .get(),
+                origin,
                 50,
-                1.0D
+                1.0D,
+                1.0D,
+                0.0D,
+                false
         );
-        holySparksAt(
+
+        sphere(
                 level,
-                center.add(0.0D, 1.5D, 0.0D),
+                MartialParticleRegistry
+                        .PALADIN_SPARK_DECELERATE
+                        .get(),
+                origin,
                 50,
-                radius * 0.75D,
-                0.20D,
-                0.45D
+                1.0D,
+                1.0D,
+                0.0D,
+                false
         );
     }
 
@@ -725,41 +693,59 @@ public final class PaladinVfx {
             Vec3 center,
             double radius
     ) {
-        RandomSource random = level.random;
+        // Banner entity dimensions are frozen at 6 x .5 in source.
+        pillarAt(
+                level,
+                MartialParticleRegistry
+                        .PALADIN_SPARK_DECELERATE
+                        .get(),
+                center,
+                6.0D,
+                0.5D,
+                15,
+                0.10D,
+                0.15D,
+                FEET,
+                0.0D,
+                1.0D
+        );
 
-        for (int i = 0; i < 15; i++) {
-            double angle =
-                    random.nextDouble() * Math.PI * 2.0D;
-            double r =
-                    Math.min(
-                            radius,
-                            0.4D + random.nextDouble() * 1.4D
-                    );
-
-            velocityParticle(
-                    level,
-                    (i % 4 == 0)
-                            ? ParticleTypes.END_ROD
-                            : HOLY_DUST,
-                    center.x + Math.cos(angle) * r,
-                    center.y + random.nextDouble() * 2.0D,
-                    center.z + Math.sin(angle) * r,
-                    0.0D,
-                    0.02D + random.nextDouble() * 0.10D,
-                    0.0D
-            );
-        }
+        pipeAt(
+                level,
+                MartialParticleRegistry
+                        .PALADIN_STRIPE_FLOAT
+                        .get(),
+                center,
+                6.0D,
+                0.5D,
+                3,
+                0.05D,
+                0.10D,
+                FEET,
+                0.0D,
+                1.0D
+        );
     }
 
     public static void lightwellSpawn(
             ServerLevel level,
             Vec3 center
     ) {
-        holyBurstAt(
+        sphere(
                 level,
-                center.add(0.0D, 0.7D, 0.0D),
+                MartialParticleRegistry
+                        .PALADIN_HOLY_DECELERATE
+                        .get(),
+                center.add(
+                        0.0D,
+                        0.70D,
+                        0.0D
+                ),
                 30,
-                0.40D
+                0.20D,
+                0.40D,
+                0.0D,
+                false
         );
     }
 
@@ -767,64 +753,86 @@ public final class PaladinVfx {
             ServerLevel level,
             Vec3 center
     ) {
-        RandomSource random = level.random;
-
-        for (int i = 0; i < 2; i++) {
-            double angle =
-                    random.nextDouble() * Math.PI * 2.0D;
-            double r =
-                    random.nextDouble() * 0.45D;
-
-            velocityParticle(
-                    level,
-                    (i & 1) == 0
-                            ? HOLY_DUST
-                            : ParticleTypes.END_ROD,
-                    center.x + Math.cos(angle) * r,
-                    center.y + 0.05D,
-                    center.z + Math.sin(angle) * r,
-                    0.0D,
-                    0.02D + random.nextDouble() * 0.10D,
-                    0.0D
-            );
-        }
+        pillarAt(
+                level,
+                MartialParticleRegistry
+                        .PALADIN_SPARK_ASCEND
+                        .get(),
+                center,
+                0.9D,
+                1.4D,
+                2,
+                0.02D,
+                0.12D,
+                0.10D,
+                0.45D,
+                1.0D
+        );
     }
 
     public static void holyMoteTrail(
             ServerLevel level,
-            Vec3 position
+            Vec3 position,
+            Vec3 velocity
     ) {
-        RandomSource random = level.random;
-        for (int i = 0; i < 5; i++) {
-            velocityParticle(
-                    level,
-                    (i & 1) == 0
-                            ? HOLY_DUST
-                            : ParticleTypes.END_ROD,
-                    position.x
-                            + (random.nextDouble() - 0.5D) * 0.12D,
-                    position.y
-                            + (random.nextDouble() - 0.5D) * 0.12D,
-                    position.z
-                            + (random.nextDouble() - 0.5D) * 0.12D,
-                    0.0D,
-                    random.nextDouble() * 0.10D,
-                    0.0D
-            );
+        if (velocity.lengthSqr() <= 1.0E-8D) {
+            return;
         }
+
+        orientedCircle(
+                level,
+                MartialParticleRegistry
+                        .PALADIN_SPARK_FLOAT
+                        .get(),
+                position,
+                velocity.normalize(),
+                5,
+                0.0D,
+                0.10D
+        );
     }
 
     public static void judgementTrail(
             ServerLevel level,
-            Vec3 point
+            Vec3 point,
+            Vec3 velocity
     ) {
-        holySparksAt(
+        if (velocity.lengthSqr() <= 1.0E-8D) {
+            return;
+        }
+
+        Vec3 forward =
+                velocity.normalize();
+
+        // Frozen meteor: magic_stripe PIPE widthFactor2 x5, then spark x4.
+        orientedPipe(
                 level,
+                MartialParticleRegistry
+                        .PALADIN_STRIPE_FLOAT
+                        .get(),
                 point,
-                8,
+                forward,
+                0.25D,
+                5,
+                0.0D,
                 0.20D,
-                0.05D,
-                0.20D
+                2.0D,
+                0.0D
+        );
+
+        orientedPipe(
+                level,
+                MartialParticleRegistry
+                        .PALADIN_SPARK_FLOAT
+                        .get(),
+                point,
+                forward,
+                0.25D,
+                4,
+                0.0D,
+                0.10D,
+                2.0D,
+                0.0D
         );
     }
 
@@ -832,135 +840,555 @@ public final class PaladinVfx {
             ServerLevel level,
             Vec3 center
     ) {
-        holyGlimmerAt(
+        sphere(
                 level,
-                center.add(0.0D, 0.5D, 0.0D),
-                5.0D,
-                3.0D,
+                MartialParticleRegistry
+                        .PALADIN_HOLY_DECELERATE
+                        .get(),
+                center,
                 100,
-                0.08D,
-                0.18D
-        );
-        holySparksAt(
-                level,
-                center.add(0.0D, 0.5D, 0.0D),
-                100,
-                3.0D,
-                0.20D,
-                0.40D
+                0.80D,
+                0.90D,
+                0.0D,
+                false
         );
 
-        level.sendParticles(
+        sphere(
+                level,
+                MartialParticleRegistry
+                        .PALADIN_SPARK_FLOAT
+                        .get(),
+                center,
+                100,
+                0.20D,
+                0.40D,
+                0.0D,
+                false
+        );
+
+        sphere(
+                level,
                 ParticleTypes.SMOKE,
-                center.x,
-                center.y + 0.25D,
-                center.z,
+                center,
                 50,
-                2.0D,
-                0.75D,
-                2.0D,
-                0.08D
+                0.10D,
+                0.30D,
+                0.0D,
+                false
         );
     }
 
-    private static void groundRings(
+    public static void circleAreaEffect(
             ServerLevel level,
-            Vec3 center,
+            LivingEntity caster,
             double range,
-            int rings,
-            int points,
-            DustParticleOptions particle
+            double alpha
     ) {
-        for (int ring = 1; ring <= rings; ring++) {
-            double radius =
-                    range * ring / (double) rings;
+        area(
+                level,
+                MartialParticleRegistry
+                        .PALADIN_AREA_637_GROUND
+                        .get(),
+                new Vec3(
+                        caster.getX(),
+                        groundY(
+                                level,
+                                caster.position()
+                        ),
+                        caster.getZ()
+                ),
+                range,
+                alpha,
+                0
+        );
+    }
 
-            for (int i = 0; i < points; i++) {
-                double angle =
-                        Math.PI * 2.0D * i / points;
-                velocityParticle(
-                        level,
-                        particle,
-                        center.x + Math.cos(angle) * radius,
-                        center.y,
-                        center.z + Math.sin(angle) * radius,
+    private static void pillar(
+            ServerLevel level,
+            ParticleOptions particle,
+            LivingEntity source,
+            int count,
+            double minSpeed,
+            double maxSpeed,
+            double verticalOrigin,
+            double extent,
+            double widthFactor
+    ) {
+        pillarAt(
+                level,
+                particle,
+                source.position(),
+                source.getBbWidth(),
+                source.getBbHeight(),
+                count,
+                minSpeed,
+                maxSpeed,
+                verticalOrigin,
+                extent,
+                widthFactor
+        );
+    }
+
+    private static void pillarAt(
+            ServerLevel level,
+            ParticleOptions particle,
+            Vec3 sourcePosition,
+            double sourceWidth,
+            double sourceHeight,
+            int count,
+            double minSpeed,
+            double maxSpeed,
+            double verticalOrigin,
+            double extent,
+            double widthFactor
+    ) {
+        RandomSource random =
+                level.random;
+        Vec3 origin =
+                sourcePosition.add(
                         0.0D,
-                        0.005D,
+                        sourceHeight * verticalOrigin,
                         0.0D
                 );
-            }
+        double radius =
+                sourceWidth
+                        * 0.5D
+                        * widthFactor
+                        + extent;
+
+        for (int i = 0; i < count; i++) {
+            double r =
+                    radius
+                            * random.nextDouble();
+            double angle =
+                    random.nextDouble()
+                            * Math.PI
+                            * 2.0D;
+            Vec3 position =
+                    origin.add(
+                            Math.cos(angle) * r,
+                            0.0D,
+                            Math.sin(angle) * r
+                    );
+            Vec3 velocity =
+                    new Vec3(
+                            0.0D,
+                            randomInRange(
+                                    random,
+                                    minSpeed,
+                                    maxSpeed
+                            ),
+                            0.0D
+                    );
+            emit(
+                    level,
+                    particle,
+                    position,
+                    velocity
+            );
         }
     }
 
-    private static Vec3 approximateMainHand(
-            LivingEntity entity
+    private static void pipe(
+            ServerLevel level,
+            ParticleOptions particle,
+            LivingEntity source,
+            int count,
+            double minSpeed,
+            double maxSpeed,
+            double verticalOrigin,
+            double extent,
+            double widthFactor
     ) {
-        Vec3 look =
-                entity.getLookAngle().normalize();
-        Vec3 side =
-                new Vec3(
-                        -look.z,
-                        0.0D,
-                        look.x
-                );
-        if (side.lengthSqr() > 1.0E-8D) {
-            side = side.normalize();
-        }
-
-        double handedness =
-                entity.getMainArm()
-                        == net.minecraft.world.entity.HumanoidArm.RIGHT
-                        ? 1.0D
-                        : -1.0D;
-
-        return entity.getEyePosition()
-                .add(look.scale(0.45D))
-                .add(side.scale(0.30D * handedness))
-                .add(0.0D, -0.35D, 0.0D);
-    }
-
-    private static Vec3 randomUnitVector(
-            RandomSource random
-    ) {
-        double y =
-                random.nextDouble() * 2.0D - 1.0D;
-        double angle =
-                random.nextDouble() * Math.PI * 2.0D;
-        double horizontal =
-                Math.sqrt(
-                        Math.max(
-                                0.0D,
-                                1.0D - y * y
-                        )
-                );
-
-        return new Vec3(
-                Math.cos(angle) * horizontal,
-                y,
-                Math.sin(angle) * horizontal
+        pipeAt(
+                level,
+                particle,
+                source.position(),
+                source.getBbWidth(),
+                source.getBbHeight(),
+                count,
+                minSpeed,
+                maxSpeed,
+                verticalOrigin,
+                extent,
+                widthFactor
         );
     }
 
-    private static void velocityParticle(
+    private static void pipeAt(
             ServerLevel level,
-            net.minecraft.core.particles.ParticleOptions particle,
-            double x,
-            double y,
-            double z,
-            double vx,
-            double vy,
-            double vz
+            ParticleOptions particle,
+            Vec3 sourcePosition,
+            double sourceWidth,
+            double sourceHeight,
+            int count,
+            double minSpeed,
+            double maxSpeed,
+            double verticalOrigin,
+            double extent,
+            double widthFactor
+    ) {
+        RandomSource random =
+                level.random;
+        Vec3 origin =
+                sourcePosition.add(
+                        0.0D,
+                        sourceHeight * verticalOrigin,
+                        0.0D
+                );
+        double radius =
+                sourceWidth
+                        * 0.5D
+                        * widthFactor
+                        + extent;
+
+        for (int i = 0; i < count; i++) {
+            double angle =
+                    random.nextDouble()
+                            * Math.PI
+                            * 2.0D;
+            Vec3 position =
+                    origin.add(
+                            Math.cos(angle) * radius,
+                            0.0D,
+                            Math.sin(angle) * radius
+                    );
+            Vec3 velocity =
+                    new Vec3(
+                            0.0D,
+                            randomInRange(
+                                    random,
+                                    minSpeed,
+                                    maxSpeed
+                            ),
+                            0.0D
+                    );
+            emit(
+                    level,
+                    particle,
+                    position,
+                    velocity
+            );
+        }
+    }
+
+    private static void sphere(
+            ServerLevel level,
+            ParticleOptions particle,
+            Vec3 origin,
+            int count,
+            double minSpeed,
+            double maxSpeed,
+            double preTravel,
+            boolean invert
+    ) {
+        RandomSource random =
+                level.random;
+
+        for (int i = 0; i < count; i++) {
+            double speed =
+                    randomInRange(
+                            random,
+                            minSpeed,
+                            maxSpeed
+                    );
+
+            Vec3 velocity =
+                    new Vec3(
+                            speed,
+                            0.0D,
+                            0.0D
+                    )
+                            .zRot(
+                                    (float) (
+                                            random.nextDouble()
+                                                    * Math.PI
+                                                    * 2.0D
+                                    )
+                            )
+                            .yRot(
+                                    (float) (
+                                            random.nextDouble()
+                                                    * Math.PI
+                                                    * 2.0D
+                                    )
+                            );
+
+            Vec3 position =
+                    preTravel == 0.0D
+                            ? origin
+                            : origin.add(
+                                    velocity.scale(
+                                            preTravel
+                                    )
+                            );
+
+            if (invert) {
+                velocity =
+                        velocity.scale(
+                                -1.0D
+                        );
+            }
+
+            emit(
+                    level,
+                    particle,
+                    position,
+                    velocity
+            );
+        }
+    }
+
+    private static void orientedCircle(
+            ServerLevel level,
+            ParticleOptions particle,
+            Vec3 origin,
+            Vec3 forward,
+            int count,
+            double minSpeed,
+            double maxSpeed
+    ) {
+        RandomSource random =
+                level.random;
+        Basis basis =
+                basis(forward);
+
+        for (int i = 0; i < count; i++) {
+            double angle =
+                    random.nextDouble()
+                            * Math.PI
+                            * 2.0D;
+            double speed =
+                    randomInRange(
+                            random,
+                            minSpeed,
+                            maxSpeed
+                    );
+            Vec3 velocity =
+                    basis.side
+                            .scale(
+                                    Math.cos(angle)
+                            )
+                            .add(
+                                    basis.up.scale(
+                                            Math.sin(angle)
+                                    )
+                            )
+                            .scale(speed);
+
+            emit(
+                    level,
+                    particle,
+                    origin,
+                    velocity
+            );
+        }
+    }
+
+    private static void orientedPipe(
+            ServerLevel level,
+            ParticleOptions particle,
+            Vec3 origin,
+            Vec3 forward,
+            double sourceWidth,
+            int count,
+            double minSpeed,
+            double maxSpeed,
+            double widthFactor,
+            double extent
+    ) {
+        RandomSource random =
+                level.random;
+        Vec3 axis =
+                forward.normalize();
+        Basis basis =
+                basis(axis);
+        double radius =
+                sourceWidth
+                        * 0.5D
+                        * widthFactor
+                        + extent;
+
+        for (int i = 0; i < count; i++) {
+            double angle =
+                    random.nextDouble()
+                            * Math.PI
+                            * 2.0D;
+            Vec3 offset =
+                    basis.side
+                            .scale(
+                                    Math.cos(angle) * radius
+                            )
+                            .add(
+                                    basis.up.scale(
+                                            Math.sin(angle) * radius
+                                    )
+                            );
+            double speed =
+                    randomInRange(
+                            random,
+                            minSpeed,
+                            maxSpeed
+                    );
+
+            emit(
+                    level,
+                    particle,
+                    origin.add(offset),
+                    axis.scale(speed)
+            );
+        }
+    }
+
+    private static void area(
+            ServerLevel level,
+            ParticleOptions particle,
+            Vec3 position,
+            double scale,
+            double alpha,
+            int followEntityId
     ) {
         level.sendParticles(
                 particle,
-                x,
-                y,
-                z,
+                position.x,
+                position.y,
+                position.z,
                 0,
-                vx,
-                vy,
-                vz,
+                scale,
+                alpha,
+                followEntityId,
                 1.0D
         );
+    }
+
+    private static void emit(
+            ServerLevel level,
+            ParticleOptions particle,
+            Vec3 position,
+            Vec3 velocity
+    ) {
+        level.sendParticles(
+                particle,
+                position.x,
+                position.y,
+                position.z,
+                0,
+                velocity.x,
+                velocity.y,
+                velocity.z,
+                1.0D
+        );
+    }
+
+    private static Vec3 sourceOrigin(
+            LivingEntity source,
+            double verticalOrigin
+    ) {
+        return source.position()
+                .add(
+                        0.0D,
+                        source.getBbHeight()
+                                * verticalOrigin,
+                        0.0D
+                );
+    }
+
+    private static Vec3 launchPoint(
+            LivingEntity caster
+    ) {
+        double launchHeight =
+                caster.getEyeHeight()
+                        - caster.getBbHeight()
+                        * 0.15D;
+        return caster.position()
+                .add(
+                        0.0D,
+                        launchHeight,
+                        0.0D
+                )
+                .add(
+                        caster.getLookAngle()
+                                .normalize()
+                                .scale(0.5D)
+                );
+    }
+
+    private static double groundY(
+            ServerLevel level,
+            Vec3 position
+    ) {
+        BlockPos start =
+                BlockPos.containing(
+                        position.x,
+                        position.y + 0.5D,
+                        position.z
+                );
+
+        for (int i = 0; i <= 3; i++) {
+            BlockPos blockPos =
+                    start.below(i);
+            BlockState state =
+                    level.getBlockState(
+                            blockPos
+                    );
+            if (!state
+                    .getCollisionShape(
+                            level,
+                            blockPos
+                    )
+                    .isEmpty()) {
+                return blockPos.getY()
+                        + 1.01D;
+            }
+        }
+
+        return position.y + 0.01D;
+    }
+
+    private static double randomInRange(
+            RandomSource random,
+            double min,
+            double max
+    ) {
+        return min
+                + (
+                max - min
+        ) * random.nextDouble();
+    }
+
+    private static Basis basis(
+            Vec3 forward
+    ) {
+        Vec3 axis =
+                forward.normalize();
+        Vec3 reference =
+                Math.abs(axis.y) < 0.95D
+                        ? new Vec3(
+                                0.0D,
+                                1.0D,
+                                0.0D
+                        )
+                        : new Vec3(
+                                1.0D,
+                                0.0D,
+                                0.0D
+                        );
+        Vec3 side =
+                axis.cross(reference)
+                        .normalize();
+        Vec3 up =
+                side.cross(axis)
+                        .normalize();
+
+        return new Basis(
+                side,
+                up
+        );
+    }
+
+    private record Basis(
+            Vec3 side,
+            Vec3 up
+    ) {
     }
 }
