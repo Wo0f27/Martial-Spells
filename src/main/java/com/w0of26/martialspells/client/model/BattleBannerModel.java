@@ -3,8 +3,9 @@ package com.w0of26.martialspells.client.model;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.w0of26.martialspells.MartialSpells;
+import com.w0of26.martialspells.client.animation.BattleBannerAnimations;
 import com.w0of26.martialspells.entity.BattleBannerEntity;
-import net.minecraft.client.model.EntityModel;
+import net.minecraft.client.model.HierarchicalModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
@@ -23,7 +24,7 @@ import net.minecraft.util.Mth;
  * The exact upstream keyframe clip remains final-presentation polish.</p>
  */
 public final class BattleBannerModel
-        extends EntityModel<BattleBannerEntity> {
+        extends HierarchicalModel<BattleBannerEntity> {
     public static final ModelLayerLocation LAYER =
             new ModelLayerLocation(
                     ResourceLocation.fromNamespaceAndPath(
@@ -164,6 +165,11 @@ public final class BattleBannerModel
     }
 
     @Override
+    public ModelPart root() {
+        return root;
+    }
+
+    @Override
     public void setupAnim(
             BattleBannerEntity entity,
             float limbSwing,
@@ -175,12 +181,24 @@ public final class BattleBannerModel
         root.getAllParts()
                 .forEach(ModelPart::resetPose);
 
-        float wave =
-                Mth.sin(ageInTicks * 0.12F) * 0.07F;
-        flagPart.xRot = wave;
-        flagPart2.xRot = wave * 1.35F;
-        flagPart3.xRot = wave * 1.70F;
-        flagPart4.xRot = wave * 2.0F;
+        this.animate(
+                entity.spawnAnimationState,
+                BattleBannerAnimations.place,
+                ageInTicks,
+                1.0F
+        );
+        this.animate(
+                entity.idleAnimationState,
+                BattleBannerAnimations.idle,
+                ageInTicks,
+                1.0F
+        );
+        this.animate(
+                entity.despawnAnimationState,
+                BattleBannerAnimations.place,
+                ageInTicks,
+                -1.0F
+        );
     }
 
     @Override
