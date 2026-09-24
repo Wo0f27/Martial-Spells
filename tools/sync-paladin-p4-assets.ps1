@@ -49,6 +49,8 @@ Copy-PaladinAsset "textures/item/barrier.png" "src/main/resources/assets/martial
 Copy-PaladinAsset "textures/entity/battle_banner.png" "src/main/resources/assets/martial_spells/textures/entity/battle_banner.png"
 Copy-PaladinAsset "textures/entity/lightwell_base.png" "src/main/resources/assets/martial_spells/textures/entity/lightwell_base.png"
 Copy-PaladinAsset "textures/entity/lightwell_glow.png" "src/main/resources/assets/martial_spells/textures/entity/lightwell_glow.png"
+Copy-PaladinAsset "textures/spell_effect/divine_protection.png" "src/main/resources/assets/martial_spells/textures/spell_effect/divine_protection.png"
+Copy-PaladinAsset "textures/spell_effect/divine_protection_glow.png" "src/main/resources/assets/martial_spells/textures/spell_effect/divine_protection_glow.png"
 
 # P3 already owns this source texture for Penance; re-assert it here because
 # Holy Mote now shares the same frozen Lightwell-orb model.
