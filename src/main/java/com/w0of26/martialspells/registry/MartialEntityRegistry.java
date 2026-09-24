@@ -10,6 +10,7 @@ import com.w0of26.martialspells.entity.ThrowNetProjectile;
 import com.w0of26.martialspells.entity.ShatteringThrowProjectile;
 import com.w0of26.martialspells.entity.PenanceProjectile;
 import com.w0of26.martialspells.entity.JudgementVisualEntity;
+import com.w0of26.martialspells.entity.HolyBeamVisualEntity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -88,6 +89,15 @@ public final class MartialEntityRegistry {
                     .build(MartialSpells.MOD_ID + ":shattering_throw"));
 
     /** Frozen Spell Engine projectile dimensions/tracking for Penance. */
+    public static final RegistryObject<EntityType<HolyBeamVisualEntity>> HOLY_BEAM_VISUAL =
+            ENTITY_TYPES.register("holy_beam_visual", () -> EntityType.Builder
+                    .<HolyBeamVisualEntity>of(HolyBeamVisualEntity::new, MobCategory.MISC)
+                    .sized(0.10F, 0.10F)
+                    .fireImmune()
+                    .clientTrackingRange(128)
+                    .updateInterval(1)
+                    .build(MartialSpells.MOD_ID + ":holy_beam_visual"));
+
     public static final RegistryObject<EntityType<JudgementVisualEntity>> JUDGEMENT_VISUAL =
             ENTITY_TYPES.register("judgement_visual", () -> EntityType.Builder
                     .<JudgementVisualEntity>of(JudgementVisualEntity::new, MobCategory.MISC)
