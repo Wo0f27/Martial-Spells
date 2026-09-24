@@ -143,6 +143,36 @@ final class PaladinHolySpellSupport {
         );
     }
 
+    static boolean damageBypassingIframes(
+            AbstractSpell spell,
+            Level level,
+            int spellLevel,
+            LivingEntity caster,
+            LivingEntity target,
+            float sourceCoefficient
+    ) {
+        int previousInvulnerableTime =
+                target.invulnerableTime;
+        target.invulnerableTime = 0;
+
+        boolean damaged =
+                damage(
+                        spell,
+                        level,
+                        spellLevel,
+                        caster,
+                        target,
+                        sourceCoefficient
+                );
+
+        // Spell Engine's bypass_iframes does not erase or restart the
+        // target's unrelated vanilla hurt timer.
+        target.invulnerableTime =
+                previousInvulnerableTime;
+
+        return damaged;
+    }
+
     static boolean damage(
             AbstractSpell spell,
             Level level,
