@@ -35,6 +35,9 @@ foreach ($effect in @(
     Copy-PaladinAsset "textures/mob_effect/$effect.png" "src/main/resources/assets/martial_spells/textures/mob_effect/$effect.png"
 }
 
+Copy-PaladinAsset "textures/spell_projectile/judgement.png" "src/main/resources/assets/martial_spells/textures/spell_projectile/judgement.png"
+Copy-PaladinAsset "textures/spell_projectile/lightwell_orb.png" "src/main/resources/assets/martial_spells/textures/spell_projectile/lightwell_orb.png"
+
 foreach ($sound in @(
     "holy_beam_start_casting.ogg",
     "holy_beam_casting.ogg",
