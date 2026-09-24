@@ -15,7 +15,6 @@ import io.redspace.ironsspellbooks.api.util.Utils;
 import io.redspace.ironsspellbooks.damage.DamageSources;
 import io.redspace.ironsspellbooks.network.particles.HealParticlesPacket;
 import io.redspace.ironsspellbooks.setup.PacketDistributor;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -168,6 +167,11 @@ public final class PaladinImmolationSpell extends AbstractSpell {
                                 target.position()
                         )
                 );
+                PaladinVfx.healPillar(
+                        serverLevel,
+                        target,
+                        20
+                );
 
                 continue;
             }
@@ -197,6 +201,13 @@ public final class PaladinImmolationSpell extends AbstractSpell {
             );
 
             if (damaged) {
+                PaladinVfx.holyBurst(
+                        serverLevel,
+                        target,
+                        30,
+                        0.70D
+                );
+
                 serverLevel.playSound(
                         null,
                         target.getX(),
@@ -221,28 +232,10 @@ public final class PaladinImmolationSpell extends AbstractSpell {
                 1.0F
         );
 
-        serverLevel.sendParticles(
-                ParticleTypes.END_ROD,
-                caster.getX(),
-                caster.getY() + 0.5D,
-                caster.getZ(),
-                60,
-                RANGE * 0.55D,
-                1.0D,
-                RANGE * 0.55D,
-                0.12D
-        );
-
-        serverLevel.sendParticles(
-                ParticleTypes.FLAME,
-                caster.getX(),
-                caster.getY() + 0.25D,
-                caster.getZ(),
-                40,
-                RANGE * 0.45D,
-                0.5D,
-                RANGE * 0.45D,
-                0.08D
+        PaladinVfx.immolationRelease(
+                serverLevel,
+                caster,
+                RANGE
         );
 
         super.onCast(
