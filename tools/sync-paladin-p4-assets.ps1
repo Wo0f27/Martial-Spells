@@ -5,7 +5,22 @@ $ErrorActionPreference = "Stop"
 
 $SourceCommit = "2807417a1dd9a65204c002ded487da0e6ae467a1"
 $SourceRoot = "https://raw.githubusercontent.com/ZsoltMolnarrr/Paladins/$SourceCommit/common/src/main/resources/assets/paladins"
+$SpellEngineCommit = "fea2dc16c1f77d2e583149354b67227d589c9a4d"
+$SpellEngineRoot = "https://raw.githubusercontent.com/ZsoltMolnarrr/SpellEngine/$SpellEngineCommit/common/src/main/resources/assets/spell_engine"
 $TargetRoot = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot ".."))
+
+function Copy-SpellEngineAsset {
+    param(
+        [Parameter(Mandatory=$true)][string]$SourceRelative,
+        [Parameter(Mandatory=$true)][string]$TargetRelative
+    )
+
+    $source = "$SpellEngineRoot/$SourceRelative"
+    $target = Join-Path $TargetRoot $TargetRelative
+    New-Item -ItemType Directory -Force -Path (Split-Path -Parent $target) | Out-Null
+    Write-Host "sync GPL Spell Engine VFX $TargetRelative"
+    Invoke-WebRequest -Uri $source -OutFile $target -UseBasicParsing -Headers @{ "User-Agent" = "Martial-Spells-Paladin-VFX-sync" }
+}
 
 function Copy-PaladinAsset {
     param(
@@ -53,7 +68,26 @@ foreach ($sound in @(
     Copy-PaladinAsset "sounds/$sound" "src/main/resources/assets/martial_spells/sounds/$sound"
 }
 
+# Exact Paladins visuals reference a small subset of Spell Engine's GPLv3
+# particle artwork. These files are intentionally kept under paladin_source/
+# and pinned separately from the Paladins-owned assets above.
+Copy-SpellEngineAsset "textures/particle/magic/holy.png" "src/main/resources/assets/martial_spells/textures/particle/paladin_source/magic/holy.png"
+Copy-SpellEngineAsset "textures/particle/magic/heal.png" "src/main/resources/assets/martial_spells/textures/particle/paladin_source/magic/heal.png"
+
+foreach ($frame in 0..7) {
+    Copy-SpellEngineAsset "textures/particle/magic/vertical_stripe_$frame.png" "src/main/resources/assets/martial_spells/textures/particle/paladin_source/magic/vertical_stripe_$frame.png"
+}
+
+foreach ($frame in 0..14) {
+    Copy-SpellEngineAsset "textures/particle/zone/effect_637_$frame.png" "src/main/resources/assets/martial_spells/textures/particle/paladin_source/zone/effect_637_$frame.png"
+}
+
+foreach ($frame in 0..16) {
+    Copy-SpellEngineAsset "textures/particle/zone/effect_676_$frame.png" "src/main/resources/assets/martial_spells/textures/particle/paladin_source/zone/effect_676_$frame.png"
+}
+
 Write-Host ""
 Write-Host "Paladin/Priest P4 source asset sync complete."
-Write-Host "Pinned upstream commit: $SourceCommit"
+Write-Host "Pinned Paladins commit: $SourceCommit"
+Write-Host "Pinned Spell Engine VFX commit: $SpellEngineCommit"
 Write-Host "Next: python .\tools\audit-paladin-p4.py"
