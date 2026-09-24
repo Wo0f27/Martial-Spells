@@ -71,7 +71,8 @@ public final class JudgementVisualEntity extends Entity {
             if (level() instanceof ServerLevel serverLevel) {
                 PaladinVfx.judgementTrail(
                         serverLevel,
-                        position()
+                        position(),
+                        getDeltaMovement()
                 );
             }
         }
