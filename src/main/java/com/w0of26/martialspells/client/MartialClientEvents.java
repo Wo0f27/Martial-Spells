@@ -21,6 +21,7 @@ import com.w0of26.martialspells.client.render.NettedEffectRenderer;
 import com.w0of26.martialspells.client.render.ThrowNetRenderer;
 import com.w0of26.martialspells.client.render.ShatteringThrowRenderer;
 import com.w0of26.martialspells.client.render.PenanceProjectileRenderer;
+import com.w0of26.martialspells.client.render.JudgementVisualRenderer;
 import com.w0of26.martialspells.registry.MartialEntityRegistry;
 import com.w0of26.martialspells.registry.MartialParticleRegistry;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
@@ -58,12 +59,15 @@ public final class MartialClientEvents {
         event.registerEntityRenderer(MartialEntityRegistry.THROW_NET.get(), ThrowNetRenderer::new);
         event.registerEntityRenderer(MartialEntityRegistry.SHATTERING_THROW.get(), ShatteringThrowRenderer::new);
         event.registerEntityRenderer(MartialEntityRegistry.PENANCE_PROJECTILE.get(), PenanceProjectileRenderer::new);
+        event.registerEntityRenderer(MartialEntityRegistry.JUDGEMENT_VISUAL.get(), JudgementVisualRenderer::new);
     }
 
     @SubscribeEvent
     public static void registerAdditionalModels(ModelEvent.RegisterAdditional event) {
         event.register(ThrowNetRenderer.MODEL);
         event.register(NettedEffectRenderer.MODEL);
+        event.register(PenanceProjectileRenderer.MODEL);
+        event.register(JudgementVisualRenderer.MODEL);
     }
 
     @SubscribeEvent
@@ -79,6 +83,18 @@ public final class MartialClientEvents {
             MartialSpells.LOGGER.error(
                     "Netted status-effect model failed to bake: {}",
                     NettedEffectRenderer.MODEL
+            );
+        }
+        if (manager.getModel(PenanceProjectileRenderer.MODEL) == manager.getMissingModel()) {
+            MartialSpells.LOGGER.error(
+                    "Penance projectile model failed to bake: {}",
+                    PenanceProjectileRenderer.MODEL
+            );
+        }
+        if (manager.getModel(JudgementVisualRenderer.MODEL) == manager.getMissingModel()) {
+            MartialSpells.LOGGER.error(
+                    "Judgement projectile model failed to bake: {}",
+                    JudgementVisualRenderer.MODEL
             );
         }
     }
