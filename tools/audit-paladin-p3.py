@@ -85,6 +85,16 @@ if (
 if "EntityHitResult" in holy_beam:
     errors.append("Holy Light BEAM must not use a single EntityHitResult target")
 
+for token in (
+    "HolyBeamVisualEntity",
+    "MartialEntityRegistry",
+    ".HOLY_BEAM_VISUAL",
+    "BEAM_VISUALS",
+    "PaladinVfx.holyBeam(",
+):
+    if token not in holy_beam:
+        errors.append(f"Holy Light presentation missing {token}")
+
 levitate = (spell_dir / "PaladinLevitateSpell.java").read_text(encoding="utf-8")
 for token in (
     '"levitate"',
@@ -234,10 +244,18 @@ for token in (
     if token not in entity_registry:
         errors.append(f"Judgement visual entity registration missing {token}")
 
+for token in (
+    'ENTITY_TYPES.register("holy_beam_visual"',
+    ".sized(0.10F, 0.10F)",
+):
+    if token not in entity_registry:
+        errors.append(f"Holy Light visual entity registration missing {token}")
+
 client_events = (root / "src/main/java/com/w0of26/martialspells/client/MartialClientEvents.java").read_text(encoding="utf-8")
 for token in (
     "PenanceProjectileRenderer::new",
     "JudgementVisualRenderer::new",
+    "HolyBeamVisualRenderer::new",
     "event.register(PenanceProjectileRenderer.MODEL)",
     "event.register(JudgementVisualRenderer.MODEL)",
 ):
@@ -267,6 +285,26 @@ for token in (
 ):
     if token not in judgement_visual:
         errors.append(f"Judgement visual entity missing {token}")
+
+holy_beam_visual = (entity_dir / "HolyBeamVisualEntity.java").read_text(encoding="utf-8")
+for token in (
+    "OWNER_ID",
+    "SAFETY_LIFETIME_TICKS = 120",
+    "noCulling = true",
+    "NetworkHooks",
+):
+    if token not in holy_beam_visual:
+        errors.append(f"Holy Light beam visual entity missing {token}")
+
+holy_beam_renderer = (root / "src/main/java/com/w0of26/martialspells/client/render/HolyBeamVisualRenderer.java").read_text(encoding="utf-8")
+for token in (
+    "RenderType.lightning()",
+    "OUTER_WIDTH = 0.055D",
+    "INNER_WIDTH = 0.020D",
+    "PaladinHolyBeamSpell.RANGE",
+):
+    if token not in holy_beam_renderer:
+        errors.append(f"Holy Light beam renderer missing {token}")
 
 judgement_renderer = (root / "src/main/java/com/w0of26/martialspells/client/render/JudgementVisualRenderer.java").read_text(encoding="utf-8")
 for token in (
@@ -480,7 +518,7 @@ print("")
 print("CP11 P3 Priest channel/control summary")
 print(" - spells: Holy Light, Levitate, Penance")
 print(" - source channel scheduling: equal-interval midpoints")
-print(" - Holy Light: 5 sec / 25 pulses / multi-target blocked BEAM / 0.2x per-pulse")
+print(" - Holy Light: 5 sec / 25 pulses / continuous golden blocked BEAM + flow particles")
 print(" - Holy Light/Penance: source damage iframe bypass preserved")
 print(" - Levitate: 1.5 sec / 4 reset-velocity lifts / executable Slow Falling refresh")
 print(" - Penance: 1.5 sec / 3 look-launched homing bolts / 20-block travel cap")
