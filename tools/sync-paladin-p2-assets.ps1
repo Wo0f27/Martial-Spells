@@ -30,6 +30,9 @@ foreach ($spell in @(
     Copy-PaladinAsset "textures/spell/$spell.png" "src/main/resources/assets/martial_spells/textures/gui/spell_icons/$spell.png"
 }
 
+Copy-PaladinAsset "textures/spell_effect/divine_protection.png" "src/main/resources/assets/martial_spells/textures/spell_effect/divine_protection.png"
+Copy-PaladinAsset "textures/spell_effect/divine_protection_glow.png" "src/main/resources/assets/martial_spells/textures/spell_effect/divine_protection_glow.png"
+
 foreach ($sound in @(
     "blessed_strike_start.ogg",
     "blessed_strike_casting.ogg",
