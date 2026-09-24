@@ -92,6 +92,22 @@ public final class PaladinBlessedStrikesSpell extends AbstractSpell {
     }
 
     @Override
+    public void onServerCastTick(
+            Level level,
+            int spellLevel,
+            LivingEntity entity,
+            MagicData magicData
+    ) {
+        if (level instanceof ServerLevel serverLevel
+                && serverLevel.getGameTime() % 2L == 0L) {
+            PaladinVfx.blessedGather(
+                    serverLevel,
+                    entity
+            );
+        }
+    }
+
+    @Override
     public void onCast(
             Level level,
             int spellLevel,
@@ -108,6 +124,10 @@ public final class PaladinBlessedStrikesSpell extends AbstractSpell {
         addSeal(caster);
 
         if (level instanceof ServerLevel serverLevel) {
+            PaladinVfx.blessedRelease(
+                    serverLevel,
+                    caster
+            );
             serverLevel.playSound(
                     null,
                     caster.getX(),
