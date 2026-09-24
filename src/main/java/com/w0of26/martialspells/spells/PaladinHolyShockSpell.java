@@ -83,6 +83,22 @@ public final class PaladinHolyShockSpell extends AbstractSpell {
     }
 
     @Override
+    public void onServerCastTick(
+            Level level,
+            int spellLevel,
+            LivingEntity entity,
+            MagicData magicData
+    ) {
+        if (level instanceof ServerLevel serverLevel
+                && serverLevel.getGameTime() % 2L == 0L) {
+            PaladinVfx.holyCasting(
+                    serverLevel,
+                    entity
+            );
+        }
+    }
+
+    @Override
     public void onCast(
             Level level,
             int spellLevel,
@@ -110,6 +126,21 @@ public final class PaladinHolyShockSpell extends AbstractSpell {
                     HEAL_COEFFICIENT
             );
 
+            if (level instanceof ServerLevel serverLevel) {
+                PaladinVfx.healPillar(
+                        serverLevel,
+                        target,
+                        15
+                );
+                PaladinVfx.holyGlimmer(
+                        serverLevel,
+                        target,
+                        15,
+                        0.20D,
+                        0.25D
+                );
+            }
+
             playImpactSound(
                     level,
                     target,
@@ -132,6 +163,15 @@ public final class PaladinHolyShockSpell extends AbstractSpell {
                         caster.getX() - target.getX(),
                         caster.getZ() - target.getZ()
                 );
+
+                if (level instanceof ServerLevel serverLevel) {
+                    PaladinVfx.holyBurst(
+                            serverLevel,
+                            target,
+                            30,
+                            0.70D
+                    );
+                }
 
                 playImpactSound(
                         level,
