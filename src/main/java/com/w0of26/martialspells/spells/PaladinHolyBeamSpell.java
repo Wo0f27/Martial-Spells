@@ -244,7 +244,7 @@ public final class PaladinHolyBeamSpell extends AbstractSpell {
                         caster
                 );
         Vec3 maximumEnd =
-                caster.getEyePosition()
+                sourceBeamStart(caster)
                         .add(
                                 caster.getLookAngle()
                                         .normalize()
@@ -338,11 +338,36 @@ public final class PaladinHolyBeamSpell extends AbstractSpell {
         }
     }
 
+    /**
+     * Frozen Spell Engine LaunchGeometry.launchPoint used by BEAM targeting:
+     * shoulder-height origin plus the default 0.5-block forward offset.
+     */
+    private static Vec3 sourceBeamStart(
+            ServerPlayer caster
+    ) {
+        Vec3 look =
+                caster.getLookAngle()
+                        .normalize();
+
+        return caster.position()
+                .add(
+                        0.0D,
+                        caster.getEyeHeight()
+                                - caster.getBbHeight()
+                                * 0.15D,
+                        0.0D
+                )
+                .add(
+                        look.scale(0.50D)
+                );
+    }
+
     private static Vec3 beamEnd(
             ServerLevel level,
             ServerPlayer caster
     ) {
-        Vec3 start = caster.getEyePosition();
+        Vec3 start =
+                sourceBeamStart(caster);
         Vec3 end =
                 start.add(
                         caster.getLookAngle()
@@ -371,7 +396,8 @@ public final class PaladinHolyBeamSpell extends AbstractSpell {
             ServerLevel level,
             ServerPlayer caster
     ) {
-        Vec3 start = caster.getEyePosition();
+        Vec3 start =
+                sourceBeamStart(caster);
         Vec3 end =
                 start.add(
                         caster.getLookAngle()
