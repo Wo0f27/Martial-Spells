@@ -11,6 +11,8 @@ import net.minecraft.client.particle.TextureSheetParticle;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
@@ -28,6 +30,8 @@ public final class PaladinSourceAreaParticle
 
     private final SpriteSet sprites;
     private final Facing facing;
+    private final Entity followEntity;
+    private final Vec3 followOffset;
 
     private PaladinSourceAreaParticle(
             ClientLevel level,
@@ -52,6 +56,23 @@ public final class PaladinSourceAreaParticle
 
         this.sprites = sprites;
         this.facing = facing;
+
+        int followId =
+                facing == Facing.CAMERA
+                        ? (int) Math.round(zd)
+                        : -1;
+        followEntity =
+                followId > 0
+                        ? level.getEntity(followId)
+                        : null;
+        followOffset =
+                followEntity != null
+                        ? new Vec3(
+                                x - followEntity.getX(),
+                                y - followEntity.getY(),
+                                z - followEntity.getZ()
+                        )
+                        : Vec3.ZERO;
 
         xd = 0.0D;
         yd = 0.0D;
@@ -90,6 +111,14 @@ public final class PaladinSourceAreaParticle
         super.tick();
 
         if (!removed) {
+            if (followEntity != null
+                    && !followEntity.isRemoved()) {
+                setPos(
+                        followEntity.getX() + followOffset.x,
+                        followEntity.getY() + followOffset.y,
+                        followEntity.getZ() + followOffset.z
+                );
+            }
             setSpriteFromAge(sprites);
         }
     }
