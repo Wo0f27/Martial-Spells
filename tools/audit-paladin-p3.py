@@ -269,7 +269,8 @@ for token in (
     "ORBIT_RADIUS = 0.6F",
     "ORBIT_DEGREES_PER_TICK = 15.0F",
     "SCALE = 0.9F",
-    "LightTexture.FULL_BRIGHT",
+    "PaladinSpellModelRenderTypes.glow()",
+    "packedLight",
 ):
     if token not in penance_renderer:
         errors.append(f"Penance source orb renderer missing {token}")
@@ -344,7 +345,9 @@ judgement_renderer = (root / "src/main/java/com/w0of26/martialspells/client/rend
 for token in (
     '"spell_projectile/judgement"',
     "SCALE = 1.2F",
-    "LightTexture.FULL_BRIGHT",
+    "PaladinSpellModelRenderTypes.radiate()",
+    "* 2.0F",
+    "packedLight",
 ):
     if token not in judgement_renderer:
         errors.append(f"Judgement source model renderer missing {token}")
@@ -563,7 +566,8 @@ for token in (
     "HORIZONTAL_OFFSET = 0.35F",
     "ORBITING_SPEED = 2.25F",
     "effect.getAmplifier()",
-    "LightTexture.FULL_BRIGHT",
+    "PaladinSpellModelRenderTypes.radiate()",
+    "packedLight",
 ):
     if token not in divine_renderer:
         errors.append(f"Divine Protection source orbit renderer missing {token}")
