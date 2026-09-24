@@ -71,7 +71,9 @@ public final class PaladinLightwellSpell extends AbstractSpell {
             LivingEntity caster
     ) {
         return WELL_BASE_HEALING_POWER
-                + getSpellPower(
+                + PaladinHolySpellSupport
+                .getSourceEquivalentPower(
+                        this,
                         1,
                         caster
                 )
