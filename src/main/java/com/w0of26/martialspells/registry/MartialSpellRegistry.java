@@ -55,6 +55,13 @@ public final class MartialSpellRegistry {
     public static final RegistryObject<AbstractSpell> IMMOLATION =
             SPELLS.register("immolation", PaladinImmolationSpell::new);
 
+    public static final RegistryObject<AbstractSpell> HOLY_BEAM =
+            SPELLS.register("holy_beam", PaladinHolyBeamSpell::new);
+    public static final RegistryObject<AbstractSpell> LEVITATE =
+            SPELLS.register("levitate", PaladinLevitateSpell::new);
+    public static final RegistryObject<AbstractSpell> PENANCE =
+            SPELLS.register("penance", PaladinPenanceSpell::new);
+
     private MartialSpellRegistry() {}
 
     public static void register(IEventBus modEventBus) {
