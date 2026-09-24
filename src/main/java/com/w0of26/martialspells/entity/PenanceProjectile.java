@@ -42,6 +42,7 @@ public final class PenanceProjectile
     private float knockback;
     private int shieldStacksPerBolt;
     private int shieldAmplifierCap;
+    private float distanceTraveled;
     private UUID followedTargetId;
 
     public PenanceProjectile(
@@ -86,7 +87,9 @@ public final class PenanceProjectile
     @Override
     public void tick() {
         if (!level().isClientSide) {
-            if (tickCount > SOURCE_AGE_CAP_TICKS) {
+            if (distanceTraveled
+                    >= PaladinPenanceSpell.RANGE
+                    || tickCount > SOURCE_AGE_CAP_TICKS) {
                 discard();
                 return;
             }
@@ -95,12 +98,18 @@ public final class PenanceProjectile
         }
 
         normalizeVelocity();
+        double stepDistance =
+                getDeltaMovement().length();
+
         super.tick();
 
         if (!isRemoved()) {
             normalizeVelocity();
 
             if (level() instanceof ServerLevel serverLevel) {
+                distanceTraveled +=
+                        (float) stepDistance;
+
                 serverLevel.sendParticles(
                         ParticleTypes.END_ROD,
                         getX(),
@@ -468,6 +477,10 @@ public final class PenanceProjectile
                 "PenanceShieldCap",
                 shieldAmplifierCap
         );
+        tag.putFloat(
+                "PenanceDistance",
+                distanceTraveled
+        );
 
         if (followedTargetId != null) {
             tag.putUUID(
@@ -497,6 +510,10 @@ public final class PenanceProjectile
                         tag.getInt(
                                 "PenanceShieldCap"
                         )
+                );
+        distanceTraveled =
+                tag.getFloat(
+                        "PenanceDistance"
                 );
         followedTargetId =
                 tag.hasUUID("PenanceTarget")
