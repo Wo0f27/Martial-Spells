@@ -562,6 +562,7 @@ if blessed_shader_json_path.is_file():
 if blessed_shader_vsh_path.is_file():
     blessed_shader_vsh = blessed_shader_vsh_path.read_text(encoding="utf-8")
     for token in (
+        "vertexDistance = fog_distance(ModelViewMat, Position, FogShape);",
         "itemTexCoord = UV0;",
         "glowTexCoord = (TextureMat * vec4(UV0, 0.0, 1.0)).xy;",
     ):
