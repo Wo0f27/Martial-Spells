@@ -441,10 +441,6 @@ vfx_expectations = {
         "PaladinVfx.healPillar(",
         "PaladinVfx.holyGlimmer(",
     ),
-    "PaladinBlessedStrikesSpell.java": (
-        "PaladinVfx.blessedGather(",
-        "PaladinVfx.blessedRelease(",
-    ),
     "PaladinDivineProtectionSpell.java": (
         "PaladinVfx.divineProtectionApply(",
     ),
@@ -478,57 +474,37 @@ for filename, tokens in vfx_expectations.items():
             errors.append(f"{filename} missing source-style VFX call {token}")
 
 blessed_events = (root / "src/main/java/com/w0of26/martialspells/events/BlessedStrikesEvents.java").read_text(encoding="utf-8")
-if "PaladinVfx.holyBurst(" not in blessed_events:
-    errors.append("BlessedStrikesEvents missing source Holy impact burst")
-if "blessedWeaponAura(" in blessed_events:
-    errors.append("Blessed Strikes must not use the old particle weapon-aura approximation")
-
-blessed_glow = (root / "src/main/java/com/w0of26/martialspells/client/render/BlessedStrikesItemGlow.java").read_text(encoding="utf-8")
-for token in (
-    "OPACITY_PER_STACK =",
-    "0.20F",
-    "MAX_STACKS =",
-    "5",
-    "currentOpacity",
-    "boolean active()",
-    "EquipmentSlot.MAINHAND",
-    "EquipmentSlot.OFFHAND",
-):
-    if token not in blessed_glow:
-        errors.append(f"Blessed Strikes held-item state missing {token}")
 for forbidden in (
-    "BlessedStrikesGlowRenderTypes",
-    "ShaderInstance",
-    "textureMatrix(",
+    "PaladinVfx.",
+    "playSound(",
+    "MartialSoundRegistry",
 ):
-    if forbidden in blessed_glow:
-        errors.append(f"Blessed Strikes baseline must not own a custom glow renderer: {forbidden}")
+    if forbidden in blessed_events:
+        errors.append(f"Blessed Strikes user-approved mechanics-only path still has presentation: {forbidden}")
 
-blessed_mixin = (root / "src/main/java/com/w0of26/martialspells/mixin/client/BlessedStrikesItemRendererMixin.java").read_text(encoding="utf-8")
+blessed_spell = (spell_dir / "PaladinBlessedStrikesSpell.java").read_text(encoding="utf-8")
 for token in (
-    '@Mixin(ItemRenderer.class)',
-    "renderStatic(",
-    "getFoilBuffer",
-    "getFoilBufferDirect",
-    "BlessedStrikesItemGlow.begin(",
-    "BlessedStrikesItemGlow.active()",
-    "VertexMultiConsumer.create(",
-    "RenderType.glint()",
-    "RenderType.entityGlint()",
-    "RenderType.glintDirect()",
-    "RenderType.entityGlintDirect()",
-    "RenderType.glintTranslucent()",
+    "CastType.INSTANT",
+    "castTime = 0",
+    "MANA_COST = 30",
+    "MAX_SEALS = 5",
+    "FULL_STACK_AMPLIFIER = MAX_SEALS - 1",
+    "AnimationHolder.none()",
 ):
-    if token not in blessed_mixin:
-        errors.append(f"Blessed Strikes vanilla-glint hook missing {token}")
+    if token not in blessed_spell:
+        errors.append(f"Blessed Strikes instant mechanics-only spell missing {token}")
 for forbidden in (
-    "BlessedStrikesGlowRenderTypes",
-    "new ShaderInstance(",
+    "onServerCastTick(",
+    "PaladinVfx.",
+    "BLESSED_STRIKE_START",
+    "BLESSED_STRIKE_RELEASE",
 ):
-    if forbidden in blessed_mixin:
-        errors.append(f"Blessed Strikes vanilla-glint hook still references custom rendering: {forbidden}")
+    if forbidden in blessed_spell:
+        errors.append(f"Blessed Strikes instant spell still contains removed presentation/channel code: {forbidden}")
 
 for obsolete_path in (
+    root / "src/main/java/com/w0of26/martialspells/client/render/BlessedStrikesItemGlow.java",
+    root / "src/main/java/com/w0of26/martialspells/mixin/client/BlessedStrikesItemRendererMixin.java",
     root / "src/main/java/com/w0of26/martialspells/client/render/BlessedStrikesGlowRenderTypes.java",
     root / "src/main/java/com/w0of26/martialspells/client/render/BlessedStrikesGlowVertexConsumer.java",
     root / "src/main/java/com/w0of26/martialspells/mixin/client/BlessedStrikesGlowBufferSourceMixin.java",
@@ -537,13 +513,15 @@ for obsolete_path in (
     root / "src/main/resources/assets/martial_spells/shaders/core/blessed_strikes_glow.fsh",
 ):
     if obsolete_path.exists():
-        errors.append(f"obsolete Blessed Strikes custom-render file remains: {obsolete_path.name}")
+        errors.append(f"obsolete Blessed Strikes presentation file remains: {obsolete_path.name}")
 
 mixins_json = json.loads((root / "src/main/resources/martial_spells.mixins.json").read_text(encoding="utf-8"))
-if "client.BlessedStrikesItemRendererMixin" not in mixins_json.get("client", []):
-    errors.append("Blessed Strikes item-render mixin is not registered")
-if "client.BlessedStrikesGlowBufferSourceMixin" in mixins_json.get("client", []):
-    errors.append("obsolete Blessed Strikes custom-buffer mixin is still registered")
+for mixin_id in (
+    "client.BlessedStrikesItemRendererMixin",
+    "client.BlessedStrikesGlowBufferSourceMixin",
+):
+    if mixin_id in mixins_json.get("client", []):
+        errors.append(f"removed Blessed Strikes presentation mixin is still registered: {mixin_id}")
 
 divine_events = (root / "src/main/java/com/w0of26/martialspells/events/DivineProtectionEvents.java").read_text(encoding="utf-8")
 if "PaladinVfx.divineProtectionPop(" not in divine_events:

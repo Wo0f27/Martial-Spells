@@ -3,15 +3,11 @@ package com.w0of26.martialspells.events;
 import com.w0of26.martialspells.MartialSpells;
 import com.w0of26.martialspells.registry.MartialEffectRegistry;
 import com.w0of26.martialspells.registry.MartialSpellRegistry;
-import com.w0of26.martialspells.registry.MartialSoundRegistry;
 import com.w0of26.martialspells.spells.PaladinBlessedStrikesSpell;
-import com.w0of26.martialspells.spells.PaladinVfx;
 import io.redspace.ironsspellbooks.damage.DamageSources;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
@@ -85,25 +81,6 @@ public final class BlessedStrikesEvents {
                     attacker.getZ() - target.getZ()
             );
 
-            if (target.level() instanceof ServerLevel serverLevel) {
-                PaladinVfx.holyBurst(
-                        serverLevel,
-                        target,
-                        30,
-                        0.70D
-                );
-
-                serverLevel.playSound(
-                        null,
-                        target.getX(),
-                        target.getY(),
-                        target.getZ(),
-                        MartialSoundRegistry.HOLY_SHOCK_DAMAGE.get(),
-                        SoundSource.PLAYERS,
-                        1.0F,
-                        1.0F
-                );
-            }
         }
 
         attacker.getPersistentData().putBoolean(

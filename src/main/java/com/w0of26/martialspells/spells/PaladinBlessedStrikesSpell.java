@@ -3,7 +3,6 @@ package com.w0of26.martialspells.spells;
 import com.w0of26.martialspells.MartialSpells;
 import com.w0of26.martialspells.combat.PaladinHybridPower;
 import com.w0of26.martialspells.registry.MartialEffectRegistry;
-import com.w0of26.martialspells.registry.MartialSoundRegistry;
 import io.redspace.ironsspellbooks.api.config.DefaultConfig;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.api.registry.SchoolRegistry;
@@ -11,13 +10,12 @@ import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
 import io.redspace.ironsspellbooks.api.spells.CastSource;
 import io.redspace.ironsspellbooks.api.spells.CastType;
 import io.redspace.ironsspellbooks.api.spells.SpellRarity;
+import io.redspace.ironsspellbooks.api.util.AnimationHolder;
 import io.redspace.ironsspellbooks.api.util.Utils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
@@ -26,11 +24,13 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Iron's translation of frozen Paladins Blessed Strikes.
+ * User-approved mechanics-only translation of Blessed Strikes.
  *
- * Iron's CONTINUOUS spells execute once immediately and then every ten ticks.
- * The immediate execution is deliberately a no-op; the five executions at
- * remaining durations 40/30/20/10/0 are the source's five half-second seals.
+ * <p>The original 2.5-second channel and its presentation are intentionally
+ * removed. Casting is instant and immediately grants five Blessed Strikes
+ * charges for 15 seconds. The existing melee trigger still consumes one
+ * charge after each successful melee swing, including Better Combat cleaves
+ * that hit multiple targets in the same tick.</p>
  */
 public final class PaladinBlessedStrikesSpell extends AbstractSpell {
     public static final ResourceLocation SPELL_ID =
@@ -39,10 +39,11 @@ public final class PaladinBlessedStrikesSpell extends AbstractSpell {
                     "blessed_strikes"
             );
 
-    public static final int CAST_TIME_TICKS = 50;
     public static final int BASE_COOLDOWN_SECONDS = 12;
     public static final int EFFECT_DURATION_TICKS = 15 * 20;
-    public static final int MAX_AMPLIFIER = 5;
+    public static final int MAX_SEALS = 5;
+    public static final int FULL_STACK_AMPLIFIER = MAX_SEALS - 1;
+    public static final int MANA_COST = 30;
     public static final float DAMAGE_COEFFICIENT = 0.50F;
     public static final double KNOCKBACK_STRENGTH = 0.50D;
 
@@ -55,13 +56,12 @@ public final class PaladinBlessedStrikesSpell extends AbstractSpell {
                     .build();
 
     public PaladinBlessedStrikesSpell() {
-        // Full channel costs 30 target-side mana:
-        // one 5-mana channel-initiation tick + five 5-mana seal ticks.
-        baseManaCost = 5;
+        // Preserve the total cost of the former full five-seal channel.
+        baseManaCost = MANA_COST;
         manaCostPerLevel = 0;
         baseSpellPower = PaladinHolySpellSupport.SOURCE_POWER_REFERENCE;
         spellPowerPerLevel = 0;
-        castTime = CAST_TIME_TICKS;
+        castTime = 0;
     }
 
     @Override
@@ -76,14 +76,12 @@ public final class PaladinBlessedStrikesSpell extends AbstractSpell {
 
     @Override
     public CastType getCastType() {
-        return CastType.CONTINUOUS;
+        return CastType.INSTANT;
     }
 
     @Override
     public Optional<SoundEvent> getCastStartSound() {
-        return Optional.of(
-                MartialSoundRegistry.BLESSED_STRIKE_START.get()
-        );
+        return Optional.empty();
     }
 
     @Override
@@ -92,19 +90,13 @@ public final class PaladinBlessedStrikesSpell extends AbstractSpell {
     }
 
     @Override
-    public void onServerCastTick(
-            Level level,
-            int spellLevel,
-            LivingEntity entity,
-            MagicData magicData
-    ) {
-        if (level instanceof ServerLevel serverLevel
-                && serverLevel.getGameTime() % 2L == 0L) {
-            PaladinVfx.blessedGather(
-                    serverLevel,
-                    entity
-            );
-        }
+    public AnimationHolder getCastStartAnimation() {
+        return AnimationHolder.none();
+    }
+
+    @Override
+    public AnimationHolder getCastFinishAnimation() {
+        return AnimationHolder.none();
     }
 
     @Override
@@ -115,30 +107,16 @@ public final class PaladinBlessedStrikesSpell extends AbstractSpell {
             CastSource castSource,
             MagicData magicData
     ) {
-        // Iron's continuous framework fires once immediately at duration 50.
-        // Upstream begins granting seals only after the first 0.5 second.
-        if (magicData.getCastDurationRemaining() >= CAST_TIME_TICKS) {
-            return;
-        }
-
-        addSeal(caster);
-
-        if (level instanceof ServerLevel serverLevel) {
-            PaladinVfx.blessedRelease(
-                    serverLevel,
-                    caster
-            );
-            serverLevel.playSound(
-                    null,
-                    caster.getX(),
-                    caster.getY(),
-                    caster.getZ(),
-                    MartialSoundRegistry.BLESSED_STRIKE_RELEASE.get(),
-                    SoundSource.PLAYERS,
-                    1.0F,
-                    1.0F
-            );
-        }
+        caster.addEffect(
+                new MobEffectInstance(
+                        MartialEffectRegistry.BLESSED_STRIKES.get(),
+                        EFFECT_DURATION_TICKS,
+                        FULL_STACK_AMPLIFIER,
+                        false,
+                        true,
+                        true
+                )
+        );
 
         super.onCast(
                 level,
@@ -146,34 +124,6 @@ public final class PaladinBlessedStrikesSpell extends AbstractSpell {
                 caster,
                 castSource,
                 magicData
-        );
-    }
-
-    private static void addSeal(
-            LivingEntity caster
-    ) {
-        MobEffectInstance current =
-                caster.getEffect(
-                        MartialEffectRegistry.BLESSED_STRIKES.get()
-                );
-
-        int amplifier =
-                current == null
-                        ? 0
-                        : Math.min(
-                                MAX_AMPLIFIER,
-                                current.getAmplifier() + 1
-                        );
-
-        caster.addEffect(
-                new MobEffectInstance(
-                        MartialEffectRegistry.BLESSED_STRIKES.get(),
-                        EFFECT_DURATION_TICKS,
-                        amplifier,
-                        false,
-                        true,
-                        true
-                )
         );
     }
 
@@ -201,7 +151,7 @@ public final class PaladinBlessedStrikesSpell extends AbstractSpell {
         return List.of(
                 Component.translatable(
                         "ui.martial_spells.blessed_strikes_seals",
-                        5
+                        MAX_SEALS
                 ),
                 Component.translatable(
                         "ui.irons_spellbooks.damage",

@@ -35,14 +35,17 @@ spell_contract = {
         "SpellRarity.RARE",
         "SchoolRegistry.HOLY_RESOURCE",
         ".setMaxLevel(1)",
-        "CAST_TIME_TICKS = 50",
         "BASE_COOLDOWN_SECONDS = 12",
         "EFFECT_DURATION_TICKS = 15 * 20",
-        "MAX_AMPLIFIER = 5",
+        "MAX_SEALS = 5",
+        "FULL_STACK_AMPLIFIER = MAX_SEALS - 1",
+        "MANA_COST = 30",
         "DAMAGE_COEFFICIENT = 0.50F",
         "KNOCKBACK_STRENGTH = 0.50D",
-        "CastType.CONTINUOUS",
-        "getCastDurationRemaining() >= CAST_TIME_TICKS",
+        "CastType.INSTANT",
+        "castTime = 0",
+        "AnimationHolder.none()",
+        "FULL_STACK_AMPLIFIER",
     ),
     "PaladinDivineProtectionSpell.java": (
         '"divine_protection"',
@@ -125,6 +128,24 @@ for token in (
 ):
     if token not in blessed_events:
         errors.append(f"BlessedStrikesEvents missing {token}")
+for forbidden in (
+    "PaladinVfx.",
+    "playSound(",
+    "MartialSoundRegistry",
+):
+    if forbidden in blessed_events:
+        errors.append(f"BlessedStrikesEvents must remain presentation-free: {forbidden}")
+
+blessed_spell = (spell_dir / "PaladinBlessedStrikesSpell.java").read_text(encoding="utf-8")
+for forbidden in (
+    "onServerCastTick(",
+    "PaladinVfx.",
+    "BLESSED_STRIKE_START",
+    "BLESSED_STRIKE_RELEASE",
+    "CastType.CONTINUOUS",
+):
+    if forbidden in blessed_spell:
+        errors.append(f"Blessed Strikes instant buff still contains channel/presentation code: {forbidden}")
 
 divine_events = (event_dir / "DivineProtectionEvents.java").read_text(encoding="utf-8")
 for token in (
@@ -211,6 +232,9 @@ if "2807417a1dd9a65204c002ded487da0e6ae467a1" not in sync_text:
     errors.append("P2 asset sync is not pinned to frozen Paladins commit")
 if "sync-paladin-p1-assets.ps1" not in sync_text:
     errors.append("P2 asset sync must re-assert finalized P1 assets first")
+if 'textures/mob_effect/blessed_strikes.png' not in sync_text:
+    errors.append("P2 asset sync missing Blessed Strikes mob-effect icon")
+
 
 for spell_id in (
     "blessed_strikes",
@@ -221,6 +245,10 @@ for spell_id in (
     icon = root / f"src/main/resources/assets/martial_spells/textures/gui/spell_icons/{spell_id}.png"
     if not icon.is_file():
         errors.append(f"source icon missing; run P2 asset sync: {spell_id}.png")
+
+blessed_effect_icon = root / "src/main/resources/assets/martial_spells/textures/mob_effect/blessed_strikes.png"
+if not blessed_effect_icon.is_file():
+    errors.append("Blessed Strikes mob-effect icon missing; run P2 asset sync")
 
 for sound in p2_sounds:
     path = root / "src/main/resources/assets/martial_spells/sounds" / f"{sound}.ogg"
@@ -238,11 +266,11 @@ print(" - spells: 4")
 print(" - status effects: 2")
 print(" - Holy-dominant blend: 75% Holy / 25% melee")
 print(" - Judgement blend: 75% melee / 25% Holy")
-print(" - Blessed Strikes: 5 seal pulses; next-tick one-seal consumption")
+print(" - Blessed Strikes: instant 5-seal / 15-second buff; next-tick one-seal consumption")
 print(" - Divine Protection: 1-3 protected hits for 8 seconds")
 print(" - Judgement: 10-tick meteor; 6-block squared falloff")
 print(" - Immolation: ally heal / enemy damage + 4-second burn")
-print(" - source icons: 4")
+print(" - source icons: 4 spell icons + Blessed Strikes mob-effect icon")
 print(" - source sounds: 7")
 
 if errors:
