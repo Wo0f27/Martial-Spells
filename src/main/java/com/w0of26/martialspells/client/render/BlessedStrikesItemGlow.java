@@ -19,7 +19,8 @@ import javax.annotation.Nullable;
  * Blessed Strikes held-item glow state.
  *
  * <p>Source semantics retained: Holy #FFFFCC, opacity 0.2 per blessing,
- * maximum five blessings, source glow texture scale 8 and gain 3.</p>
+ * maximum five visible blessing stacks, source glow texture scale 8 and
+ * gain 3.</p>
  */
 public final class BlessedStrikesItemGlow {
     private static final float OPACITY_PER_STACK =
@@ -109,13 +110,19 @@ public final class BlessedStrikesItemGlow {
             return original;
         }
 
+        /*
+         * This mirrors Spell Engine's primary item-glow path: the item's
+         * geometry is copied into a dedicated POSITION_TEX glint layer while
+         * the original consumer still renders the weapon normally. Do not
+         * rewrite the atlas UVs here; that belongs only to Spell Engine's
+         * optional shader-pack emissive bloom pass.
+         */
         VertexConsumer glow =
-                new BlessedStrikesGlowVertexConsumer(
-                        buffers.getBuffer(
-                                BlessedStrikesGlowRenderTypes
-                                        .itemGlow()
-                        ),
-                        currentOpacity
+                buffers.getBuffer(
+                        BlessedStrikesGlowRenderTypes
+                                .itemGlow(
+                                        currentOpacity
+                                )
                 );
 
         return VertexMultiConsumer.create(

@@ -492,38 +492,46 @@ for token in (
     "MAX_STACKS =",
     "5",
     "VertexMultiConsumer.create(",
-    "BlessedStrikesGlowVertexConsumer",
+    ".itemGlow(",
+    "currentOpacity",
     "EquipmentSlot.MAINHAND",
     "EquipmentSlot.OFFHAND",
 ):
     if token not in blessed_glow:
         errors.append(f"Blessed Strikes source item-glow state missing {token}")
+if "BlessedStrikesGlowVertexConsumer" in blessed_glow:
+    errors.append("Blessed Strikes primary glow must not use the shader-pack emissive UV adapter")
 
 blessed_render_types = (root / "src/main/java/com/w0of26/martialspells/client/render/BlessedStrikesGlowRenderTypes.java").read_text(encoding="utf-8")
 for token in (
     "extends RenderType",
     '"textures/misc/paladin_item_glow.png"',
-    "RENDERTYPE_ENTITY_TRANSLUCENT_EMISSIVE_SHADER",
+    "DefaultVertexFormat.POSITION_TEX",
+    "RENDERTYPE_GLINT_SHADER",
     "EQUAL_DEPTH_TEST",
     "SourceFactor.ONE",
     "DestFactor.ONE",
     "COLOR_WRITE",
-    "LIGHTMAP",
+    "GAIN = 3.0F",
+    "HOLY_BLUE =",
+    "204.0F / 255.0F",
+    "RenderStateShard.TexturingStateShard",
+    "RenderSystem.setTextureMatrix(",
+    "RenderSystem.setShaderColor(",
+    "RenderSystem.setShaderGlintAlpha(",
+    "RenderSystem.resetTextureMatrix()",
+    ".setTexturingState(",
 ):
     if token not in blessed_render_types:
-        errors.append(f"Blessed Strikes safe glow RenderType missing {token}")
-if "RENDERTYPE_GLINT_SHADER" in blessed_render_types:
-    errors.append("Blessed Strikes must not use the old Forge-blackening GLINT render path")
+        errors.append(f"Blessed Strikes source glint RenderType missing {token}")
+if "RENDERTYPE_ENTITY_TRANSLUCENT_EMISSIVE_SHADER" in blessed_render_types:
+    errors.append("Blessed Strikes primary glow must not use Spell Engine's secondary shader-pack emissive pass")
+if "DefaultVertexFormat.NEW_ENTITY" in blessed_render_types:
+    errors.append("Blessed Strikes primary glow must use the source POSITION_TEX glint vertex layout")
 
-blessed_vertex = (root / "src/main/java/com/w0of26/martialspells/client/render/BlessedStrikesGlowVertexConsumer.java").read_text(encoding="utf-8")
-for token in (
-    "opacity * 3.0F",
-    "255.0F * intensity",
-    "204.0F * intensity",
-    "textureMatrix.transformPosition(",
-):
-    if token not in blessed_vertex:
-        errors.append(f"Blessed Strikes Holy emissive vertex adapter missing {token}")
+obsolete_blessed_vertex = root / "src/main/java/com/w0of26/martialspells/client/render/BlessedStrikesGlowVertexConsumer.java"
+if obsolete_blessed_vertex.exists():
+    errors.append("obsolete BlessedStrikesGlowVertexConsumer remains after restoring the source primary glint path")
 
 blessed_mixin = (root / "src/main/java/com/w0of26/martialspells/mixin/client/BlessedStrikesItemRendererMixin.java").read_text(encoding="utf-8")
 for token in (

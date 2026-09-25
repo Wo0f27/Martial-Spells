@@ -8,16 +8,17 @@ import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Forge-safe Blessed Strikes glow layer.
+ * Source-faithful Blessed Strikes weapon glow.
  *
- * <p>The previous GLINT_PROGRAM port could blacken the base item on Forge.
- * This layer keeps the source streak texture, additive blend, EQUAL depth
- * mask and Holy tint, but uses the color-capable emissive entity shader so the
- * overlay can never replace/darken the already-rendered item.</p>
+ * <p>Spell Engine's primary item glow is a custom glint pass: POSITION_TEX
+ * geometry, the glint shader, an additive ONE/ONE blend and an EQUAL depth
+ * mask. The Holy tint and stack opacity are supplied through render state,
+ * not by replacing the item's atlas UVs with the glow texture.</p>
  */
 public final class BlessedStrikesGlowRenderTypes
         extends RenderType {
@@ -27,10 +28,40 @@ public final class BlessedStrikesGlowRenderTypes
                     "textures/misc/paladin_item_glow.png"
             );
 
+    private static final float GAIN = 3.0F;
+    private static final float HOLY_BLUE =
+            204.0F / 255.0F;
+    private static final int OPACITY_STEPS = 5;
+
+    private static final Map<Integer, RenderType> LAYERS =
+            new ConcurrentHashMap<>();
     private static final Set<RenderType> GLOW_LAYERS =
             ConcurrentHashMap.newKeySet();
 
-    private static RenderType layer;
+    /*
+     * RenderSystem color/glint state is global. Source Spell Engine restores
+     * the values it found instead of assuming vanilla defaults; do the same
+     * here so Blessed Strikes does not alter unrelated enchantment glints.
+     */
+    private static final float[] SHADER_COLOR_TO_RESTORE =
+            new float[4];
+    private static float glintAlphaToRestore = 1.0F;
+
+    private static final RenderStateShard.TransparencyStateShard ADDITIVE =
+            new RenderStateShard.TransparencyStateShard(
+                    "martial_spells_blessed_strikes_additive",
+                    () -> {
+                        RenderSystem.enableBlend();
+                        RenderSystem.blendFunc(
+                                GlStateManager.SourceFactor.ONE,
+                                GlStateManager.DestFactor.ONE
+                        );
+                    },
+                    () -> {
+                        RenderSystem.disableBlend();
+                        RenderSystem.defaultBlendFunc();
+                    }
+            );
 
     private BlessedStrikesGlowRenderTypes(
             String name,
@@ -54,38 +85,120 @@ public final class BlessedStrikesGlowRenderTypes
         );
     }
 
-    public static RenderType itemGlow() {
-        if (layer != null) {
-            return layer;
-        }
+    public static RenderType itemGlow(
+            float opacity
+    ) {
+        float clampedOpacity =
+                Math.max(
+                        0.0F,
+                        Math.min(
+                                1.0F,
+                                opacity
+                        )
+                );
 
-        RenderStateShard.TransparencyStateShard additive =
-                new RenderStateShard.TransparencyStateShard(
-                        "martial_spells_blessed_strikes_additive",
+        int opacityStep =
+                Math.max(
+                        1,
+                        Math.min(
+                                OPACITY_STEPS,
+                                Math.round(
+                                        clampedOpacity
+                                                * OPACITY_STEPS
+                                )
+                        )
+                );
+
+        return LAYERS.computeIfAbsent(
+                opacityStep,
+                BlessedStrikesGlowRenderTypes::createItemGlowLayer
+        );
+    }
+
+    private static RenderType createItemGlowLayer(
+            int opacityStep
+    ) {
+        float opacity =
+                opacityStep
+                        / (float) OPACITY_STEPS;
+
+        RenderStateShard.TexturingStateShard texturing =
+                new RenderStateShard.TexturingStateShard(
+                        "martial_spells_blessed_strikes_texturing_"
+                                + opacityStep,
                         () -> {
-                            RenderSystem.enableBlend();
-                            RenderSystem.blendFunc(
-                                    GlStateManager.SourceFactor.ONE,
-                                    GlStateManager.DestFactor.ONE
+                            float[] shaderColor =
+                                    RenderSystem.getShaderColor();
+
+                            System.arraycopy(
+                                    shaderColor,
+                                    0,
+                                    SHADER_COLOR_TO_RESTORE,
+                                    0,
+                                    SHADER_COLOR_TO_RESTORE.length
+                            );
+
+                            glintAlphaToRestore =
+                                    RenderSystem.getShaderGlintAlpha();
+
+                            RenderSystem.setTextureMatrix(
+                                    BlessedStrikesItemGlow
+                                            .textureMatrix()
+                            );
+
+                            /*
+                             * Source Color.HOLY is #FFFFCC. Opacity is folded
+                             * into RGB because ONE/ONE additive blending does
+                             * not use source alpha. Gain 3 broadens/hotens the
+                             * streaks exactly like Spell Engine's item glow.
+                             */
+                            float intensity =
+                                    opacity * GAIN;
+
+                            RenderSystem.setShaderColor(
+                                    intensity,
+                                    intensity,
+                                    HOLY_BLUE * intensity,
+                                    1.0F
+                            );
+
+                            /*
+                             * Blessed Strikes is gameplay state, so it must
+                             * not disappear with the cosmetic Glint Strength
+                             * option.
+                             */
+                            RenderSystem.setShaderGlintAlpha(
+                                    1.0F
                             );
                         },
                         () -> {
-                            RenderSystem.disableBlend();
-                            RenderSystem.defaultBlendFunc();
+                            RenderSystem.resetTextureMatrix();
+
+                            RenderSystem.setShaderColor(
+                                    SHADER_COLOR_TO_RESTORE[0],
+                                    SHADER_COLOR_TO_RESTORE[1],
+                                    SHADER_COLOR_TO_RESTORE[2],
+                                    SHADER_COLOR_TO_RESTORE[3]
+                            );
+
+                            RenderSystem.setShaderGlintAlpha(
+                                    glintAlphaToRestore
+                            );
                         }
                 );
 
-        layer =
+        RenderType layer =
                 create(
-                        "martial_spells_blessed_strikes_glow",
-                        DefaultVertexFormat.NEW_ENTITY,
+                        "martial_spells_blessed_strikes_glow_"
+                                + opacityStep,
+                        DefaultVertexFormat.POSITION_TEX,
                         VertexFormat.Mode.QUADS,
                         1536,
                         false,
                         false,
                         CompositeState.builder()
                                 .setShaderState(
-                                        RENDERTYPE_ENTITY_TRANSLUCENT_EMISSIVE_SHADER
+                                        RENDERTYPE_GLINT_SHADER
                                 )
                                 .setTextureState(
                                         new RenderStateShard.TextureStateShard(
@@ -104,13 +217,10 @@ public final class BlessedStrikesGlowRenderTypes
                                         EQUAL_DEPTH_TEST
                                 )
                                 .setTransparencyState(
-                                        additive
+                                        ADDITIVE
                                 )
-                                .setOverlayState(
-                                        OVERLAY
-                                )
-                                .setLightmapState(
-                                        LIGHTMAP
+                                .setTexturingState(
+                                        texturing
                                 )
                                 .createCompositeState(false)
                 );
