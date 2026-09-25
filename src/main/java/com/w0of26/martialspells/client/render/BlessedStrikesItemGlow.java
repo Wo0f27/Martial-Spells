@@ -1,32 +1,25 @@
 package com.w0of26.martialspells.client.render;
 
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.blaze3d.vertex.VertexMultiConsumer;
 import com.w0of26.martialspells.registry.MartialEffectRegistry;
-import net.minecraft.Util;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
-import org.joml.Matrix4f;
 
 import javax.annotation.Nullable;
 
 /**
- * Blessed Strikes held-item glow state.
+ * Client-side state for the Blessed Strikes held-item presentation.
  *
- * <p>Source semantics retained: Holy #FFFFCC, opacity 0.2 per blessing,
- * maximum five visible blessing stacks, source glow texture scale 8 and
- * gain 3.</p>
+ * <p>The stable Forge 1.20.1 presentation uses Minecraft's own item glint
+ * render types. This class only answers whether the currently rendered held
+ * item is blessed and preserves the source stack count for light intensity.
+ * It intentionally does not own a custom RenderType or shader.</p>
  */
 public final class BlessedStrikesItemGlow {
     private static final float OPACITY_PER_STACK =
             0.20F;
-    private static final float TEXTURE_SCALE =
-            8.0F;
     private static final int MAX_STACKS =
             5;
 
@@ -79,10 +72,14 @@ public final class BlessedStrikesItemGlow {
         currentOpacity = 0.0F;
     }
 
+    public static boolean active() {
+        return currentOpacity > 0.0F;
+    }
+
     public static int light(
             int packedLight
     ) {
-        if (currentOpacity <= 0.0F) {
+        if (!active()) {
             return packedLight;
         }
 
@@ -100,67 +97,6 @@ public final class BlessedStrikesItemGlow {
                         packedLight
                 )
         );
-    }
-
-    public static VertexConsumer glowing(
-            MultiBufferSource buffers,
-            VertexConsumer original
-    ) {
-        if (currentOpacity <= 0.0F) {
-            return original;
-        }
-
-        /*
-         * This mirrors Spell Engine's primary item-glow path: the item's
-         * geometry is copied into a dedicated POSITION_TEX glint layer while
-         * the original consumer still renders the weapon normally. Do not
-         * rewrite the atlas UVs here; that belongs only to Spell Engine's
-         * optional shader-pack emissive bloom pass.
-         */
-        VertexConsumer glow =
-                buffers.getBuffer(
-                        BlessedStrikesGlowRenderTypes
-                                .itemGlow(
-                                        currentOpacity
-                                )
-                );
-
-        return VertexMultiConsumer.create(
-                glow,
-                original
-        );
-    }
-
-    public static Matrix4f textureMatrix() {
-        long time =
-                (long) (
-                        Util.getMillis()
-                                * Minecraft.getInstance()
-                                .options
-                                .glintSpeed()
-                                .get()
-                                * 8.0D
-                );
-
-        float x =
-                (float) (time % 110000L)
-                        / 110000.0F;
-        float y =
-                (float) (time % 30000L)
-                        / 30000.0F;
-
-        return new Matrix4f()
-                .translation(
-                        -x,
-                        y,
-                        0.0F
-                )
-                .rotateZ(
-                        (float) (
-                                Math.PI / 18.0D
-                        )
-                )
-                .scale(TEXTURE_SCALE);
     }
 
     private static boolean isHeldEquipment(

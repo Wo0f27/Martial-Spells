@@ -14,8 +14,7 @@
     "IronsReleaseUsingHelperMixin"
   ],
   "client": [
-    "client.BlessedStrikesItemRendererMixin",
-    "client.BlessedStrikesGlowBufferSourceMixin"
+    "client.BlessedStrikesItemRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1
