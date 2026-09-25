@@ -2,6 +2,7 @@ package com.w0of26.martialspells.client;
 
 import com.w0of26.martialspells.MartialSpells;
 import com.w0of26.martialspells.client.render.DivineProtectionRenderer;
+import com.w0of26.martialspells.client.render.BlessedStrikesGlowRenderTypes;
 import com.w0of26.martialspells.client.render.PaladinBarrierRenderer;
 import com.w0of26.martialspells.client.render.HolyMoteRenderer;
 import com.w0of26.martialspells.client.render.LightwellRenderer;
@@ -40,10 +41,13 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.ModelEvent;
 import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
+import net.minecraftforge.client.event.RegisterShadersEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+
+import java.io.IOException;
 
 @Mod.EventBusSubscriber(modid = MartialSpells.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public final class MartialClientEvents {
@@ -59,6 +63,15 @@ public final class MartialClientEvents {
         );
         MartialSpells.LOGGER.info(
                 "Registered W4 Netted Forge render hook"
+        );
+    }
+
+    @SubscribeEvent
+    public static void registerShaders(
+            RegisterShadersEvent event
+    ) throws IOException {
+        BlessedStrikesGlowRenderTypes.registerShader(
+                event
         );
     }
 

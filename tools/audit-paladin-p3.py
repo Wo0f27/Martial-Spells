@@ -507,7 +507,11 @@ for token in (
     "extends RenderType",
     '"textures/misc/paladin_item_glow.png"',
     "DefaultVertexFormat.POSITION_TEX",
-    "RENDERTYPE_GLINT_SHADER",
+    "GLOW_SHADER",
+    "GLOW_TEXTURES",
+    "TextureAtlas.LOCATION_BLOCKS",
+    "RegisterShadersEvent",
+    "new ShaderInstance(",
     "EQUAL_DEPTH_TEST",
     "SourceFactor.ONE",
     "DestFactor.ONE",
@@ -528,6 +532,54 @@ if "RENDERTYPE_ENTITY_TRANSLUCENT_EMISSIVE_SHADER" in blessed_render_types:
     errors.append("Blessed Strikes primary glow must not use Spell Engine's secondary shader-pack emissive pass")
 if "DefaultVertexFormat.NEW_ENTITY" in blessed_render_types:
     errors.append("Blessed Strikes primary glow must use the source POSITION_TEX glint vertex layout")
+
+if "RENDERTYPE_GLINT_SHADER" in blessed_render_types:
+    errors.append("Blessed Strikes must use its item-alpha-masked Forge shader, not the unmasked vanilla glint shader")
+
+blessed_shader_json_path = root / "src/main/resources/assets/martial_spells/shaders/core/blessed_strikes_glow.json"
+blessed_shader_vsh_path = root / "src/main/resources/assets/martial_spells/shaders/core/blessed_strikes_glow.vsh"
+blessed_shader_fsh_path = root / "src/main/resources/assets/martial_spells/shaders/core/blessed_strikes_glow.fsh"
+for shader_path in (
+    blessed_shader_json_path,
+    blessed_shader_vsh_path,
+    blessed_shader_fsh_path,
+):
+    if not shader_path.is_file():
+        errors.append(f"Blessed Strikes Forge silhouette shader missing: {shader_path.name}")
+
+if blessed_shader_json_path.is_file():
+    blessed_shader_json = blessed_shader_json_path.read_text(encoding="utf-8")
+    for token in (
+        '"Sampler0"',
+        '"Sampler1"',
+        '"srcrgb": "1"',
+        '"dstrgb": "1"',
+        '"martial_spells:blessed_strikes_glow"',
+    ):
+        if token not in blessed_shader_json:
+            errors.append(f"Blessed Strikes shader JSON missing {token}")
+
+if blessed_shader_vsh_path.is_file():
+    blessed_shader_vsh = blessed_shader_vsh_path.read_text(encoding="utf-8")
+    for token in (
+        "itemTexCoord = UV0;",
+        "glowTexCoord = (TextureMat * vec4(UV0, 0.0, 1.0)).xy;",
+    ):
+        if token not in blessed_shader_vsh:
+            errors.append(f"Blessed Strikes shader vertex stage missing {token}")
+
+if blessed_shader_fsh_path.is_file():
+    blessed_shader_fsh = blessed_shader_fsh_path.read_text(encoding="utf-8")
+    for token in (
+        "texture(Sampler0, itemTexCoord)",
+        "itemColor.a < 0.1",
+        "texture(Sampler1, glowTexCoord)",
+        "glowColor.a < 0.1",
+        "ColorModulator.rgb",
+        "GlintAlpha",
+    ):
+        if token not in blessed_shader_fsh:
+            errors.append(f"Blessed Strikes shader fragment stage missing {token}")
 
 obsolete_blessed_vertex = root / "src/main/java/com/w0of26/martialspells/client/render/BlessedStrikesGlowVertexConsumer.java"
 if obsolete_blessed_vertex.exists():
@@ -584,6 +636,8 @@ for token in (
 
 client_events = (root / "src/main/java/com/w0of26/martialspells/client/MartialClientEvents.java").read_text(encoding="utf-8")
 for token in (
+    "BlessedStrikesGlowRenderTypes.registerShader(",
+    "RegisterShadersEvent",
     "DivineProtectionRenderer::onRenderLivingPost",
     "PALADIN_AREA_553_CAMERA",
     "PALADIN_AREA_637_GROUND",

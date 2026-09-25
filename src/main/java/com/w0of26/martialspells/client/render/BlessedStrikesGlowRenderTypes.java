@@ -4,21 +4,30 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
+import com.w0of26.martialspells.MartialSpells;
 import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.ShaderInstance;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.client.event.RegisterShadersEvent;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Source-faithful Blessed Strikes weapon glow.
+ * Blessed Strikes weapon glow translated from Spell Engine 1.10.5.
  *
- * <p>Spell Engine's primary item glow is a custom glint pass: POSITION_TEX
- * geometry, the glint shader, an additive ONE/ONE blend and an EQUAL depth
- * mask. The Holy tint and stack opacity are supplied through render state,
- * not by replacing the item's atlas UVs with the glow texture.</p>
+ * <p>The frozen source uses a POSITION_TEX glint pass, Holy #FFFFCC tint,
+ * gain 3, a scrolling scale-8 texture matrix, additive ONE/ONE blending and
+ * an EQUAL depth mask. Forge 1.20.1 can expose the generated item's complete
+ * front/back quad to that opaque streak texture in first person, so this port
+ * adds one target-side safety rule: the glow shader also samples the item's
+ * real block-atlas texel and discards pixels whose item alpha is below 0.1.
+ * The visible glow remains source-authored; the extra sample only supplies
+ * the silhouette mask that the frozen source expected from depth.</p>
  */
 public final class BlessedStrikesGlowRenderTypes
         extends RenderType {
@@ -26,6 +35,12 @@ public final class BlessedStrikesGlowRenderTypes
             ResourceLocation.fromNamespaceAndPath(
                     "martial_spells",
                     "textures/misc/paladin_item_glow.png"
+            );
+
+    private static final ResourceLocation SHADER_ID =
+            ResourceLocation.fromNamespaceAndPath(
+                    MartialSpells.MOD_ID,
+                    "blessed_strikes_glow"
             );
 
     private static final float GAIN = 3.0F;
@@ -38,6 +53,8 @@ public final class BlessedStrikesGlowRenderTypes
     private static final Set<RenderType> GLOW_LAYERS =
             ConcurrentHashMap.newKeySet();
 
+    private static ShaderInstance glowShader;
+
     /*
      * RenderSystem color/glint state is global. Source Spell Engine restores
      * the values it found instead of assuming vanilla defaults; do the same
@@ -46,6 +63,30 @@ public final class BlessedStrikesGlowRenderTypes
     private static final float[] SHADER_COLOR_TO_RESTORE =
             new float[4];
     private static float glintAlphaToRestore = 1.0F;
+
+    private static final RenderStateShard.ShaderStateShard GLOW_SHADER =
+            new RenderStateShard.ShaderStateShard(
+                    () -> glowShader
+            );
+
+    /*
+     * Sampler0 is the normal item/block atlas and therefore carries the real
+     * sword alpha. Sampler1 is the exact frozen Spell Engine streak texture.
+     */
+    private static final RenderStateShard.MultiTextureStateShard GLOW_TEXTURES =
+            RenderStateShard.MultiTextureStateShard
+                    .builder()
+                    .add(
+                            TextureAtlas.LOCATION_BLOCKS,
+                            false,
+                            false
+                    )
+                    .add(
+                            TEXTURE,
+                            true,
+                            false
+                    )
+                    .build();
 
     private static final RenderStateShard.TransparencyStateShard ADDITIVE =
             new RenderStateShard.TransparencyStateShard(
@@ -82,6 +123,19 @@ public final class BlessedStrikesGlowRenderTypes
                 sortOnUpload,
                 setupState,
                 clearState
+        );
+    }
+
+    public static void registerShader(
+            RegisterShadersEvent event
+    ) throws IOException {
+        event.registerShader(
+                new ShaderInstance(
+                        event.getResourceProvider(),
+                        SHADER_ID,
+                        DefaultVertexFormat.POSITION_TEX
+                ),
+                shader -> glowShader = shader
         );
     }
 
@@ -149,8 +203,8 @@ public final class BlessedStrikesGlowRenderTypes
                             /*
                              * Source Color.HOLY is #FFFFCC. Opacity is folded
                              * into RGB because ONE/ONE additive blending does
-                             * not use source alpha. Gain 3 broadens/hotens the
-                             * streaks exactly like Spell Engine's item glow.
+                             * not use source alpha. Gain 3 matches Spell
+                             * Engine's item glow.
                              */
                             float intensity =
                                     opacity * GAIN;
@@ -198,14 +252,10 @@ public final class BlessedStrikesGlowRenderTypes
                         false,
                         CompositeState.builder()
                                 .setShaderState(
-                                        RENDERTYPE_GLINT_SHADER
+                                        GLOW_SHADER
                                 )
                                 .setTextureState(
-                                        new RenderStateShard.TextureStateShard(
-                                                TEXTURE,
-                                                true,
-                                                false
-                                        )
+                                        GLOW_TEXTURES
                                 )
                                 .setWriteMaskState(
                                         COLOR_WRITE
