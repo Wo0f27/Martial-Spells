@@ -330,54 +330,6 @@ public final class PaladinVfx {
     }
 
     /**
-     * Frozen sealSparks().batch(invert(true).preTravel(14)).
-     */
-    public static void blessedGather(
-            ServerLevel level,
-            LivingEntity caster
-    ) {
-        sphere(
-                level,
-                MartialParticleRegistry
-                        .PALADIN_SPARK_FLOAT
-                        .get(),
-                sourceOrigin(
-                        caster,
-                        OVER_HEAD
-                ),
-                4,
-                0.02D,
-                0.10D,
-                14.0D,
-                true
-        );
-    }
-
-    /**
-     * Frozen sealSparks() on each channel release.
-     */
-    public static void blessedRelease(
-            ServerLevel level,
-            LivingEntity caster
-    ) {
-        sphere(
-                level,
-                MartialParticleRegistry
-                        .PALADIN_SPARK_FLOAT
-                        .get(),
-                sourceOrigin(
-                        caster,
-                        OVER_HEAD
-                ),
-                4,
-                0.02D,
-                0.10D,
-                0.0D,
-                false
-        );
-    }
-
-    /**
      * Continuous Holy Light casting particles from Spell Engine launch point:
      * magic_spark PIPE x3 every tick plus one FIREWORK every second tick.
      */

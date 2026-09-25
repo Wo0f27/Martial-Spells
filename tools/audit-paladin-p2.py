@@ -213,9 +213,6 @@ for key in (
         errors.append(f"lang missing {key}")
 
 p2_sounds = (
-    "blessed_strike_start",
-    "blessed_strike_casting",
-    "blessed_strike_release",
     "divine_protection_release",
     "divine_protection_impact",
     "judgement_impact",
@@ -226,6 +223,16 @@ for sound in p2_sounds:
         errors.append(f"sound registry missing {sound}")
     if sounds.get(sound, {}).get("sounds") != [f"martial_spells:{sound}"]:
         errors.append(f"sounds.json mismatch for {sound}")
+for obsolete_sound in (
+    "blessed_strike_start",
+    "blessed_strike_casting",
+    "blessed_strike_release",
+):
+    if f'register("{obsolete_sound}")' in sound_registry:
+        errors.append(f"Blessed Strikes mechanics-only path still registers sound: {obsolete_sound}")
+    if obsolete_sound in sounds:
+        errors.append(f"Blessed Strikes mechanics-only path still defines sound: {obsolete_sound}")
+
 
 sync_text = (root / "tools/sync-paladin-p2-assets.ps1").read_text(encoding="utf-8")
 if "2807417a1dd9a65204c002ded487da0e6ae467a1" not in sync_text:
@@ -271,7 +278,7 @@ print(" - Divine Protection: 1-3 protected hits for 8 seconds")
 print(" - Judgement: 10-tick meteor; 6-block squared falloff")
 print(" - Immolation: ally heal / enemy damage + 4-second burn")
 print(" - source icons: 4 spell icons + Blessed Strikes mob-effect icon")
-print(" - source sounds: 7")
+print(" - source sounds: 4 (Blessed Strikes presentation intentionally removed)")
 
 if errors:
     print("CP11 P2 AUDIT FAILED")

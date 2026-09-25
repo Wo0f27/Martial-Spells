@@ -405,8 +405,6 @@ for token in (
     "circleOfHealingRelease(",
     "immolationRelease(",
     "divineProtectionPop(",
-    "blessedGather(",
-    "blessedRelease(",
     "holyBeamCasting(",
     "holyBeam(",
     "levitateChannel(",
@@ -502,6 +500,13 @@ for forbidden in (
     if forbidden in blessed_spell:
         errors.append(f"Blessed Strikes instant spell still contains removed presentation/channel code: {forbidden}")
 
+for obsolete_helper in (
+    "blessedGather(",
+    "blessedRelease(",
+):
+    if obsolete_helper in vfx:
+        errors.append(f"Blessed Strikes mechanics-only path still retains VFX helper: {obsolete_helper}")
+
 for obsolete_path in (
     root / "src/main/java/com/w0of26/martialspells/client/render/BlessedStrikesItemGlow.java",
     root / "src/main/java/com/w0of26/martialspells/mixin/client/BlessedStrikesItemRendererMixin.java",
@@ -596,7 +601,6 @@ for token in (
 for rel in (
     "textures/spell_effect/divine_protection.png",
     "textures/spell_effect/divine_protection_glow.png",
-    "textures/misc/paladin_item_glow.png",
     "textures/particle/paladin_source/magic/holy.png",
     "textures/particle/paladin_source/magic/heal.png",
 ):

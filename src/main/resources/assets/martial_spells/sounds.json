@@ -114,21 +114,6 @@
       "martial_spells:holy_shock_damage"
     ]
   },
-  "blessed_strike_start": {
-    "sounds": [
-      "martial_spells:blessed_strike_start"
-    ]
-  },
-  "blessed_strike_casting": {
-    "sounds": [
-      "martial_spells:blessed_strike_casting"
-    ]
-  },
-  "blessed_strike_release": {
-    "sounds": [
-      "martial_spells:blessed_strike_release"
-    ]
-  },
   "divine_protection_release": {
     "sounds": [
       "martial_spells:divine_protection_release"

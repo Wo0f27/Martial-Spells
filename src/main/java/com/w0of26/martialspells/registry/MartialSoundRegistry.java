@@ -93,15 +93,6 @@ public final class MartialSoundRegistry {
     public static final RegistryObject<SoundEvent> HOLY_SHOCK_DAMAGE =
             register("holy_shock_damage");
 
-    public static final RegistryObject<SoundEvent> BLESSED_STRIKE_START =
-            register("blessed_strike_start");
-
-    public static final RegistryObject<SoundEvent> BLESSED_STRIKE_CASTING =
-            register("blessed_strike_casting");
-
-    public static final RegistryObject<SoundEvent> BLESSED_STRIKE_RELEASE =
-            register("blessed_strike_release");
-
     public static final RegistryObject<SoundEvent> DIVINE_PROTECTION_RELEASE =
             register("divine_protection_release");
 
