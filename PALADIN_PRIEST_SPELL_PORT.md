@@ -23,7 +23,7 @@ The upstream frozen source contains 15 spell JSONs. Fourteen are player-facing; 
 
 ### Holy Wand source binding
 - `heal` — **Heal**, tier 0, Priest Holy, 16-block aimed friendly heal with self fallback.
-- Migration decision: **do not register `martial_spells:heal`**. Iron's already supplies the basic Holy-healing role; the eventual Holy Wand integration will use native `irons_spellbooks:blessing_of_life` as the closest targeted-heal replacement instead of duplicating Heal under a second namespace.
+- Migration decision: **do not register `martial_spells:heal`**. Iron's already supplies the basic Holy-healing role; the final Holy Wand integration uses native `irons_spellbooks:blessing_of_life` as the closest targeted-heal replacement instead of duplicating Heal under a second namespace.
 
 ### Holy Staff source binding
 - `holy_shock` — **Holy Shock**, tier 1, Priest Holy, 16-block aimed dual-purpose heal-or-damage spell.
@@ -231,14 +231,14 @@ Status: **PASS**
 P4 is developer-confirmed **PASS**. P5 is unblocked.
 
 ### P5 — bindings and final integration
-Status: **IMPLEMENTED / VALIDATING**
+Status: **PASS**
 
 - source-equivalent grouping frozen in `PaladinPriestSpellCatalog`,
 - all four Holy Wand-family foci -> locked level-1 native Iron's Blessing of Life,
 - all three Holy Staff-family foci -> locked level-1 Martial Spells Holy Shock,
 - registry-id soft integration keeps equipment ownership in the Paladins module,
 - final icon/lang/SFX/model regression includes the restored Divine Protection effect icon,
-- complete client/server/package regression and packaged-JAR smoke test remain the local validation gate.
+- integrated bindings/resource/package gate received developer-confirmed PASS on 2026-09-28.
 
 ## Source behavioral baselines
 
@@ -247,7 +247,7 @@ Status: **IMPLEMENTED / VALIDATING**
 | Heal | 0 | 16 | 1.0s | 4s | aimed friendly heal; self fallback |
 | Holy Shock | 1 | 16 | 1.5s | 3s | friendly heal or enemy Holy damage |
 | Flash Heal | 2 | 16 | 0.5s | 6s | stronger aimed friendly heal; self fallback |
-| Blessed Strikes | 2 | 0 | 2.5s channel / 5 releases | 12s | stack up to five weapon blessings; melee hit spends one |
+| Blessed Strikes | 2 | 0 | instant | 12s | gain five 15-second seals immediately; melee hit spends one |
 | Holy Light | 2 | 32 | 5s channel / 25 ticks | proportional 10s | beam heals allies, damages enemies |
 | Levitate | 2 | 0 | 1.5s channel / 4 ticks | proportional 24s | repeated upward push + 5s float/soft-fall |
 | Divine Protection | 3 | 0 | instant | 30s | protects from a source-scaled number of incoming attacks |
@@ -264,4 +264,4 @@ Status: **IMPLEMENTED / VALIDATING**
 
 Do not move equipment code into Martial Spells. Do not add Paladins worldgen, Monk profession/workstation content, Spell Engine, Spell Power, or Runes as dependencies.
 
-CP11 is complete only when all P1-P5 checkpoints receive local build/runtime validation and developer-confirmed PASS.
+CP11 received developer-confirmed **PASS** on 2026-09-28. P0-P5 are complete.
