@@ -122,14 +122,14 @@ P1 target normalization:
 - Immolation
 
 P2 translation:
-- Blessed Strikes keeps the frozen 2.5-second channel and five 0.5-second seal releases. Amplifier + 1 is the seal count, capped at 6 like the source; one successful melee swing consumes one seal on the next tick so same-tick Better Combat cleaves all receive the bonus impact.
+- Blessed Strikes intentionally diverges from the frozen presentation/channel after developer review: the target-system version is an instant 30-mana self-buff that grants five seals for 15 seconds. One successful melee swing consumes one seal on the next tick so same-tick Better Combat cleaves all receive the bonus impact. Casting/weapon/hit presentation is intentionally removed.
 - Blessed Strikes and Immolation preserve the frozen weighted-average power blend exactly: 75% Holy reference power / 25% current Attack Damage.
 - Judgement preserves the inverse blend: 75% current Attack Damage / 25% Holy reference power.
 - Divine Protection reproduces Spell Engine Protection semantics: effect amplifier is floor(0.5 x effective Holy multiplier), capped at 2, so amplifier + 1 gives 1-3 fully negated incoming attacks during the 8-second window.
 - Judgement preserves the required 16-block hostile target, 0.5-second cast, 12-block launch height, 1.2-block/tick meteor descent, 6-block squared AOE falloff, +50% power against undead, and 3-second stun gate of 50 + 2 x Attack Damage target max health.
 - Immolation preserves the 5-block / 0.5 vertical-range area, mixed helpful/harmful intent, 1.2 damage coefficient, 0.5 heal coefficient, 4-second burn, +50% undead power, and source guaranteed undead critical at the default source 1.5x critical multiplier.
 - Iron's 1.20.1 exposes no spell-critical-chance or spell-critical-damage attributes. Therefore generic source random crit blending cannot be translated one-for-one; hybrid power weights are exact, while Immolation's explicit guaranteed undead critical is preserved at the frozen source default critical multiplier.
-- Target-side mana: Blessed Strikes consumes 5 mana at channel initiation and each of its five seal ticks (30 for a full channel); Divine Protection 40; Judgement 45; Immolation 60. These are balancing values, not upstream reagent fidelity.
+- Target-side mana: Blessed Strikes 30 as one instant cost; Divine Protection 40; Judgement 45; Immolation 60. These are balancing values, not upstream reagent fidelity.
 - Judgement now restores the frozen source projectile model at 1.2x scale on a presentation-only visual entity while server-authoritative P2 timing/damage remains unchanged.
 
 ### P3 — Priest channel and control
@@ -177,11 +177,10 @@ P3 translation:
   orbit radius and 15-degree/tick spin, paired with a synchronized double-helix
   Holy trail plus source-style damage/shield area impacts.
 
-P3 mechanics status: **PASS**. P1-P3 presentation status:
-**REVALIDATING** after the source-faithful VFX/render pass.
+P3 mechanics and presentation status: **PASS** after the integrated source-parity runtime pass.
 
 ### P4 — constructs and summons
-Status: **IMPLEMENTED / VALIDATING**
+Status: **PASS**
 
 - Barrier
   - 0.5-second cast, 4-block source range, 10-second 8x4 barrier, 40-second
@@ -229,16 +228,17 @@ Status: **IMPLEMENTED / VALIDATING**
   - Spell Engine generic healing release audio is translated to Iron's native
     Holy cast sound; no Spell Engine runtime dependency is introduced.
 
-P4 remains **VALIDATING** until local audit/build/runtime confirmation. P5 stays
-locked until that PASS.
+P4 is developer-confirmed **PASS**. P5 is unblocked.
 
 ### P5 — bindings and final integration
-- Paladin/Priest grouping
-- source-equivalent Holy Wand -> native Iron's Blessing of Life binding
-- source-equivalent Holy Staff -> Holy Shock binding
-- final icon/lang/SFX/model regression and polish
-- equipment soft integration
-- full client/server/package regression
+Status: **IMPLEMENTED / VALIDATING**
+
+- source-equivalent grouping frozen in `PaladinPriestSpellCatalog`,
+- all four Holy Wand-family foci -> locked level-1 native Iron's Blessing of Life,
+- all three Holy Staff-family foci -> locked level-1 Martial Spells Holy Shock,
+- registry-id soft integration keeps equipment ownership in the Paladins module,
+- final icon/lang/SFX/model regression includes the restored Divine Protection effect icon,
+- complete client/server/package regression and packaged-JAR smoke test remain the local validation gate.
 
 ## Source behavioral baselines
 
