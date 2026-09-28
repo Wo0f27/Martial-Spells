@@ -88,6 +88,6 @@ After client validation:
 python .\tools\audit-paladin-p5-jar.py
 ```
 
-Smoke-test the freshly built Paladins CP11 jar and Martial Spells jar together in a normal private Forge 1.20.1 instance.
+Smoke-test the freshly built Paladins CP11 mapped dev jar and Martial Spells jar together in a normal private Forge 1.20.1 instance.
 
 P5 is not PASS until these local/runtime/package checks are developer-confirmed.
