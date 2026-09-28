@@ -134,6 +134,13 @@ def archersDevJar = new File(
 def archersDevEnabled =
         (findProperty("archers_dev_enabled") ?: "true").toBoolean()
 
+def paladinsDevJar = new File(
+        rpgPortsRoot,
+        "Paladins-And-Priests/build/libs/paladins-${paladins_version}.jar"
+)
+def paladinsDevEnabled =
+        (findProperty("paladins_dev_enabled") ?: "true").toBoolean()
+
 repositories {
     maven {
         name = "Local RangedWeaponAPI"
@@ -315,6 +322,21 @@ dependencies {
         } else {
             logger.lifecycle(
                     "Archers dev runtime skipped; no slim jar found at ${archersDevJar}"
+            )
+        }
+    }
+
+    // CP11-P5 integration fixture. Paladins remains optional from
+    // Martial Spells metadata; this only loads the locally built equipment jar.
+    if (paladinsDevEnabled) {
+        if (paladinsDevJar.exists()) {
+            runtimeOnly fg.deobf(files(paladinsDevJar))
+            runtimeOnly fg.deobf(
+                    "curse.maven:azurelib-armor-912767:${azurelib_armor_file}"
+            )
+        } else {
+            logger.lifecycle(
+                    "Paladins dev runtime skipped; no CP11 jar found at ${paladinsDevJar}"
             )
         }
     }

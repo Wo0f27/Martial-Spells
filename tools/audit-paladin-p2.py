@@ -239,8 +239,8 @@ if "2807417a1dd9a65204c002ded487da0e6ae467a1" not in sync_text:
     errors.append("P2 asset sync is not pinned to frozen Paladins commit")
 if "sync-paladin-p1-assets.ps1" not in sync_text:
     errors.append("P2 asset sync must re-assert finalized P1 assets first")
-if 'textures/mob_effect/blessed_strikes.png' not in sync_text:
-    errors.append("P2 asset sync missing Blessed Strikes mob-effect icon")
+if '"blessed_strikes",' not in sync_text or '"divine_protection"' not in sync_text:
+    errors.append("P2 asset sync must include Blessed Strikes and Divine Protection mob-effect icons")
 
 
 for spell_id in (
@@ -253,9 +253,10 @@ for spell_id in (
     if not icon.is_file():
         errors.append(f"source icon missing; run P2 asset sync: {spell_id}.png")
 
-blessed_effect_icon = root / "src/main/resources/assets/martial_spells/textures/mob_effect/blessed_strikes.png"
-if not blessed_effect_icon.is_file():
-    errors.append("Blessed Strikes mob-effect icon missing; run P2 asset sync")
+for effect_id in ("blessed_strikes", "divine_protection"):
+    effect_icon = root / f"src/main/resources/assets/martial_spells/textures/mob_effect/{effect_id}.png"
+    if not effect_icon.is_file():
+        errors.append(f"{effect_id} mob-effect icon missing; run P2 asset sync")
 
 for sound in p2_sounds:
     path = root / "src/main/resources/assets/martial_spells/sounds" / f"{sound}.ogg"
@@ -277,7 +278,7 @@ print(" - Blessed Strikes: instant 5-seal / 15-second buff; next-tick one-seal c
 print(" - Divine Protection: 1-3 protected hits for 8 seconds")
 print(" - Judgement: 10-tick meteor; 6-block squared falloff")
 print(" - Immolation: ally heal / enemy damage + 4-second burn")
-print(" - source icons: 4 spell icons + Blessed Strikes mob-effect icon")
+print(" - source icons: 4 spell icons + 2 mob-effect icons")
 print(" - source sounds: 4 (Blessed Strikes presentation intentionally removed)")
 
 if errors:

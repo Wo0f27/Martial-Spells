@@ -30,7 +30,12 @@ foreach ($spell in @(
     Copy-PaladinAsset "textures/spell/$spell.png" "src/main/resources/assets/martial_spells/textures/gui/spell_icons/$spell.png"
 }
 
-Copy-PaladinAsset "textures/mob_effect/blessed_strikes.png" "src/main/resources/assets/martial_spells/textures/mob_effect/blessed_strikes.png"
+foreach ($effect in @(
+    "blessed_strikes",
+    "divine_protection"
+)) {
+    Copy-PaladinAsset "textures/mob_effect/$effect.png" "src/main/resources/assets/martial_spells/textures/mob_effect/$effect.png"
+}
 
 # Blessed Strikes is intentionally mechanics-only. Remove presentation assets
 # left by older P2 sync revisions so stale local resources do not linger.
