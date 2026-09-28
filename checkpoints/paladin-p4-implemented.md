@@ -1,6 +1,6 @@
 # CP11 P4 — Paladin/Priest Constructs and Summons
 
-Status: **IMPLEMENTED / VALIDATING**
+Status: **PASS**
 
 Frozen upstream:
 - repository: `ZsoltMolnarrr/Paladins`
@@ -13,9 +13,11 @@ Target:
 - school: `irons_spellbooks:holy`
 - no Spell Engine or Spell Power runtime dependency
 
-P0-P3 mechanics remain PASS. P1-P4 presentation is being revalidated against
-the frozen upstream after approximation mismatches were identified. P5 stays
-locked until the integrated presentation/runtime gate passes.
+P0-P3 remain PASS. The integrated P1-P4 presentation/runtime parity gate has
+now been developer-confirmed. Barrier seams, Battle Banner animation,
+Lightwell/Holy Mote presentation, Holy Light, Penance, Divine Protection and
+Immolation were accepted. Blessed Strikes uses the separate developer-approved
+presentation-free target variant. P5 is unblocked.
 
 ## Frozen P4 contract
 
@@ -194,3 +196,8 @@ Only after audit and build pass, launch the client.
    - no renderer/model-bake errors appear in `latest.log`.
 
 P4 remains **VALIDATING**, not PASS, until the user confirms this runtime gate.
+
+
+## Final result
+
+Developer-confirmed **PASS** after the integrated runtime parity pass. The construct/summon checkpoint is frozen; P5 must treat these mechanics and visuals as regression coverage rather than reopen them.
