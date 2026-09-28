@@ -1,6 +1,6 @@
 # CP11 P5 — Bindings and final integration
 
-Status: **IMPLEMENTED / VALIDATING**
+Status: **PASS**
 
 Parent: JUS-178  
 Checkpoint: JUS-194  
@@ -88,6 +88,6 @@ After client validation:
 python .\tools\audit-paladin-p5-jar.py
 ```
 
-Smoke-test the freshly built Paladins CP11 mapped dev jar and Martial Spells jar together in a normal private Forge 1.20.1 instance.
+Use the mapped `-dev.jar` only for Martial Spells `runClient` / `runServer`. For the normal private Forge smoke test, use the standard reobfuscated `paladins-3.1.1-forge-private.cp11.jar` together with the built Martial Spells jar.
 
-P5 is not PASS until these local/runtime/package checks are developer-confirmed.
+Developer-confirmed **PASS** on 2026-09-28. The bindings, integrated client runtime, resource regression, and final P5 behavior were accepted. CP11 is complete.
