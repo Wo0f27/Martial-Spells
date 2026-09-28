@@ -108,7 +108,7 @@ if "sync-paladin-p4-assets.ps1" not in sync:
 build = (root / "build.gradle").read_text(encoding="utf-8")
 props = (root / "gradle.properties").read_text(encoding="utf-8")
 for token in (
-    "Paladins-And-Priests/build/libs/paladins-",
+    "Paladins-And-Priests-Forge-1.20.1",
     "paladinsDevEnabled",
     "Paladins dev runtime skipped",
 ):
@@ -116,6 +116,7 @@ for token in (
         errors.append(f"P5 Paladins dev-runtime fixture missing: {token}")
 for token in (
     "paladins_version=3.1.1-forge-private.cp11",
+    "paladins_dev_root=../Paladins-And-Priests-Forge-1.20.1",
     "paladins_dev_enabled=true",
 ):
     if token not in props:
