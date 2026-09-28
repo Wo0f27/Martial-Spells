@@ -109,6 +109,8 @@ build = (root / "build.gradle").read_text(encoding="utf-8")
 props = (root / "gradle.properties").read_text(encoding="utf-8")
 for token in (
     "Paladins-And-Priests-Forge-1.20.1",
+    "-dev.jar",
+    "runtimeOnly files(paladinsDevJar)",
     "paladinsDevEnabled",
     "Paladins dev runtime skipped",
 ):
