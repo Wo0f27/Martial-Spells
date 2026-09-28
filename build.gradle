@@ -140,7 +140,7 @@ def paladinsDevRoot = file(
 )
 def paladinsDevJar = new File(
         paladinsDevRoot,
-        "build/libs/paladins-${paladins_version}.jar"
+        "build/libs/paladins-${paladins_version}-dev.jar"
 )
 def paladinsDevEnabled =
         (findProperty("paladins_dev_enabled") ?: "true").toBoolean()
@@ -334,7 +334,9 @@ dependencies {
     // Martial Spells metadata; this only loads the locally built equipment jar.
     if (paladinsDevEnabled) {
         if (paladinsDevJar.exists()) {
-            runtimeOnly fg.deobf(files(paladinsDevJar))
+            // Paladins -dev.jar is already mapped for Forge userdev.
+            // Do not pass it through fg.deobf or load the reobfuscated production jar.
+            runtimeOnly files(paladinsDevJar)
             runtimeOnly fg.deobf(
                     "curse.maven:azurelib-armor-912767:${azurelib_armor_file}"
             )
