@@ -154,8 +154,8 @@ Only after audit and build pass, launch the client.
    - final second visibly pulses/fades and the entity disappears cleanly.
 3. Battle Banner:
    - appears about 2 blocks ahead, ground-snapped and rotated relative to caster;
-   - placement phase grows in, active phase lasts about 10 seconds, then it
-     scales away;
+   - the authored placement animation plays, active phase lasts about 10 seconds,
+     then the authored reverse placement/despawn animation plays;
    - source texture/model renders without missing texture or z-fighting severe
      enough to obscure the flag;
    - Holy presence particles and presence audio occur while active;
@@ -194,9 +194,6 @@ Only after audit and build pass, launch the client.
    - save/reload during Barrier, Banner, or Lightwell lifetime does not crash;
    - temporary entities eventually despawn and do not accumulate indefinitely;
    - no renderer/model-bake errors appear in `latest.log`.
-
-P4 remains **VALIDATING**, not PASS, until the user confirms this runtime gate.
-
 
 ## Final result
 
