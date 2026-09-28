@@ -134,9 +134,13 @@ def archersDevJar = new File(
 def archersDevEnabled =
         (findProperty("archers_dev_enabled") ?: "true").toBoolean()
 
+def paladinsDevRoot = file(
+        findProperty("paladins_dev_root")
+                ?: "../Paladins-And-Priests-Forge-1.20.1"
+)
 def paladinsDevJar = new File(
-        rpgPortsRoot,
-        "Paladins-And-Priests/build/libs/paladins-${paladins_version}.jar"
+        paladinsDevRoot,
+        "build/libs/paladins-${paladins_version}.jar"
 )
 def paladinsDevEnabled =
         (findProperty("paladins_dev_enabled") ?: "true").toBoolean()
