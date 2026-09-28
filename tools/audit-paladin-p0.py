@@ -18,12 +18,26 @@ for required in (
     "lightwell_orb",
     "SchoolRegistry.HOLY_RESOURCE",
     "max level 1",
-    "Holy Wand -> native Iron's Blessing of Life binding",
     "do not register `martial_spells:heal`",
-    "Holy Staff -> Holy Shock",
 ):
     if required.lower() not in text.lower():
         errors.append(f"CP11 P0 contract missing: {required}")
+
+binding_contracts = {
+    "Holy Wand -> native Iron's Blessing of Life binding": (
+        "Holy Wand -> native Iron's Blessing of Life binding",
+        "Holy Wand-family foci -> locked level-1 native Iron's Blessing of Life",
+        "Holy Wand family -> native Iron's `irons_spellbooks:blessing_of_life`",
+    ),
+    "Holy Staff -> Holy Shock": (
+        "Holy Staff -> Holy Shock",
+        "Holy Staff-family foci -> locked level-1 Martial Spells Holy Shock",
+        "Holy Staff family -> `martial_spells:holy_shock`",
+    ),
+}
+for label, accepted_forms in binding_contracts.items():
+    if not any(form.lower() in text.lower() for form in accepted_forms):
+        errors.append(f"CP11 P0 contract missing: {label}")
 
 if not (
     "fourteen are player-facing" in text.lower()
