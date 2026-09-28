@@ -1,16 +1,16 @@
 # CP11 P3 — Priest channel and control
 
-Status: **MECHANICS PASS / PRESENTATION REVALIDATING**
+Status: **PASS**
 
 Frozen source: `ZsoltMolnarrr/Paladins` commit
 `2807417a1dd9a65204c002ded487da0e6ae467a1`.
 
 P0-P2 are frozen as PASS. P3 adds only Holy Light (`holy_beam`),
 Levitate, and Penance plus the two required effects and Penance projectile.
-P3 mechanics/runtime were previously confirmed. Presentation was reopened after
-the user compared the port directly against frozen Paladins and found visual
-approximations. P4 remains unlocked for the integrated parity pass; P5 remains
-reserved for final bindings/package integration.
+P3 mechanics/runtime were confirmed earlier. The later integrated P1-P4
+source-parity pass also received developer confirmation, including Holy Light's
+beam and Penance's restored projectile/trail presentation. P5 is now the final
+bindings/package-integration gate.
 
 ## Frozen behavior implemented
 
@@ -115,13 +115,11 @@ Runtime checks:
     old END_ROD-only placeholder.
 14. Early release of Holy Light, Levitate, and Penance gives proportional mana
     and effective cooldown rather than a free partial cast or the full cooldown.
-15. Recheck P1/P2 presentation against frozen upstream, not merely for
-    visibility: Circle of Healing must use the source area_effect_637 decal;
-    Blessed Strikes must use the actual #FFFFCC item-glow layer at 0.2 opacity
-    per stack; Divine Protection must show amplifier+1 orbiting base/glow
-    shields; Immolation must use the source 637+676 area effects; Judgement
-    must show its source trail, direct Holy burst, large area burst, and
-    orbiting CRIT stun marker.
+15. Recheck accepted P1/P2 presentation: Circle of Healing source area decal,
+    Divine Protection orbiting shields, Immolation source 637+676 area effects,
+    and Judgement source trail/impact/stun presentation. Blessed Strikes is
+    intentionally excluded from visual parity because the final accepted
+    target variant is presentation-free.
 
-P3 mechanics remain **PASS**, but presentation is **REVALIDATING** until the
-user tests this source-faithful parity pass.
+Developer-confirmed **PASS** for mechanics and presentation during the
+integrated P1-P4 parity pass.
