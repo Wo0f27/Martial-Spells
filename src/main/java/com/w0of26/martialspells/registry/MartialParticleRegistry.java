@@ -12,9 +12,6 @@ public final class MartialParticleRegistry {
     private static final DeferredRegister<ParticleType<?>> PARTICLES =
             DeferredRegister.create(ForgeRegistries.PARTICLE_TYPES, MartialSpells.MOD_ID);
 
-    public static final RegistryObject<SimpleParticleType> BARRAGE_TRAIL =
-            PARTICLES.register("barrage_trail", () -> new SimpleParticleType(false));
-
     public static final RegistryObject<SimpleParticleType> RANGER_MAGIC_STRIPE =
             PARTICLES.register("ranger_magic_stripe", () -> new SimpleParticleType(false));
     public static final RegistryObject<SimpleParticleType> RANGER_ROOTS =

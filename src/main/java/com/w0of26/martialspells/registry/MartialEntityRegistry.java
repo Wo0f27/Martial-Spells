@@ -1,7 +1,6 @@
 package com.w0of26.martialspells.registry;
 
 import com.w0of26.martialspells.MartialSpells;
-import com.w0of26.martialspells.entity.BarrageArrow;
 import com.w0of26.martialspells.entity.BearTrapEntity;
 import com.w0of26.martialspells.entity.CaltropBundleProjectile;
 import com.w0of26.martialspells.entity.CaltropFieldEntity;
@@ -26,14 +25,6 @@ import net.minecraftforge.registries.RegistryObject;
 public final class MartialEntityRegistry {
     public static final DeferredRegister<EntityType<?>> ENTITY_TYPES =
             DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, MartialSpells.MOD_ID);
-
-    public static final RegistryObject<EntityType<BarrageArrow>> BARRAGE_ARROW =
-            ENTITY_TYPES.register("barrage_arrow", () -> EntityType.Builder
-                    .<BarrageArrow>of(BarrageArrow::new, MobCategory.MISC)
-                    .sized(0.35F, 0.35F)
-                    .clientTrackingRange(8)
-                    .updateInterval(10)
-                    .build(MartialSpells.MOD_ID + ":barrage_arrow"));
 
     public static final RegistryObject<EntityType<EntanglingArrow>> ENTANGLING_ARROW =
             ENTITY_TYPES.register("entangling_arrow", () -> EntityType.Builder

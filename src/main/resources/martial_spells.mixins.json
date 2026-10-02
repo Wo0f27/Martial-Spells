@@ -13,6 +13,7 @@
     "LivingEntityNettedMixin",
     "IronsReleaseUsingHelperMixin",
     "AbstractArrowPowerShotMixin",
+    "BarrageSpellDataLevelMixin",
     "LivingEntityHuntersMarkMixin",
     "LivingEntityHuntersMarkVisualMixin",
     "BowPowerShotOriginMixin",

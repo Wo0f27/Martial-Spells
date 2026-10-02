@@ -86,6 +86,17 @@ public final class RangerArrowMetadata {
         return state(arrow).getBoolean("iframeBypass");
     }
 
+    /** Barrage hit-time identity, distinct from any Power Shot transfer. */
+    public static void markBarrage(AbstractArrow arrow) {
+        CompoundTag state = state(arrow);
+        state.putBoolean("barrage", true);
+        save(arrow, state);
+    }
+
+    public static boolean isBarrage(AbstractArrow arrow) {
+        return state(arrow).getBoolean("barrage");
+    }
+
     public static void setExtraPierceTargets(AbstractArrow arrow, int extraTargets) {
         if (extraTargets < 0) throw new IllegalArgumentException("extraTargets must be nonnegative");
         CompoundTag state = state(arrow);

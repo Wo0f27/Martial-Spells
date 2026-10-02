@@ -1,7 +1,6 @@
 package com.w0of26.martialspells.client.visual;
 
 import com.w0of26.martialspells.ranged.RangedWeaponClassifier;
-import com.w0of26.martialspells.spells.BarrageSpell;
 import io.redspace.ironsspellbooks.capabilities.magic.SyncedSpellData;
 import io.redspace.ironsspellbooks.player.ClientMagicData;
 import net.minecraft.client.Minecraft;
@@ -41,15 +40,6 @@ public final class MagicArrowClientVisuals {
         }
         SyncedSpellData synced = ClientMagicData.getSyncedSpellData(player);
         return synced.isCasting() ? synced.getCastingSpellId() : "";
-    }
-
-    private static int getCastingSpellLevel(Player player) {
-        Minecraft minecraft = Minecraft.getInstance();
-        if (minecraft.player == player) {
-            return ClientMagicData.isCasting() ? ClientMagicData.getCastingSpellLevel() : 1;
-        }
-        SyncedSpellData synced = ClientMagicData.getSyncedSpellData(player);
-        return synced.isCasting() ? synced.getCastingSpellLevel() : 1;
     }
 
     @Nullable
@@ -99,13 +89,7 @@ public final class MagicArrowClientVisuals {
     }
 
     public static float getWeaponPreparationProgress(@Nullable LivingEntity entity) {
-        float raw = getCastProgress(entity);
-        if (isBarrageCasting(entity) && entity instanceof Player player) {
-            int castTime = BarrageSpell.getCastTimeTicks(getCastingSpellLevel(player));
-            float prepareEndProgress = (float) BarrageSpell.PREPARE_TICKS / (float) castTime;
-            return Mth.clamp(raw / prepareEndProgress, 0.0F, 1.0F);
-        }
-        return raw;
+        return getCastProgress(entity);
     }
 
     public static float getCrossbowChargeProgress(@Nullable LivingEntity entity) {

@@ -18,21 +18,25 @@ public final class PowerShotImpact {
     private PowerShotImpact() {}
 
     public static boolean hurt(AbstractArrow arrow, Entity target, DamageSource source, float amount) {
+        boolean transferred = RangerArrowMetadata.hasTransfer(arrow, PowerShotSpell.SPELL_ID);
+        boolean barrage = RangerArrowMetadata.isBarrage(arrow);
         if (arrow.level().isClientSide || !(target instanceof LivingEntity living)
-                || !RangerArrowMetadata.hasTransfer(arrow, PowerShotSpell.SPELL_ID)) {
+                || (!transferred && !barrage)) {
             return target.hurt(source, amount);
         }
         int previousIframes = living.invulnerableTime;
         boolean bypass = RangerArrowMetadata.bypassesIframes(arrow);
         if (bypass) living.invulnerableTime = 0;
+        LivingEntity previousKnockbackTarget = barrage ? BarrageKnockbackScope.enter(living) : null;
         boolean damaged;
         try {
             damaged = target.hurt(source, amount);
         } finally {
+            if (barrage) BarrageKnockbackScope.exit(previousKnockbackTarget);
             if (bypass) living.invulnerableTime = previousIframes;
         }
         // Spell Engine applies transferred impacts even when vanilla damage says false.
-        if (RangerArrowMetadata.markTransferredHit(arrow, PowerShotSpell.SPELL_ID, living.getUUID())) {
+        if (transferred && RangerArrowMetadata.markTransferredHit(arrow, PowerShotSpell.SPELL_ID, living.getUUID())) {
             MobEffectInstance current = living.getEffect(MartialEffectRegistry.HUNTERS_MARK.get());
             int next = current == null ? 0 : Math.min(MAX_AMPLIFIER, current.getAmplifier() + 1);
             living.addEffect(new MobEffectInstance(MartialEffectRegistry.HUNTERS_MARK.get(),

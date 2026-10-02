@@ -1,4 +1,7 @@
 {
+  "bow_pull": {
+    "sounds": ["martial_spells:bow_pull"]
+  },
   "marker_shot": {
     "sounds": ["martial_spells:marker_shot"]
   },

@@ -9,7 +9,6 @@ import com.w0of26.martialspells.client.render.BattleBannerRenderer;
 import com.w0of26.martialspells.client.model.LightwellModel;
 import com.w0of26.martialspells.client.model.BattleBannerModel;
 import com.w0of26.martialspells.client.model.BearTrapModel;
-import com.w0of26.martialspells.client.particle.BarrageTrailParticle;
 import com.w0of26.martialspells.client.particle.ChargeSparkParticle;
 import com.w0of26.martialspells.client.particle.ChargeStripeParticle;
 import com.w0of26.martialspells.client.particle.DemoralizeSmokeParticle;
@@ -22,7 +21,6 @@ import com.w0of26.martialspells.client.particle.LastStandAuraParticle;
 import com.w0of26.martialspells.client.particle.PaladinSourceMagicParticle;
 import com.w0of26.martialspells.client.particle.RangerSourceParticle;
 import com.w0of26.martialspells.client.particle.PaladinSourceAreaParticle;
-import com.w0of26.martialspells.client.render.BarrageArrowRenderer;
 import com.w0of26.martialspells.client.render.BearTrapRenderer;
 import com.w0of26.martialspells.client.render.CaltropFieldRenderer;
 import com.w0of26.martialspells.client.render.DiamondBodyShieldLayer;
@@ -74,7 +72,6 @@ public final class MartialClientEvents {
 
     @SubscribeEvent
     public static void registerEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
-        event.registerEntityRenderer(MartialEntityRegistry.BARRAGE_ARROW.get(), BarrageArrowRenderer::new);
         event.registerEntityRenderer(MartialEntityRegistry.ENTANGLING_ARROW.get(), EntanglingArrowRenderer::new);
         event.registerEntityRenderer(MartialEntityRegistry.ENTANGLING_ROOTS_CLOUD.get(), EntanglingRootsCloudRenderer::new);
         event.registerEntityRenderer(MartialEntityRegistry.CALTROP_BUNDLE.get(), ThrownItemRenderer::new);
@@ -171,7 +168,6 @@ public final class MartialClientEvents {
                 sprites -> new RangerSourceParticle.Provider(sprites, RangerSourceParticle.Kind.MAGIC_STRIPE));
         event.registerSpriteSet(MartialParticleRegistry.RANGER_ROOTS.get(),
                 sprites -> new RangerSourceParticle.Provider(sprites, RangerSourceParticle.Kind.ROOTS));
-        event.registerSpriteSet(MartialParticleRegistry.BARRAGE_TRAIL.get(), BarrageTrailParticle.Provider::new);
         event.registerSpriteSet(MartialParticleRegistry.SHOCK_POWDER_SMOKE.get(), ShockPowderSmokeParticle.Provider::new);
         event.registerSpriteSet(MartialParticleRegistry.SHOCK_POWDER_ARC.get(), ShockPowderArcParticle.Provider::new);
         event.registerSpriteSet(MartialParticleRegistry.CHARGE_STRIPE.get(), ChargeStripeParticle.Provider::new);

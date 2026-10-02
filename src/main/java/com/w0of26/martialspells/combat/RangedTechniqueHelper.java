@@ -1,6 +1,5 @@
 package com.w0of26.martialspells.combat;
 
-import com.w0of26.martialspells.entity.BarrageArrow;
 import com.w0of26.martialspells.entity.EntanglingArrow;
 import com.w0of26.martialspells.ranged.RangedWeaponClassifier;
 import net.fabric_extras.ranged_weapon.api.CustomRangedWeapon;
@@ -20,14 +19,6 @@ public final class RangedTechniqueHelper {
         if (RangedWeaponClassifier.isSupported(player.getMainHandItem())) return player.getMainHandItem();
         if (RangedWeaponClassifier.isSupported(player.getOffhandItem())) return player.getOffhandItem();
         return ItemStack.EMPTY;
-    }
-
-    public static BarrageArrow createBarrageArrow(Level level, Player player, ItemStack weapon, float techniqueMultiplier) {
-        RangedWeaponClassifier.Type type = requireRangedType(weapon, "Barrage");
-        BarrageArrow arrow = new BarrageArrow(level, player);
-        applyEnchantments(arrow, weapon, type);
-        applyScaling(arrow, player, weapon, type, techniqueMultiplier);
-        return arrow;
     }
 
     public static EntanglingArrow createEntanglingArrow(Level level, Player player, ItemStack weapon,

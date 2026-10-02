@@ -27,8 +27,8 @@ public final class PowerShotArrowEvents {
 
         // Vanilla bow/crossbow release paths and the AR1 ammo helper mark the
         // actual projectile before spawn. Entangling Arrow is an explicit
-        // physical-shot type; no held-item timing inference. Existing Barrage
-        // retains its separate iframe behavior until AR3's in-place migration.
+        // physical-shot type; no held-item timing inference. AR3 Barrage uses
+        // the tagged AR1 physical-arrow path and needs no spell-specific branch.
         if (!RangerArrowMetadata.isEligibleShot(arrow)
                 && !(arrow instanceof EntanglingArrow)) return;
         RangerArrowMetadata.markEligibleShot(arrow);

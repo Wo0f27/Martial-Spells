@@ -5,6 +5,7 @@ import net.fabric_extras.ranged_weapon.api.CustomRangedWeapon;
 import net.fabric_extras.ranged_weapon.api.RangedConfig;
 import net.fabric_extras.ranged_weapon.internal.ScalingUtil;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.ArrowItem;
@@ -12,6 +13,7 @@ import net.minecraft.world.item.BowItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.Optional;
 
@@ -42,6 +44,10 @@ public final class ArchersPhysicalArrow {
             arrow = bow.customArrow(arrow);
         }
         arrow.setCritArrow(critical);
+        // Exact Spell Engine ArrowHelper.createArrow uses the crossbow-style
+        // physical launch state for spell arrows even with a bow in hand.
+        arrow.setSoundEvent(SoundEvents.CROSSBOW_HIT);
+        arrow.setShotFromCrossbow(true);
 
         if (type == RangedWeaponClassifier.Type.BOW) {
             int power = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, weapon);
@@ -80,6 +86,9 @@ public final class ArchersPhysicalArrow {
 
     /** Called before addFreshEntity; Apothic then applies Arrow Damage/Velocity on join once. */
     public static void launch(AbstractArrow arrow, Player shooter, float velocity, float inaccuracy) {
-        arrow.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0.0F, velocity, inaccuracy);
+        // Spell Engine ArrowHelper uses the current look vector directly.
+        // shootFromRotation would also inherit player motion, changing its spread.
+        Vec3 look = shooter.getLookAngle();
+        arrow.shoot(look.x, look.y, look.z, velocity, inaccuracy);
     }
 }
