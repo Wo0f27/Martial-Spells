@@ -16,7 +16,8 @@ public abstract class MagicArrowPlayerRendererMixin {
     @Inject(method = "getArmPose", at = @At("HEAD"), cancellable = true)
     private static void martialSpells$rangedNativePose(AbstractClientPlayer player, InteractionHand hand,
                                                         CallbackInfoReturnable<HumanoidModel.ArmPose> cir) {
-        if (!MagicArrowClientVisuals.isRangedSpellCasting(player)) return;
+        if (!MagicArrowClientVisuals.isRangedSpellCasting(player)
+                || MagicArrowClientVisuals.isSourceAnimatedRangerCast(player)) return;
         InteractionHand selected = MagicArrowClientVisuals.getSelectedRangedHand(player);
         if (selected != hand) return;
 

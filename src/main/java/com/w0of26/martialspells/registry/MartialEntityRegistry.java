@@ -15,6 +15,8 @@ import com.w0of26.martialspells.entity.HolyMoteProjectile;
 import com.w0of26.martialspells.entity.LightwellEntity;
 import com.w0of26.martialspells.entity.BattleBannerEntity;
 import com.w0of26.martialspells.entity.PaladinBarrierEntity;
+import com.w0of26.martialspells.entity.RainMeteorProjectile;
+import com.w0of26.martialspells.entity.RangerMagicArrowProjectile;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -57,6 +59,18 @@ public final class MartialEntityRegistry {
                     .clientTrackingRange(8)
                     .updateInterval(10)
                     .build(MartialSpells.MOD_ID + ":entangling_roots_cloud"));
+
+    public static final RegistryObject<EntityType<RainMeteorProjectile>> RAIN_METEOR =
+            ENTITY_TYPES.register("rain_meteor", () -> EntityType.Builder
+                    .<RainMeteorProjectile>of(RainMeteorProjectile::new, MobCategory.MISC)
+                    .sized(0.25F, 0.25F).fireImmune().clientTrackingRange(128).updateInterval(2)
+                    .build(MartialSpells.MOD_ID + ":rain_meteor"));
+
+    public static final RegistryObject<EntityType<RangerMagicArrowProjectile>> RANGER_MAGIC_ARROW =
+            ENTITY_TYPES.register("ranger_magic_arrow", () -> EntityType.Builder
+                    .<RangerMagicArrowProjectile>of(RangerMagicArrowProjectile::new, MobCategory.MISC)
+                    .sized(0.25F, 0.25F).fireImmune().clientTrackingRange(128).updateInterval(2)
+                    .build(MartialSpells.MOD_ID + ":ranger_magic_arrow"));
 
     /**
      * Frozen Rogues Bear Trap dimensions/tracking translated from its custom

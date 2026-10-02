@@ -43,7 +43,10 @@ public final class PaladinSourceAreaParticle
             int frames,
             double encodedScale,
             double encodedAlpha,
-            double encodedFollowId
+            double encodedFollowId,
+            float red,
+            float green,
+            float blue
     ) {
         super(
                 level,
@@ -94,9 +97,9 @@ public final class PaladinSourceAreaParticle
                         1.0F
                 );
 
-        rCol = 1.0F;
-        gCol = 1.0F;
-        bCol = 0.80F;
+        rCol = red;
+        gCol = green;
+        bCol = blue;
 
         lifetime =
                 Math.max(
@@ -289,15 +292,26 @@ public final class PaladinSourceAreaParticle
         private final SpriteSet sprites;
         private final Facing facing;
         private final int frames;
+        private final float red;
+        private final float green;
+        private final float blue;
 
         public Provider(
                 SpriteSet sprites,
                 Facing facing,
                 int frames
         ) {
+            this(sprites, facing, frames, 1.0F, 1.0F, 0.80F);
+        }
+
+        public Provider(SpriteSet sprites, Facing facing, int frames,
+                        float red, float green, float blue) {
             this.sprites = sprites;
             this.facing = facing;
             this.frames = frames;
+            this.red = red;
+            this.green = green;
+            this.blue = blue;
         }
 
         @Override
@@ -321,7 +335,10 @@ public final class PaladinSourceAreaParticle
                     frames,
                     xd,
                     yd,
-                    zd
+                    zd,
+                    red,
+                    green,
+                    blue
             );
         }
     }

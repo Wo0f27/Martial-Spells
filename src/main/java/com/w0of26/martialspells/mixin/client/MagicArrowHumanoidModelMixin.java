@@ -25,7 +25,8 @@ public abstract class MagicArrowHumanoidModelMixin {
     @Inject(method = "setupAnim", at = @At("TAIL"))
     private void martialSpells$rangedPose(LivingEntity entity, float limbSwing, float limbSwingAmount,
                                            float ageInTicks, float netHeadYaw, float headPitch, CallbackInfo ci) {
-        if (!(entity instanceof Player player) || !MagicArrowClientVisuals.isRangedSpellCasting(player)) return;
+        if (!(entity instanceof Player player) || !MagicArrowClientVisuals.isRangedSpellCasting(player)
+                || MagicArrowClientVisuals.isSourceAnimatedRangerCast(player)) return;
         RangedWeaponClassifier.Type type = MagicArrowClientVisuals.getSelectedRangedType(player);
         HumanoidArm arm = MagicArrowClientVisuals.getSelectedRangedArm(player);
         if (arm == null || type == RangedWeaponClassifier.Type.NONE) return;

@@ -34,7 +34,9 @@ public final class RangerSourceParticle extends TextureSheetParticle {
             setColor((0xBF / 255.0F) * darken, (0x40 / 255.0F) * darken,
                     (0x40 / 255.0F) * darken);
             quadSize = 0.11F * (1.0F + (random.nextFloat() * 2.0F - 1.0F) * 0.33F);
-            lifetime = Math.max(1, Math.round(16.0F * (1.0F
+            // SpellParticle divides the entry's 16-tick lifetime by its 0.5 playback speed.
+            // The eight sprite frames therefore progress across about 32 ticks.
+            lifetime = Math.max(1, Math.round((16.0F / 0.5F) * (1.0F
                     + (random.nextFloat() * 2.0F - 1.0F) * 0.5F)));
         } else {
             hasPhysics = true;

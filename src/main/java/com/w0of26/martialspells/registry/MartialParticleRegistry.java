@@ -16,6 +16,14 @@ public final class MartialParticleRegistry {
             PARTICLES.register("ranger_magic_stripe", () -> new SimpleParticleType(false));
     public static final RegistryObject<SimpleParticleType> RANGER_ROOTS =
             PARTICLES.register("ranger_roots", () -> new SimpleParticleType(false));
+    public static final RegistryObject<SimpleParticleType> RANGER_NATURE_FLOAT =
+            PARTICLES.register("ranger_nature_float", () -> new SimpleParticleType(false));
+    public static final RegistryObject<SimpleParticleType> RANGER_NATURE_DECELERATE =
+            PARTICLES.register("ranger_nature_decelerate", () -> new SimpleParticleType(false));
+    public static final RegistryObject<SimpleParticleType> RANGER_NATURE_BURST =
+            PARTICLES.register("ranger_nature_burst", () -> new SimpleParticleType(false));
+    public static final RegistryObject<SimpleParticleType> RANGER_RAIN_AREA =
+            PARTICLES.register("ranger_rain_area", () -> new SimpleParticleType(false));
 
     public static final RegistryObject<SimpleParticleType> SHOCK_POWDER_SMOKE =
             PARTICLES.register("shock_powder_smoke", () -> new SimpleParticleType(false));

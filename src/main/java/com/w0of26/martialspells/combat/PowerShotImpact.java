@@ -40,7 +40,7 @@ public final class PowerShotImpact {
             MobEffectInstance current = living.getEffect(MartialEffectRegistry.HUNTERS_MARK.get());
             int next = current == null ? 0 : Math.min(MAX_AMPLIFIER, current.getAmplifier() + 1);
             living.addEffect(new MobEffectInstance(MartialEffectRegistry.HUNTERS_MARK.get(),
-                    MARK_TICKS, next, false, true, true));
+                    MARK_TICKS, next, false, false, true));
             if (living.level() instanceof ServerLevel server) {
                 RangerSourceVfx.huntersMarkImpact(server, living);
             }

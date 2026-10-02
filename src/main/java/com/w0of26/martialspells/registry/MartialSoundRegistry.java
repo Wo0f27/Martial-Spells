@@ -15,6 +15,11 @@ public final class MartialSoundRegistry {
     public static final RegistryObject<SoundEvent> MARKER_SHOT = register("marker_shot");
     public static final RegistryObject<SoundEvent> ENTANGLING_ROOTS = register("entangling_roots");
     public static final RegistryObject<SoundEvent> BOW_PULL = register("bow_pull");
+    public static final RegistryObject<SoundEvent> RAIN_OF_ARROWS_RELEASE = register("rain_of_arrows_release");
+    public static final RegistryObject<SoundEvent> RAIN_OF_ARROWS_IMPACT = register("rain_of_arrows_impact");
+    public static final RegistryObject<SoundEvent> MAGIC_ARROW_RELEASE = register("magic_arrow_release");
+    public static final RegistryObject<SoundEvent> MAGIC_ARROW_IMPACT = register("magic_arrow_impact");
+    public static final RegistryObject<SoundEvent> GENERIC_WIND_CHARGING = register("generic_wind_charging");
 
     public static final RegistryObject<SoundEvent> SHOCK_POWDER_RELEASE =
             register("shock_powder_release");

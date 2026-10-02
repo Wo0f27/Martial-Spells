@@ -34,6 +34,7 @@ import com.w0of26.martialspells.client.render.ShatteringThrowRenderer;
 import com.w0of26.martialspells.client.render.PenanceProjectileRenderer;
 import com.w0of26.martialspells.client.render.JudgementVisualRenderer;
 import com.w0of26.martialspells.client.render.HolyBeamVisualRenderer;
+import com.w0of26.martialspells.client.render.RangerSourceProjectileRenderer;
 import com.w0of26.martialspells.registry.MartialEntityRegistry;
 import com.w0of26.martialspells.registry.MartialParticleRegistry;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
@@ -86,6 +87,12 @@ public final class MartialClientEvents {
         event.registerEntityRenderer(MartialEntityRegistry.BATTLE_BANNER.get(), BattleBannerRenderer::new);
         event.registerEntityRenderer(MartialEntityRegistry.LIGHTWELL.get(), LightwellRenderer::new);
         event.registerEntityRenderer(MartialEntityRegistry.HOLY_MOTE.get(), HolyMoteRenderer::new);
+        event.registerEntityRenderer(MartialEntityRegistry.RAIN_METEOR.get(),
+                context -> new RangerSourceProjectileRenderer<>(context,
+                        RangerSourceProjectileRenderer.RAIN_MODEL, 1.0F, false));
+        event.registerEntityRenderer(MartialEntityRegistry.RANGER_MAGIC_ARROW.get(),
+                context -> new RangerSourceProjectileRenderer<>(context,
+                        RangerSourceProjectileRenderer.MAGIC_MODEL, 1.2F, true));
     }
 
     @SubscribeEvent
@@ -95,6 +102,8 @@ public final class MartialClientEvents {
         event.register(EntanglingRootsEffectRenderer.MODEL);
         event.register(HuntersMarkEffectRenderer.MODEL);
         event.register(PenanceProjectileRenderer.MODEL);
+        event.register(RangerSourceProjectileRenderer.RAIN_MODEL);
+        event.register(RangerSourceProjectileRenderer.MAGIC_MODEL);
         event.register(JudgementVisualRenderer.MODEL);
         event.register(DivineProtectionRenderer.BASE_MODEL);
         event.register(DivineProtectionRenderer.GLOW_MODEL);
@@ -168,6 +177,19 @@ public final class MartialClientEvents {
                 sprites -> new RangerSourceParticle.Provider(sprites, RangerSourceParticle.Kind.MAGIC_STRIPE));
         event.registerSpriteSet(MartialParticleRegistry.RANGER_ROOTS.get(),
                 sprites -> new RangerSourceParticle.Provider(sprites, RangerSourceParticle.Kind.ROOTS));
+        event.registerSpriteSet(MartialParticleRegistry.RANGER_NATURE_FLOAT.get(),
+                sprites -> new PaladinSourceMagicParticle.Provider(sprites,
+                        PaladinSourceMagicParticle.Motion.FLOAT, 0.4F, 1.0F, 0.4F, 0.75F));
+        event.registerSpriteSet(MartialParticleRegistry.RANGER_NATURE_DECELERATE.get(),
+                sprites -> new PaladinSourceMagicParticle.Provider(sprites,
+                        PaladinSourceMagicParticle.Motion.DECELERATE, 0.4F, 1.0F, 0.4F, 0.75F));
+        event.registerSpriteSet(MartialParticleRegistry.RANGER_NATURE_BURST.get(),
+                sprites -> new PaladinSourceMagicParticle.Provider(sprites,
+                        PaladinSourceMagicParticle.Motion.BURST, 0.4F, 1.0F, 0.4F, 0.75F));
+        event.registerSpriteSet(MartialParticleRegistry.RANGER_RAIN_AREA.get(),
+                sprites -> new PaladinSourceAreaParticle.Provider(sprites,
+                        PaladinSourceAreaParticle.Facing.GROUND, 16,
+                        0xCE / 255.0F, 0xB1 / 255.0F, 0x5C / 255.0F));
         event.registerSpriteSet(MartialParticleRegistry.SHOCK_POWDER_SMOKE.get(), ShockPowderSmokeParticle.Provider::new);
         event.registerSpriteSet(MartialParticleRegistry.SHOCK_POWDER_ARC.get(), ShockPowderArcParticle.Provider::new);
         event.registerSpriteSet(MartialParticleRegistry.CHARGE_STRIPE.get(), ChargeStripeParticle.Provider::new);

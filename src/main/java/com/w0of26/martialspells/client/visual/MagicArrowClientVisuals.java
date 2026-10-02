@@ -15,18 +15,31 @@ import org.jetbrains.annotations.Nullable;
 public final class MagicArrowClientVisuals {
     public static final String MAGIC_ARROW_ID = "irons_spellbooks:magic_arrow";
     public static final String BARRAGE_ID = "martial_spells:barrage";
+    public static final String RANGER_MAGIC_ARROW_ID = "martial_spells:magic_arrow";
+    public static final String RAIN_OF_ARROWS_ID = "martial_spells:rain_of_arrows";
     public static final String ENTANGLING_ARROW_ID = "martial_spells:entangling_arrow";
     private static final float MAGIC_ARROW_CROSSBOW_CHARGE_END_PROGRESS = 2.0F / 3.0F;
 
     private MagicArrowClientVisuals() {}
 
     public static boolean isMagicArrowCasting(@Nullable LivingEntity entity) { return isCastingSpell(entity, MAGIC_ARROW_ID); }
+    public static boolean isRangerMagicArrowCasting(@Nullable LivingEntity entity) {
+        return isCastingSpell(entity, RANGER_MAGIC_ARROW_ID);
+    }
+    public static boolean isRainOfArrowsCasting(@Nullable LivingEntity entity) {
+        return isCastingSpell(entity, RAIN_OF_ARROWS_ID);
+    }
+    public static boolean isSourceAnimatedRangerCast(@Nullable LivingEntity entity) {
+        return isRangerMagicArrowCasting(entity) || isRainOfArrowsCasting(entity);
+    }
     public static boolean isBarrageCasting(@Nullable LivingEntity entity) { return isCastingSpell(entity, BARRAGE_ID); }
     public static boolean isEntanglingArrowCasting(@Nullable LivingEntity entity) {
         return isCastingSpell(entity, ENTANGLING_ARROW_ID);
     }
     public static boolean isRangedSpellCasting(@Nullable LivingEntity entity) {
-        return isMagicArrowCasting(entity) || isBarrageCasting(entity) || isEntanglingArrowCasting(entity);
+        return isMagicArrowCasting(entity) || isBarrageCasting(entity) || isEntanglingArrowCasting(entity)
+                || isCastingSpell(entity, RANGER_MAGIC_ARROW_ID)
+                || isCastingSpell(entity, RAIN_OF_ARROWS_ID);
     }
 
     private static boolean isCastingSpell(@Nullable LivingEntity entity, String spellId) {

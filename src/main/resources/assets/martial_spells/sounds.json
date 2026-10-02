@@ -8,6 +8,21 @@
   "entangling_roots": {
     "sounds": ["martial_spells:entangling_roots"]
   },
+  "rain_of_arrows_release": {
+    "sounds": ["martial_spells:rain_of_arrows_release"]
+  },
+  "rain_of_arrows_impact": {
+    "sounds": ["martial_spells:rain_of_arrows_impact"]
+  },
+  "magic_arrow_release": {
+    "sounds": ["martial_spells:magic_arrow_release"]
+  },
+  "magic_arrow_impact": {
+    "sounds": ["martial_spells:magic_arrow_impact"]
+  },
+  "generic_wind_charging": {
+    "sounds": ["martial_spells:generic_wind_charging"]
+  },
   "shock_powder_release": {
     "sounds": [
       "martial_spells:shock_powder_release"

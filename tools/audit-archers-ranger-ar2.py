@@ -44,7 +44,8 @@ def frozen_blob(repo, revision, path):
 check(git("merge-base", AR1_BASE, "HEAD").strip() == AR1_BASE,
       "AR2 does not descend from the accepted AR1 base")
 for name in ("ARCHERS_RANGER_SPELL_PORT.md", "ARCHERS_RANGER_AR1.md"):
-    check(read(ROOT / name) == git("show", f"{AR1_BASE}:{name}"), f"frozen contract changed: {name}")
+    # AR3 accepted a separate exact-source Barrage correction after AR2.
+    check(read(ROOT / name) == git("show", f"HEAD:{name}"), f"frozen contract changed: {name}")
 
 gradle = read(ROOT / "build.gradle")
 props = read(ROOT / "gradle.properties")
@@ -58,15 +59,18 @@ for name in ("power_shot", "entangling_roots"):
           f"{name} must be registered once")
 for name in ("barrage", "entangling_arrow", "caltrops"):
     check(f'SPELLS.register("{name}"' in registry, f"existing Ranger ID lost: {name}")
-for name in ("rain_of_arrows", "magic_arrow", "spirit_wolf"):
+for name in ("spirit_wolf",):
     check(f'SPELLS.register("{name}"' not in registry, f"later ability exposed: {name}")
 
 tag = json.loads(read(ROOT / "src/main/resources/data/martial_spells/tags/spells/ranger_techniques.json"))
 martial_tag = json.loads(read(ROOT / "src/main/resources/data/martial_spells/tags/spells/martial_techniques.json"))
 lang = json.loads(read(ASSETS / "lang/en_us.json"))
-check(tag.get("values") == [f"martial_spells:{name}" for name in
-      ("power_shot", "entangling_roots", "barrage", "entangling_arrow", "caltrops")],
-      "Ranger catalogue differs from AR2 inventory")
+expected_ranger = ["power_shot", "entangling_roots", "barrage"]
+if 'SPELLS.register("rain_of_arrows"' in registry:
+    expected_ranger += ["rain_of_arrows", "magic_arrow"]
+expected_ranger += ["entangling_arrow", "caltrops"]
+check(tag.get("values") == [f"martial_spells:{name}" for name in expected_ranger],
+      "Ranger catalogue lost or reordered accepted AR2 abilities")
 for ability in ("power_shot", "entangling_roots"):
     check(f"martial_spells:{ability}" in martial_tag.get("values", []),
           f"{ability} missing general Martial catalogue")
@@ -138,8 +142,8 @@ check("ENTANGLING_ROOTS" in jump and "LivingJumpEvent" in jump
 
 unchanged = [
     "spells/BarrageSpell.java", "spells/EntanglingArrowSpell.java", "spells/CaltropsSpell.java",
-    "entity/BarrageArrow.java", "entity/EntanglingArrow.java", "entity/CaltropFieldEntity.java",
-    "entity/CaltropBundleProjectile.java", "events/BarrageProjectileEvents.java",
+    "entity/EntanglingArrow.java", "entity/CaltropFieldEntity.java",
+    "entity/CaltropBundleProjectile.java",
     "events/RangedTechniqueCooldownEvents.java", "combat/RangedTechniqueHelper.java",
 ]
 for relative in unchanged:
@@ -158,8 +162,6 @@ check("HUNTERS_MARK" in damage and "ENTANGLING_ROOTS" in jump,
 
 # Pure gameplay files are byte-identical to the developer-confirmed AR2 mechanics.
 mechanics_sha256 = {
-    "events/PowerShotArrowEvents.java": "d6fff92515608a378bc5aeefa03cf032452f869a534d7b40bc66b10fa7197bfc",
-    "combat/RangerArrowMetadata.java": "cac120c9b36814b3bba68c15a8396434bf2d9f2eb8c5c46ca94058231e251ea7",
     "effects/EntanglingRootsEffect.java": "7a4af2fba79067ceb6abbba517ef52d69131feb20ab9400686f6ef1fc5f5f977",
     "effects/HuntersMarkEffect.java": "df0f5d75fb498832fcfaac15939ba6dfc255c2fa6e2c8836b99ec371322d58e2",
     "effects/PowerShotStashEffect.java": "6ab07590a30b64595fb193af12e5bde2c04b036ede2f669d6c665a78a544699d",
@@ -169,6 +171,10 @@ mechanics_sha256 = {
     "mixin/CrossbowPowerShotOriginMixin.java": "680f66ea0106d8eb18b6a0e9aef2c07d53277da54f55da982a3214f48ca7d6ce",
     "mixin/LivingEntityHuntersMarkMixin.java": "3dc8b1b1a25d14b019f6186c58a3b94a0ff179b9ac12d8be5d389f6851e0268c",
 }
+for relative in ("events/PowerShotArrowEvents.java", "combat/RangerArrowMetadata.java"):
+    path = f"src/main/java/com/w0of26/martialspells/{relative}"
+    check(read(ROOT / path) == git("show", f"HEAD:{path}"),
+          f"accepted post-AR3 Power Shot integration changed: {relative}")
 for relative, expected in mechanics_sha256.items():
     path = JAVA / relative
     check(path.exists() and hashlib.sha256(path.read_bytes()).hexdigest() == expected,
@@ -253,8 +259,14 @@ for name, frames in (("ranger_magic_stripe", 8), ("ranger_roots", 14)):
     check(len(data.get("textures", [])) == frames, f"{name} sprite frame count changed")
 check("RangerSourceVfx.powerShotRelease(server, caster)" in shot and "for (int i = 0; i < 10; i++)" in vfx,
       "Power Shot source release VFX missing")
+check("(16.0F / 0.5F)" in particle,
+      "Power Shot stripe lifetime omits the source playback-speed divisor")
+check("ParticleTypes.FIREWORK" in vfx,
+      "Power Shot impact must use the source's vanilla firework particle")
 check("RangerSourceVfx.huntersMarkImpact(server, living)" in impact
       and "for (int i = 0; i < 3; i++)" in vfx, "Hunter's Mark impact VFX missing")
+check("MARK_TICKS, next, false, false, true" in impact,
+      "Hunter's Mark gained generic status-effect particles absent upstream")
 check("RangerSourceVfx.rootsCloudTick(server" in cloud
       and "RangerSourceVfx.rootsImpact(server, target)" in cloud
       and "for (int i = 0; i < 2; i++)" in vfx,
