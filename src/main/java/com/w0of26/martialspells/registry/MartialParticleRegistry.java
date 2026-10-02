@@ -15,6 +15,11 @@ public final class MartialParticleRegistry {
     public static final RegistryObject<SimpleParticleType> BARRAGE_TRAIL =
             PARTICLES.register("barrage_trail", () -> new SimpleParticleType(false));
 
+    public static final RegistryObject<SimpleParticleType> RANGER_MAGIC_STRIPE =
+            PARTICLES.register("ranger_magic_stripe", () -> new SimpleParticleType(false));
+    public static final RegistryObject<SimpleParticleType> RANGER_ROOTS =
+            PARTICLES.register("ranger_roots", () -> new SimpleParticleType(false));
+
     public static final RegistryObject<SimpleParticleType> SHOCK_POWDER_SMOKE =
             PARTICLES.register("shock_powder_smoke", () -> new SimpleParticleType(false));
 

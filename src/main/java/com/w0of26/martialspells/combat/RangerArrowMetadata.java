@@ -5,6 +5,8 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 
+import java.util.UUID;
+
 /** Server-owned, Forge-persistent state attached to real ammo-created arrows. */
 public final class RangerArrowMetadata {
     private static final String ROOT = MartialSpells.MOD_ID + ":ranger_arrow";
@@ -31,6 +33,15 @@ public final class RangerArrowMetadata {
         return state(arrow).getBoolean("eligibleShot");
     }
 
+    /** Prevents a rejoined/reloaded projectile from spending a later stash. */
+    public static boolean markShotEvaluated(AbstractArrow arrow) {
+        CompoundTag state = state(arrow);
+        if (state.getBoolean("shotEvaluated")) return false;
+        state.putBoolean("shotEvaluated", true);
+        save(arrow, state);
+        return true;
+    }
+
     /** Returns false on a second stamp with the same transfer identity. */
     public static boolean stampTransfer(AbstractArrow arrow, ResourceLocation identity, CompoundTag payload) {
         CompoundTag state = state(arrow);
@@ -49,6 +60,20 @@ public final class RangerArrowMetadata {
 
     public static CompoundTag transfer(AbstractArrow arrow, ResourceLocation identity) {
         return state(arrow).getCompound(TRANSFERS).getCompound(identity.toString()).copy();
+    }
+
+    /** Per projectile/target hit guard; stored on the arrow across reloads. */
+    public static boolean markTransferredHit(AbstractArrow arrow, ResourceLocation identity, UUID targetId) {
+        CompoundTag state = state(arrow);
+        CompoundTag hits = state.getCompound("transferredHits");
+        CompoundTag spellHits = hits.getCompound(identity.toString());
+        String key = targetId.toString();
+        if (spellHits.getBoolean(key)) return false;
+        spellHits.putBoolean(key, true);
+        hits.put(identity.toString(), spellHits);
+        state.put("transferredHits", hits);
+        save(arrow, state);
+        return true;
     }
 
     public static void setIframeBypass(AbstractArrow arrow, boolean enabled) {

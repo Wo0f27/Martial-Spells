@@ -1,4 +1,10 @@
 {
+  "marker_shot": {
+    "sounds": ["martial_spells:marker_shot"]
+  },
+  "entangling_roots": {
+    "sounds": ["martial_spells:entangling_roots"]
+  },
   "shock_powder_release": {
     "sounds": [
       "martial_spells:shock_powder_release"

@@ -11,7 +11,12 @@
     "LivingEntityAttackStrengthAccessor",
     "EntityInvulnerabilityAccessor",
     "LivingEntityNettedMixin",
-    "IronsReleaseUsingHelperMixin"
+    "IronsReleaseUsingHelperMixin",
+    "AbstractArrowPowerShotMixin",
+    "LivingEntityHuntersMarkMixin",
+    "LivingEntityHuntersMarkVisualMixin",
+    "BowPowerShotOriginMixin",
+    "CrossbowPowerShotOriginMixin"
   ],
   "client": [],
   "injectors": {

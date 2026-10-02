@@ -23,6 +23,8 @@ public final class MartialSpellRegistry {
     public static final RegistryObject<AbstractSpell> HEAVENFALL_STRIKE = SPELLS.register("heavenfall_strike", HeavenfallStrikeSpell::new);
     public static final RegistryObject<AbstractSpell> STILLNESS_OF_MIND = SPELLS.register("stillness_of_mind", StillnessOfMindSpell::new);
     public static final RegistryObject<AbstractSpell> BARRAGE = SPELLS.register("barrage", BarrageSpell::new);
+    public static final RegistryObject<AbstractSpell> POWER_SHOT = SPELLS.register("power_shot", PowerShotSpell::new);
+    public static final RegistryObject<AbstractSpell> ENTANGLING_ROOTS = SPELLS.register("entangling_roots", EntanglingRootsSpell::new);
     public static final RegistryObject<AbstractSpell> ENTANGLING_ARROW = SPELLS.register("entangling_arrow", EntanglingArrowSpell::new);
     public static final RegistryObject<AbstractSpell> CALTROPS = SPELLS.register("caltrops", CaltropsSpell::new);
     public static final RegistryObject<AbstractSpell> SHOCK_POWDER = SPELLS.register("shock_powder", ShockPowderSpell::new);

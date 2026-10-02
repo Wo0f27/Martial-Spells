@@ -5,6 +5,7 @@ import com.w0of26.martialspells.entity.BarrageArrow;
 import com.w0of26.martialspells.entity.BearTrapEntity;
 import com.w0of26.martialspells.entity.CaltropBundleProjectile;
 import com.w0of26.martialspells.entity.CaltropFieldEntity;
+import com.w0of26.martialspells.entity.EntanglingRootsCloud;
 import com.w0of26.martialspells.entity.EntanglingArrow;
 import com.w0of26.martialspells.entity.ThrowNetProjectile;
 import com.w0of26.martialspells.entity.ShatteringThrowProjectile;
@@ -57,6 +58,14 @@ public final class MartialEntityRegistry {
                     .clientTrackingRange(10)
                     .updateInterval(20)
                     .build(MartialSpells.MOD_ID + ":caltrop_field"));
+
+    public static final RegistryObject<EntityType<EntanglingRootsCloud>> ENTANGLING_ROOTS_CLOUD =
+            ENTITY_TYPES.register("entangling_roots_cloud", () -> EntityType.Builder
+                    .<EntanglingRootsCloud>of(EntanglingRootsCloud::new, MobCategory.MISC)
+                    .sized(7.0F, 1.05F)
+                    .clientTrackingRange(8)
+                    .updateInterval(10)
+                    .build(MartialSpells.MOD_ID + ":entangling_roots_cloud"));
 
     /**
      * Frozen Rogues Bear Trap dimensions/tracking translated from its custom

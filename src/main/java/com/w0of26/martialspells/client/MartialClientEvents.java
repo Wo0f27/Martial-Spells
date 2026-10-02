@@ -20,12 +20,16 @@ import com.w0of26.martialspells.client.particle.LastStandSparkParticle;
 import com.w0of26.martialspells.client.particle.LastStandSmokeParticle;
 import com.w0of26.martialspells.client.particle.LastStandAuraParticle;
 import com.w0of26.martialspells.client.particle.PaladinSourceMagicParticle;
+import com.w0of26.martialspells.client.particle.RangerSourceParticle;
 import com.w0of26.martialspells.client.particle.PaladinSourceAreaParticle;
 import com.w0of26.martialspells.client.render.BarrageArrowRenderer;
 import com.w0of26.martialspells.client.render.BearTrapRenderer;
 import com.w0of26.martialspells.client.render.CaltropFieldRenderer;
 import com.w0of26.martialspells.client.render.DiamondBodyShieldLayer;
 import com.w0of26.martialspells.client.render.EntanglingArrowRenderer;
+import com.w0of26.martialspells.client.render.EntanglingRootsCloudRenderer;
+import com.w0of26.martialspells.client.render.EntanglingRootsEffectRenderer;
+import com.w0of26.martialspells.client.render.HuntersMarkEffectRenderer;
 import com.w0of26.martialspells.client.render.NettedEffectRenderer;
 import com.w0of26.martialspells.client.render.ThrowNetRenderer;
 import com.w0of26.martialspells.client.render.ShatteringThrowRenderer;
@@ -57,6 +61,12 @@ public final class MartialClientEvents {
         MinecraftForge.EVENT_BUS.addListener(
                 DivineProtectionRenderer::onRenderLivingPost
         );
+        MinecraftForge.EVENT_BUS.addListener(
+                EntanglingRootsEffectRenderer::onRenderLivingPost
+        );
+        MinecraftForge.EVENT_BUS.addListener(
+                HuntersMarkEffectRenderer::onRenderLivingPost
+        );
         MartialSpells.LOGGER.info(
                 "Registered W4 Netted Forge render hook"
         );
@@ -66,6 +76,7 @@ public final class MartialClientEvents {
     public static void registerEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(MartialEntityRegistry.BARRAGE_ARROW.get(), BarrageArrowRenderer::new);
         event.registerEntityRenderer(MartialEntityRegistry.ENTANGLING_ARROW.get(), EntanglingArrowRenderer::new);
+        event.registerEntityRenderer(MartialEntityRegistry.ENTANGLING_ROOTS_CLOUD.get(), EntanglingRootsCloudRenderer::new);
         event.registerEntityRenderer(MartialEntityRegistry.CALTROP_BUNDLE.get(), ThrownItemRenderer::new);
         event.registerEntityRenderer(MartialEntityRegistry.CALTROP_FIELD.get(), CaltropFieldRenderer::new);
         event.registerEntityRenderer(MartialEntityRegistry.BEAR_TRAP.get(), BearTrapRenderer::new);
@@ -84,6 +95,8 @@ public final class MartialClientEvents {
     public static void registerAdditionalModels(ModelEvent.RegisterAdditional event) {
         event.register(ThrowNetRenderer.MODEL);
         event.register(NettedEffectRenderer.MODEL);
+        event.register(EntanglingRootsEffectRenderer.MODEL);
+        event.register(HuntersMarkEffectRenderer.MODEL);
         event.register(PenanceProjectileRenderer.MODEL);
         event.register(JudgementVisualRenderer.MODEL);
         event.register(DivineProtectionRenderer.BASE_MODEL);
@@ -104,6 +117,14 @@ public final class MartialClientEvents {
                     "Netted status-effect model failed to bake: {}",
                     NettedEffectRenderer.MODEL
             );
+        }
+        if (manager.getModel(EntanglingRootsEffectRenderer.MODEL) == manager.getMissingModel()) {
+            MartialSpells.LOGGER.error("Entangling Roots effect model failed to bake: {}",
+                    EntanglingRootsEffectRenderer.MODEL);
+        }
+        if (manager.getModel(HuntersMarkEffectRenderer.MODEL) == manager.getMissingModel()) {
+            MartialSpells.LOGGER.error("Hunter's Mark effect model failed to bake: {}",
+                    HuntersMarkEffectRenderer.MODEL);
         }
         if (manager.getModel(PenanceProjectileRenderer.MODEL) == manager.getMissingModel()) {
             MartialSpells.LOGGER.error(
@@ -146,6 +167,10 @@ public final class MartialClientEvents {
 
     @SubscribeEvent
     public static void registerParticleProviders(RegisterParticleProvidersEvent event) {
+        event.registerSpriteSet(MartialParticleRegistry.RANGER_MAGIC_STRIPE.get(),
+                sprites -> new RangerSourceParticle.Provider(sprites, RangerSourceParticle.Kind.MAGIC_STRIPE));
+        event.registerSpriteSet(MartialParticleRegistry.RANGER_ROOTS.get(),
+                sprites -> new RangerSourceParticle.Provider(sprites, RangerSourceParticle.Kind.ROOTS));
         event.registerSpriteSet(MartialParticleRegistry.BARRAGE_TRAIL.get(), BarrageTrailParticle.Provider::new);
         event.registerSpriteSet(MartialParticleRegistry.SHOCK_POWDER_SMOKE.get(), ShockPowderSmokeParticle.Provider::new);
         event.registerSpriteSet(MartialParticleRegistry.SHOCK_POWDER_ARC.get(), ShockPowderArcParticle.Provider::new);

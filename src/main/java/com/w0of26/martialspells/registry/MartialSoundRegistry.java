@@ -12,6 +12,9 @@ public final class MartialSoundRegistry {
     private static final DeferredRegister<SoundEvent> SOUNDS =
             DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, MartialSpells.MOD_ID);
 
+    public static final RegistryObject<SoundEvent> MARKER_SHOT = register("marker_shot");
+    public static final RegistryObject<SoundEvent> ENTANGLING_ROOTS = register("entangling_roots");
+
     public static final RegistryObject<SoundEvent> SHOCK_POWDER_RELEASE =
             register("shock_powder_release");
 

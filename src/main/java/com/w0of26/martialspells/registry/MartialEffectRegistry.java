@@ -25,6 +25,9 @@ import com.w0of26.martialspells.effects.SliceAndDiceEffect;
 import com.w0of26.martialspells.effects.StealthEffect;
 import com.w0of26.martialspells.effects.StillnessOfMindEffect;
 import com.w0of26.martialspells.effects.TrappedEffect;
+import com.w0of26.martialspells.effects.PowerShotStashEffect;
+import com.w0of26.martialspells.effects.HuntersMarkEffect;
+import com.w0of26.martialspells.effects.EntanglingRootsEffect;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
@@ -38,6 +41,13 @@ public final class MartialEffectRegistry {
                     ForgeRegistries.MOB_EFFECTS,
                     MartialSpells.MOD_ID
             );
+
+    public static final RegistryObject<MobEffect> POWER_SHOT_STASH =
+            MOB_EFFECTS.register("power_shot_stash", PowerShotStashEffect::new);
+    public static final RegistryObject<MobEffect> HUNTERS_MARK =
+            MOB_EFFECTS.register("hunters_mark", HuntersMarkEffect::new);
+    public static final RegistryObject<MobEffect> ENTANGLING_ROOTS =
+            MOB_EFFECTS.register("entangling_roots", EntanglingRootsEffect::new);
 
     public static final RegistryObject<MobEffect> GUARDIANS_CRY =
             MOB_EFFECTS.register(
