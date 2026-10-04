@@ -23,6 +23,12 @@
   "generic_wind_charging": {
     "sounds": ["martial_spells:generic_wind_charging"]
   },
+  "spirit_wolf_summon": {
+    "sounds": ["martial_spells:spirit_wolf_summon_1", "martial_spells:spirit_wolf_summon_2"]
+  },
+  "spirit_wolf_spawn": {
+    "sounds": ["martial_spells:spirit_wolf_spawn"]
+  },
   "shock_powder_release": {
     "sounds": [
       "martial_spells:shock_powder_release"

@@ -27,6 +27,7 @@ public final class MartialSpellRegistry {
     public static final RegistryObject<AbstractSpell> ENTANGLING_ROOTS = SPELLS.register("entangling_roots", EntanglingRootsSpell::new);
     public static final RegistryObject<AbstractSpell> RAIN_OF_ARROWS = SPELLS.register("rain_of_arrows", RainOfArrowsSpell::new);
     public static final RegistryObject<AbstractSpell> MAGIC_ARROW = SPELLS.register("magic_arrow", RangerMagicArrowSpell::new);
+    public static final RegistryObject<AbstractSpell> SPIRIT_WOLF = SPELLS.register("spirit_wolf", SpiritWolfSpell::new);
     public static final RegistryObject<AbstractSpell> ENTANGLING_ARROW = SPELLS.register("entangling_arrow", EntanglingArrowSpell::new);
     public static final RegistryObject<AbstractSpell> CALTROPS = SPELLS.register("caltrops", CaltropsSpell::new);
     public static final RegistryObject<AbstractSpell> SHOCK_POWDER = SPELLS.register("shock_powder", ShockPowderSpell::new);

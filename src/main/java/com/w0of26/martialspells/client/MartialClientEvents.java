@@ -35,6 +35,8 @@ import com.w0of26.martialspells.client.render.PenanceProjectileRenderer;
 import com.w0of26.martialspells.client.render.JudgementVisualRenderer;
 import com.w0of26.martialspells.client.render.HolyBeamVisualRenderer;
 import com.w0of26.martialspells.client.render.RangerSourceProjectileRenderer;
+import com.w0of26.martialspells.client.render.SpiritWolfRenderer;
+import com.w0of26.martialspells.client.model.SpiritWolfModel;
 import com.w0of26.martialspells.registry.MartialEntityRegistry;
 import com.w0of26.martialspells.registry.MartialParticleRegistry;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
@@ -93,6 +95,7 @@ public final class MartialClientEvents {
         event.registerEntityRenderer(MartialEntityRegistry.RANGER_MAGIC_ARROW.get(),
                 context -> new RangerSourceProjectileRenderer<>(context,
                         RangerSourceProjectileRenderer.MAGIC_MODEL, 1.2F, true));
+        event.registerEntityRenderer(MartialEntityRegistry.SPIRIT_WOLF.get(), SpiritWolfRenderer::new);
     }
 
     @SubscribeEvent
@@ -169,6 +172,7 @@ public final class MartialClientEvents {
         event.registerLayerDefinition(BearTrapModel.LAYER, BearTrapModel::createBodyLayer);
         event.registerLayerDefinition(BattleBannerModel.LAYER, BattleBannerModel::createBodyLayer);
         event.registerLayerDefinition(LightwellModel.LAYER, LightwellModel::createBodyLayer);
+        event.registerLayerDefinition(SpiritWolfModel.LAYER, SpiritWolfModel::createBodyLayer);
     }
 
     @SubscribeEvent
@@ -186,6 +190,9 @@ public final class MartialClientEvents {
         event.registerSpriteSet(MartialParticleRegistry.RANGER_NATURE_BURST.get(),
                 sprites -> new PaladinSourceMagicParticle.Provider(sprites,
                         PaladinSourceMagicParticle.Motion.BURST, 0.4F, 1.0F, 0.4F, 0.75F));
+        event.registerSpriteSet(MartialParticleRegistry.RANGER_NATURE_ASCEND.get(),
+                sprites -> new PaladinSourceMagicParticle.Provider(sprites,
+                        PaladinSourceMagicParticle.Motion.ASCEND, 0.4F, 1.0F, 0.4F, 0.75F));
         event.registerSpriteSet(MartialParticleRegistry.RANGER_RAIN_AREA.get(),
                 sprites -> new PaladinSourceAreaParticle.Provider(sprites,
                         PaladinSourceAreaParticle.Facing.GROUND, 16,

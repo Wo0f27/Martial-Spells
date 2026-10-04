@@ -22,6 +22,8 @@ public final class MartialParticleRegistry {
             PARTICLES.register("ranger_nature_decelerate", () -> new SimpleParticleType(false));
     public static final RegistryObject<SimpleParticleType> RANGER_NATURE_BURST =
             PARTICLES.register("ranger_nature_burst", () -> new SimpleParticleType(false));
+    public static final RegistryObject<SimpleParticleType> RANGER_NATURE_ASCEND =
+            PARTICLES.register("ranger_nature_ascend", () -> new SimpleParticleType(false));
     public static final RegistryObject<SimpleParticleType> RANGER_RAIN_AREA =
             PARTICLES.register("ranger_rain_area", () -> new SimpleParticleType(false));
 

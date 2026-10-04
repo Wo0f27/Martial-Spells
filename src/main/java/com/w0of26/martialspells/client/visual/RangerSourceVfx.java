@@ -162,6 +162,39 @@ public final class RangerSourceVfx {
                 target.position().add(0, target.getBbHeight() * 0.5D, 0), 25, 1.2D, 1.8D);
     }
 
+    /** Frozen wolf spawn: 20 wide-pipe DECELERATE sparks plus 20 sphere sparks. */
+    public static void spiritWolfSpawn(ServerLevel level, Vec3 position, float width, float height) {
+        RandomSource random = level.getRandom();
+        double pipeRadius = width + 0.5D; // width/2 * width_factor(2) + extent(.5)
+        Vec3 pipeOrigin = position.add(0, height * 0.1D, 0);
+        for (int i = 0; i < 20; i++) {
+            double angle = random.nextDouble() * Math.PI * 2.0D;
+            Vec3 origin = pipeOrigin.add(Math.cos(angle) * pipeRadius, 0, Math.sin(angle) * pipeRadius);
+            emit(level, MartialParticleRegistry.RANGER_NATURE_DECELERATE.get(), origin,
+                    new Vec3(0, between(random, 0.15D, 0.35D), 0));
+        }
+        Vec3 sphereOrigin = position.add(0, height * 0.5D, 0);
+        for (int i = 0; i < 20; i++) {
+            Vec3 direction = sphereDirection(random).scale(between(random, 0.15D, 0.35D));
+            emit(level, MartialParticleRegistry.RANGER_NATURE_DECELERATE.get(),
+                    sphereOrigin.add(direction.scale(0.5D)), direction);
+        }
+    }
+
+    /** Frozen wolf despawn: 20 PILLAR sparks with ASCEND particle motion. */
+    public static void spiritWolfDespawn(ServerLevel level, Vec3 position, float width, float height) {
+        RandomSource random = level.getRandom();
+        Vec3 center = position.add(0, height * 0.1D, 0);
+        double outerRadius = width * 0.5D + 0.5D;
+        for (int i = 0; i < 20; i++) {
+            double angle = random.nextDouble() * Math.PI * 2.0D;
+            double radius = random.nextDouble() * outerRadius;
+            Vec3 origin = center.add(Math.cos(angle) * radius, 0, Math.sin(angle) * radius);
+            emit(level, MartialParticleRegistry.RANGER_NATURE_ASCEND.get(), origin,
+                    new Vec3(0, between(random, 0.15D, 0.35D), 0));
+        }
+    }
+
     private static void sphereBatch(ServerLevel level, ParticleOptions particle, Vec3 origin,
                                     int count, double minSpeed, double maxSpeed) {
         RandomSource random = level.getRandom();

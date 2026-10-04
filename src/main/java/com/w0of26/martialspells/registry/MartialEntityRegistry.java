@@ -17,13 +17,18 @@ import com.w0of26.martialspells.entity.BattleBannerEntity;
 import com.w0of26.martialspells.entity.PaladinBarrierEntity;
 import com.w0of26.martialspells.entity.RainMeteorProjectile;
 import com.w0of26.martialspells.entity.RangerMagicArrowProjectile;
+import com.w0of26.martialspells.entity.SpiritWolfEntity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
+@Mod.EventBusSubscriber(modid = MartialSpells.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public final class MartialEntityRegistry {
     public static final DeferredRegister<EntityType<?>> ENTITY_TYPES =
             DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, MartialSpells.MOD_ID);
@@ -71,6 +76,12 @@ public final class MartialEntityRegistry {
                     .<RangerMagicArrowProjectile>of(RangerMagicArrowProjectile::new, MobCategory.MISC)
                     .sized(0.25F, 0.25F).fireImmune().clientTrackingRange(128).updateInterval(2)
                     .build(MartialSpells.MOD_ID + ":ranger_magic_arrow"));
+
+    public static final RegistryObject<EntityType<SpiritWolfEntity>> SPIRIT_WOLF =
+            ENTITY_TYPES.register("spirit_wolf", () -> EntityType.Builder
+                    .<SpiritWolfEntity>of(SpiritWolfEntity::new, MobCategory.MISC)
+                    .sized(0.8F, 0.925F).clientTrackingRange(64).updateInterval(3)
+                    .build(MartialSpells.MOD_ID + ":spirit_wolf"));
 
     /**
      * Frozen Rogues Bear Trap dimensions/tracking translated from its custom
@@ -171,6 +182,10 @@ public final class MartialEntityRegistry {
                     .build(MartialSpells.MOD_ID + ":penance_projectile"));
 
     private MartialEntityRegistry() {}
+
+    @SubscribeEvent public static void registerAttributes(EntityAttributeCreationEvent event) {
+        event.put(SPIRIT_WOLF.get(), SpiritWolfEntity.createAttributes().build());
+    }
 
     public static void register(IEventBus bus) {
         ENTITY_TYPES.register(bus);

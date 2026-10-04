@@ -20,6 +20,8 @@ public final class MartialSoundRegistry {
     public static final RegistryObject<SoundEvent> MAGIC_ARROW_RELEASE = register("magic_arrow_release");
     public static final RegistryObject<SoundEvent> MAGIC_ARROW_IMPACT = register("magic_arrow_impact");
     public static final RegistryObject<SoundEvent> GENERIC_WIND_CHARGING = register("generic_wind_charging");
+    public static final RegistryObject<SoundEvent> SPIRIT_WOLF_SUMMON = register("spirit_wolf_summon");
+    public static final RegistryObject<SoundEvent> SPIRIT_WOLF_SPAWN = register("spirit_wolf_spawn");
 
     public static final RegistryObject<SoundEvent> SHOCK_POWDER_RELEASE =
             register("shock_powder_release");
