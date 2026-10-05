@@ -410,6 +410,11 @@ tasks.named('jar', Jar).configure {
 tasks.register('devJar', Jar) {
     archiveClassifier = 'dev'
     from sourceSets.main.output
+    // Keep the mapped consumer mod's strict external mixin remapping available.
+    dependsOn tasks.named('compileJava')
+    from(layout.buildDirectory.file('tmp/compileJava/compileJava-refmap.json')) {
+        rename { "${mod_id}.refmap.json" }
+    }
 }
 java.withSourcesJar()
 

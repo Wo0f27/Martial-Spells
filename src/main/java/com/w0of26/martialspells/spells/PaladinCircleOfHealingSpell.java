@@ -1,6 +1,8 @@
 package com.w0of26.martialspells.spells;
 
 import com.w0of26.martialspells.MartialSpells;
+import com.w0of26.martialspells.api.AbilityCompatibility;
+import net.minecraft.world.entity.player.Player;
 import io.redspace.ironsspellbooks.api.config.DefaultConfig;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.api.registry.SchoolRegistry;
@@ -91,13 +93,19 @@ public final class PaladinCircleOfHealingSpell extends AbstractSpell {
             return;
         }
 
+        // Apply once to the output coefficient shared by all allies in this cast.
+        float healCoefficient = HEAL_COEFFICIENT;
+        if (caster instanceof Player player) {
+            healCoefficient *= (float) (1.0 + AbilityCompatibility.getCircleOfHealingPowerAdjustment(player));
+        }
+
         PaladinHolySpellSupport.heal(
                 this,
                 serverLevel,
                 spellLevel,
                 caster,
                 caster,
-                HEAL_COEFFICIENT
+                healCoefficient
         );
         PaladinVfx.healPillar(
                 serverLevel,
@@ -152,7 +160,7 @@ public final class PaladinCircleOfHealingSpell extends AbstractSpell {
                     spellLevel,
                     caster,
                     target,
-                    HEAL_COEFFICIENT
+                    healCoefficient
             );
             PaladinVfx.healPillar(
                     serverLevel,

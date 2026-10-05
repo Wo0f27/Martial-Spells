@@ -1,5 +1,7 @@
 package com.w0of26.martialspells.entity;
 
+import com.w0of26.martialspells.api.AbilityCompatibility;
+import com.w0of26.martialspells.spells.BearTrapSpell;
 import com.w0of26.martialspells.damage.MartialDamageTypes;
 import com.w0of26.martialspells.mixin.EntityInvulnerabilityAccessor;
 import com.w0of26.martialspells.registry.MartialEffectRegistry;
@@ -244,6 +246,12 @@ public final class BearTrapEntity extends Entity {
     }
 
     private void performImpact(ServerPlayer owner, LivingEntity target, ServerLevel level) {
+        // Source modifiers resolve at impact over captured power, including the status health gate.
+        double adjustment = AbilityCompatibility.getBearTrapPowerAdjustment(owner);
+        float basePower = entityData.get(DAMAGE_POWER);
+        float impactPower = basePower * (float) (1.0 + adjustment);
+        float controlLimit = entityData.get(CONTROL_LIMIT)
+                + basePower * BearTrapSpell.CONTROL_POWER_MULTIPLIER * (float) adjustment;
         Vec3 originalVelocity = target.getDeltaMovement();
         EntityInvulnerabilityAccessor invulnerability = (EntityInvulnerabilityAccessor) target;
         int originalInvulnerableTime = invulnerability.martialSpells$getInvulnerableTime();
@@ -253,7 +261,7 @@ public final class BearTrapEntity extends Entity {
             invulnerability.martialSpells$setInvulnerableTime(0);
             target.hurt(
                     MartialDamageTypes.bearTrap(owner, this),
-                    entityData.get(DAMAGE_POWER)
+                    impactPower
             );
         } finally {
             // Source restores the pre-impact i-frame timer and its configured
@@ -263,7 +271,7 @@ public final class BearTrapEntity extends Entity {
             target.hurtMarked = true;
         }
 
-        if (target.getMaxHealth() <= entityData.get(CONTROL_LIMIT)) {
+        if (target.getMaxHealth() <= controlLimit) {
             target.addEffect(
                     new MobEffectInstance(
                             MartialEffectRegistry.BEAR_TRAP.get(),

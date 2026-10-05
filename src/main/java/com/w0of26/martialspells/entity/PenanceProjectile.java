@@ -1,5 +1,7 @@
 package com.w0of26.martialspells.entity;
 
+import com.w0of26.martialspells.combat.PenanceCritContext;
+import net.minecraft.world.damagesource.DamageSource;
 import com.w0of26.martialspells.registry.MartialEffectRegistry;
 import com.w0of26.martialspells.registry.MartialSoundRegistry;
 import com.w0of26.martialspells.registry.MartialSpellRegistry;
@@ -278,17 +280,13 @@ public final class PenanceProjectile
                 target.invulnerableTime;
         target.invulnerableTime = 0;
 
-        boolean damaged =
-                DamageSources.applyDamage(
-                        target,
-                        damage,
-                        MartialSpellRegistry.PENANCE
-                                .get()
-                                .getDamageSource(owner)
-                );
-
-        target.invulnerableTime =
-                previousInvulnerableTime;
+        DamageSource source = MartialSpellRegistry.PENANCE.get().getDamageSource(owner);
+        boolean damaged;
+        try (PenanceCritContext.Scope ignored = PenanceCritContext.enter(source, target, owner)) {
+            damaged = DamageSources.applyDamage(target, damage, source);
+        } finally {
+            target.invulnerableTime = previousInvulnerableTime;
+        }
 
         if (!damaged) {
             discard();

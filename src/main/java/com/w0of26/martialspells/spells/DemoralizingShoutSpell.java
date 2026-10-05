@@ -1,6 +1,8 @@
 package com.w0of26.martialspells.spells;
 
 import com.w0of26.martialspells.MartialSpells;
+import com.w0of26.martialspells.api.AbilityCompatibility;
+import net.minecraft.world.entity.player.Player;
 import com.w0of26.martialspells.combat.PhysicalMeleePower;
 import com.w0of26.martialspells.damage.MartialDamageTypes;
 import com.w0of26.martialspells.registry.MartialEffectRegistry;
@@ -176,6 +178,10 @@ public final class DemoralizingShoutSpell extends AbstractSpell implements Marti
 
         double controlHealthLimit = getControlHealthLimit(caster);
         float directDamage = getDirectDamage(caster);
+        if (caster instanceof Player player) {
+            // Source 1 + 4.0 = 5x chip damage. The independent control gate is untouched.
+            directDamage *= (float) (1.0 + AbilityCompatibility.getShoutDamageMultiplierAdjustment(player));
+        }
         Vec3 origin = caster.getEyePosition();
         double verticalRange = RANGE * VERTICAL_RANGE_MULTIPLIER;
 

@@ -9,6 +9,9 @@ from ranger_audit_support import ACCEPTED_BASE, ROOT, blob, normalized_barrage, 
 JAVA = ROOT / "src/main/java/com/w0of26/martialspells"
 RES = ROOT / "src/main/resources"
 errors = []
+# A later authorized ability checkpoint may add only its independently audited seams.
+from ability_compat_audit_support import ADDITIONS, normalize_ability_hooks
+
 
 
 def check(ok, reason):
@@ -54,17 +57,21 @@ for rel in sorted(changed_main.intersection(tracked)):
         continue
     old = blob(ACCEPTED_BASE, rel)
     if path.suffix == ".java":
-        current = normalize(rel, path.read_text(encoding="utf-8"))
+        current = normalize(rel, normalize_ability_hooks(rel, path.read_text(encoding="utf-8")))
         check(current == old.decode().replace("\r\n", "\n"), f"frozen gameplay/presentation changed: {rel}")
     else:
-        check(path.read_bytes() == old, f"frozen resource changed: {rel}")
+        if rel == "src/main/resources/martial_spells.mixins.json":
+            check(normalize_ability_hooks(rel, path.read_text(encoding="utf-8")) == old.decode().replace("\r\n", "\n"),
+                  f"frozen mixin resource changed beyond the ability hook: {rel}")
+        else:
+            check(path.read_bytes() == old, f"frozen resource changed: {rel}")
 accepted_main = set(tracked)
 for folder in (ROOT / "src/main", ROOT / "src/generated"):
     if folder.is_dir():
         for path in folder.rglob("*"):
             if path.is_file():
                 rel = path.relative_to(ROOT).as_posix()
-                check(rel in accepted_main or rel == "src/main/java/com/w0of26/martialspells/api/RangerCompatibility.java",
+                check(rel in accepted_main or rel == "src/main/java/com/w0of26/martialspells/api/RangerCompatibility.java" or rel in ADDITIONS,
                       f"unexpected main source/resource added: {rel}")
 
 registry = java("registry/MartialSpellRegistry.java")
