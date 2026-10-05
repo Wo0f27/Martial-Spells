@@ -1,6 +1,7 @@
 package com.w0of26.martialspells.spells;
 
 import com.w0of26.martialspells.MartialSpells;
+import com.w0of26.martialspells.api.RangerCompatibility;
 import com.w0of26.martialspells.combat.ArchersPhysicalArrow;
 import com.w0of26.martialspells.combat.RangedTechniqueHelper;
 import com.w0of26.martialspells.combat.RangerArrowMetadata;
@@ -138,7 +139,8 @@ public final class BarrageSpell extends AbstractSpell implements MartialTechniqu
         if (!isArrow(ammunition)) return false;
 
         Optional<AbstractArrow> prepared = ArchersPhysicalArrow.prepare(level, player, weapon,
-                ammunition.copyWithCount(1), DAMAGE_MULTIPLIER, 0, 0, true, true);
+                ammunition.copyWithCount(1), DAMAGE_MULTIPLIER, 0,
+                RangerCompatibility.extraBarragePenetrableTargets(player), true, true);
         if (prepared.isEmpty()) return false;
         AbstractArrow arrow = prepared.get();
         RangerArrowMetadata.markBarrage(arrow);

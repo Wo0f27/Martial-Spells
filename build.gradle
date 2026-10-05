@@ -406,7 +406,23 @@ tasks.named('jar', Jar).configure {
 //     dependsOn 'reobfJar'
 // }
 
-// Example configuration to allow publishing using the maven-publish plugin
+// Mapped classifier for local Java/Forge development consumers; main jar remains reobfuscated.
+tasks.register('devJar', Jar) {
+    archiveClassifier = 'dev'
+    from sourceSets.main.output
+}
+java.withSourcesJar()
+
+// Export mapped dependency paths only for the isolated external API compile probe.
+tasks.register('writeRangerConsumerClasspath') {
+    def output = layout.buildDirectory.file('ar6-consumer-classpath.txt')
+    outputs.file(output)
+    doLast {
+        output.get().asFile.text = sourceSets.main.compileClasspath.asPath
+    }
+}
+
+// Local Forge publication: production jar, mapped dev classifier and main sources.
 publishing {
     publications {
         register('mavenJava', MavenPublication) {
@@ -415,6 +431,8 @@ publishing {
             version = mod_version
 
             artifact jar
+            artifact tasks.named('devJar')
+            artifact tasks.named('sourcesJar')
         }
     }
 

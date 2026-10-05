@@ -7,6 +7,7 @@ import json
 import re
 import subprocess
 import sys
+from ranger_audit_support import accepted_gameplay_unchanged, private_asset_errors
 
 ROOT = Path(__file__).resolve().parents[1]
 JAVA = ROOT / "src/main/java/com/w0of26/martialspells"
@@ -59,8 +60,8 @@ for name in ("power_shot", "entangling_roots"):
           f"{name} must be registered once")
 for name in ("barrage", "entangling_arrow", "caltrops"):
     check(f'SPELLS.register("{name}"' in registry, f"existing Ranger ID lost: {name}")
-for name in ("spirit_wolf",):
-    check(f'SPELLS.register("{name}"' not in registry, f"later ability exposed: {name}")
+check(registry.count('SPELLS.register("spirit_wolf"') == 1,
+      "accepted AR5 Spirit Wolf registration lost or duplicated")
 
 tag = json.loads(read(ROOT / "src/main/resources/data/martial_spells/tags/spells/ranger_techniques.json"))
 martial_tag = json.loads(read(ROOT / "src/main/resources/data/martial_spells/tags/spells/martial_techniques.json"))
@@ -68,6 +69,7 @@ lang = json.loads(read(ASSETS / "lang/en_us.json"))
 expected_ranger = ["power_shot", "entangling_roots", "barrage"]
 if 'SPELLS.register("rain_of_arrows"' in registry:
     expected_ranger += ["rain_of_arrows", "magic_arrow"]
+expected_ranger += ["spirit_wolf"]
 expected_ranger += ["entangling_arrow", "caltrops"]
 check(tag.get("values") == [f"martial_spells:{name}" for name in expected_ranger],
       "Ranger catalogue lost or reordered accepted AR2 abilities")
@@ -148,7 +150,7 @@ unchanged = [
 ]
 for relative in unchanged:
     path = f"src/main/java/com/w0of26/martialspells/{relative}"
-    check(read(ROOT / path) == git("show", f"HEAD:{path}"), f"existing Ranger gameplay changed: {relative}")
+    check(accepted_gameplay_unchanged(relative), f"existing Ranger gameplay changed: {relative}")
 
 ar2_java = "\n".join(read(path) for path in (JAVA / "events/PowerShotArrowEvents.java",
     JAVA / "combat/PowerShotImpact.java", JAVA / "mixin/LivingEntityHuntersMarkMixin.java",
@@ -282,14 +284,11 @@ check("MartialSoundRegistry.MARKER_SHOT.get()" in shot
       and "MartialSoundRegistry.ENTANGLING_ROOTS.get()" not in read(JAVA / "spells/EntanglingRootsSpell.java"),
       "Ranger source sounds not used")
 
-status = git("status", "--porcelain", "-uall").splitlines()
-private = [line for line in status if line[3:].startswith("src/main/resources/assets/martial_spells/")
-           and any(k in line[3:].lower() for k in ("paladin", "priest", "holy_", "divine_",
-               "penance", "battle_banner", "lightwell", "judgement", "barrier", "immolation"))]
-check(all(line.startswith("?? ") for line in private), "private Paladin/Priest asset staged or modified")
+for error in private_asset_errors():
+    check(False, error)
 
 if failures:
     print("\n".join("FAIL: " + item for item in failures))
     sys.exit(1)
 print("PASS: Archers Ranger AR2 static source/scope audit")
-print(f"Private Paladin/Priest entries remain untracked: {len(private)}")
+print("Accepted tracked Paladin/Priest private assets unchanged: 106")

@@ -5,6 +5,7 @@ import json
 import re
 import subprocess
 import sys
+from ranger_audit_support import accepted_gameplay_unchanged, private_asset_errors
 
 ROOT = Path(__file__).resolve().parents[1]
 JAVA = ROOT / "src/main/java/com/w0of26/martialspells"
@@ -59,7 +60,8 @@ for spell_id in ("rain_of_arrows", "magic_arrow"):
           f"{spell_id} not registered exactly once")
 for old in ("power_shot", "entangling_roots", "barrage", "entangling_arrow", "caltrops"):
     check(f'SPELLS.register("{old}"' in registry, f"existing Ranger ID lost: {old}")
-check('SPELLS.register("spirit_wolf"' not in registry, "Spirit Wolf exposed early")
+check(registry.count('SPELLS.register("spirit_wolf"') == 1,
+      "accepted AR5 Spirit Wolf registration lost or duplicated")
 for tag in ("ranger_techniques", "martial_techniques"):
     values = json.loads(read(ROOT / f"src/main/resources/data/martial_spells/tags/spells/{tag}.json"))["values"]
     for spell_id in ("rain_of_arrows", "magic_arrow"):
@@ -213,15 +215,13 @@ changed = set(git("diff", "--name-only").splitlines())
 frozen_paths = [str(p.relative_to(ROOT)).replace("\\", "/") for p in
                 [ROOT / name for name in contracts if name != "ARCHERS_RANGER_AR2.md"] +
                 [JAVA / f"spells/{name}.java" for name in
-                 ("PowerShotSpell", "EntanglingRootsSpell", "BarrageSpell", "EntanglingArrowSpell", "CaltropsSpell")]]
+                 ("PowerShotSpell", "EntanglingRootsSpell", "EntanglingArrowSpell", "CaltropsSpell")]]
 check(not (changed & set(frozen_paths)), "frozen contract or existing Ranger gameplay changed")
+check(accepted_gameplay_unchanged("spells/BarrageSpell.java"),
+      "Barrage changed beyond the default-neutral AR6 API query")
 check(not git("diff", "--cached", "--name-only").strip(), "AR4 staged before runtime PASS")
-status = git("status", "--porcelain", "-uall").splitlines()
-private = [line for line in status if line[3:].startswith("src/main/resources/assets/martial_spells/")
-           and any(term in line.lower() for term in ("battle_banner", "divine_", "holy_", "lightwell",
-                                                       "paladin_source", "penance", "priest_", "barrier"))]
-check(private and all(line.startswith("?? ") for line in private),
-      "unrelated Paladin/Priest private assets no longer untracked")
+for error in private_asset_errors():
+    check(False, error)
 check("armory" not in rain.lower() and "armory" not in magic.lower(), "Armory set logic added")
 
 if errors:

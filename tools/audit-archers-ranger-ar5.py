@@ -5,6 +5,7 @@ import json
 import re
 import subprocess
 import sys
+from ranger_audit_support import normalized_barrage
 
 ROOT = Path(__file__).resolve().parents[1]
 JAVA = ROOT / "src/main/java/com/w0of26/martialspells"
@@ -210,7 +211,8 @@ for rel in ("spells/PowerShotSpell.java", "spells/EntanglingRootsSpell.java",
     try:
         old = subprocess.check_output(["git", "show", f"{base}:src/main/java/com/w0of26/martialspells/{rel}"],
                                        cwd=ROOT, stderr=subprocess.DEVNULL).decode()
-        check(read(path) == old, f"existing Ranger gameplay file changed during AR5: {rel}")
+        current = normalized_barrage(read(path)) if rel == "spells/BarrageSpell.java" else read(path)
+        check(current == old, f"existing Ranger gameplay file changed during AR5: {rel}")
     except subprocess.CalledProcessError:
         pass
 

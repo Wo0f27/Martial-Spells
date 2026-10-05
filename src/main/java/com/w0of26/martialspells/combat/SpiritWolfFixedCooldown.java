@@ -19,7 +19,7 @@ public final class SpiritWolfFixedCooldown {
         return BASE_TICKS - equipmentReductionTicks;
     }
 
-    /** Neutral Armory-facing seam: 0 normally, -100 for a future authorized bonus. */
+    /** Neutral callback: 0 normally, -100 for an external fixed-cooldown bonus. */
     public static void setAdjustmentProvider(ToIntFunction<Player> provider) {
         adjustmentProvider = Objects.requireNonNull(provider);
     }

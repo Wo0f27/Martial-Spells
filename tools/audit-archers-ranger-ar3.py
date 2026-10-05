@@ -5,6 +5,7 @@ import json
 import re
 import subprocess
 import sys
+from ranger_audit_support import normalized_barrage, private_asset_errors
 
 ROOT = Path(__file__).resolve().parents[1]
 JAVA = ROOT / "src/main/java/com/w0of26/martialspells"
@@ -23,7 +24,7 @@ def check(ok, message):
 
 def git(*args):
     return subprocess.run(["git", *args], cwd=ROOT, check=True,
-                          capture_output=True, text=True).stdout
+                          capture_output=True, text=True, encoding="utf-8").stdout
 
 
 contract = read(ROOT / "ARCHERS_RANGER_SPELL_PORT.md")
@@ -37,8 +38,9 @@ for token in ("ee8fb4081422ba0ab8ced57fe773a1c048d7bf74",
 registry = read(JAVA / "registry/MartialSpellRegistry.java")
 check(len(re.findall(r'SPELLS\.register\("barrage"', registry)) == 1,
       "Barrage must have exactly one existing registry ID")
-for absent in ("rain_of_arrows", "spirit_wolf", 'SPELLS.register("magic_arrow"'):
-    check(absent not in registry, f"future Ranger spell registered: {absent}")
+for accepted in ("rain_of_arrows", "spirit_wolf", "magic_arrow"):
+    check(registry.count(f'SPELLS.register("{accepted}"') == 1,
+          f"accepted later Ranger registration lost or duplicated: {accepted}")
 for existing in ('SPELLS.register("power_shot"', 'SPELLS.register("entangling_roots"',
                  'SPELLS.register("entangling_arrow"', 'SPELLS.register("caltrops"'):
     check(existing in registry, f"existing Ranger registry missing {existing}")
@@ -60,7 +62,7 @@ for token in ("MAX_LEVEL = 1", "CAST_TIME_TICKS = 10", "COOLDOWN_SECONDS = 10",
               "ammunition.copyWithCount(1)", "RangerArrowMetadata.markBarrage(arrow)",
               "index == 0 ? 0.0F : FOLLOW_UP_DIVERGENCE", "return false;"):
     check(token in barrage, f"Barrage executor missing {token}")
-check(bool(re.search(r"DAMAGE_MULTIPLIER,\s*0,\s*0,\s*true,\s*true", barrage)),
+check(bool(re.search(r"DAMAGE_MULTIPLIER,\s*0,\s*0,\s*true,\s*true", normalized_barrage(barrage))),
       "Barrage does not request critical arrows and iframe bypass")
 check("onServerCastTick" not in barrage and "SHOT_INTERVAL_TICKS" not in barrage
       and "getProjectileCount" not in barrage and "BarrageArrow" not in barrage,
@@ -143,8 +145,13 @@ for source, target in ((upstream / "sounds/bow_pull.ogg", ASSETS / "sounds/bow_p
               f"source asset differs: {target.name}")
 
 changed_paths = set(git("diff", "--name-only", "HEAD").splitlines())
-check("build.gradle" not in changed_paths and "gradle.properties" not in changed_paths,
-      "dependency architecture or RWA version changed")
+check("gradle.properties" not in changed_paths, "target versions changed")
+# AR6 adds publication-only tasks; dependency declarations must remain identical.
+gradle = read(ROOT / "build.gradle")
+old_gradle = git("show", "7e3653d60a5ff56c1da6f4aab1cafd4bf1c1fc41:build.gradle")
+check(gradle.split("// Mapped classifier", 1)[0] ==
+      old_gradle.split("// Example configuration to allow publishing", 1)[0],
+      "Gradle runtime/dependency architecture changed beyond AR6 publication")
 for relative in ("spells/PowerShotSpell.java", "spells/EntanglingRootsSpell.java",
                  "spells/EntanglingArrowSpell.java", "spells/CaltropsSpell.java",
                  "entity/EntanglingRootsCloud.java", "entity/EntanglingArrow.java",
@@ -163,13 +170,8 @@ check(not re.search(r"(?i)riftstalker|armory|strider[_ ]set", new_text),
       "Armory equipment detection added")
 staged = git("diff", "--cached", "--name-only").splitlines()
 check(not staged, "AR3 files or unrelated private assets are staged before runtime PASS")
-status = git("status", "--porcelain", "-uall").splitlines()
-private = [line for line in status if line[3:].startswith("src/main/resources/assets/martial_spells/")
-           and any(x in line[3:].lower() for x in
-                   ("paladin", "priest", "holy_", "divine_", "penance", "battle_banner",
-                    "lightwell", "judgement", "barrier", "immolation", "blessed_strikes"))]
-check(private and all(line.startswith("?? ") for line in private),
-      "pre-existing Paladin/Priest private assets lost untracked status")
+for error in private_asset_errors():
+    check(False, error)
 
 if errors:
     for error in errors:

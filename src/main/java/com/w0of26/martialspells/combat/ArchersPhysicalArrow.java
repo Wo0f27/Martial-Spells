@@ -63,8 +63,7 @@ public final class ArchersPhysicalArrow {
 
         int innatePierce = type == RangedWeaponClassifier.Type.CROSSBOW
                 ? EnchantmentHelper.getItemEnchantmentLevel(Enchantments.PIERCING, weapon) : 0;
-        int totalPierce = innatePierce + extraPierceTargets;
-        if (totalPierce > Byte.MAX_VALUE) return Optional.empty();
+        int totalPierce = (int) Math.min(Byte.MAX_VALUE, (long) innatePierce + extraPierceTargets);
         arrow.setPierceLevel((byte) totalPierce);
 
         ScalingUtil.Scaling baseline = type == RangedWeaponClassifier.Type.CROSSBOW
