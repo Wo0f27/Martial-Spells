@@ -1,6 +1,12 @@
 # Archers Ranger AR5 — Spirit Wolf Pack
 
-Status: implementation candidate; runtime validation pending. No commit has been made.
+Status: **AR5 RUNTIME PASS** — all requested runtime tests are user-confirmed PASS.
+
+Accepted implementation commit: `f1f9ad5306d31ec988ede1bb7457f87043495d1b`
+(`WIP: preserve Archers Ranger AR5 working state`). The user explicitly accepts
+this existing mixed commit, including the previously untracked Paladin/Priest
+private assets. Those assets are intentionally tracked from this point onward.
+The commit is retained without amendment or history rewriting.
 
 ## Source closure
 
@@ -97,8 +103,9 @@ translated from the frozen Archers Java sources without changing coordinates or
 keyframe timings. The run clip uses a local port of Spell Engine's loop-seam
 interpolation. The renderer uses the source shadow radius and a local
 translucent emissive, depth-writing layer. Spell Engine's shader compatibility
-fallback is not added as a runtime dependency; this remains a focused runtime
-check.
+fallback is not added as a runtime dependency. The local emissive rendering,
+animations, loop transitions, particles and sounds are runtime-accepted; this
+acceptance does not establish untested shaderpack compatibility.
 
 | Source presentation | Target | Status |
 | --- | --- | --- |
@@ -141,3 +148,43 @@ five-tick pending window; fixed 900-tick cooldown with ordinary CDR; exact
 model/texture/glow, spawn/despawn particles and sounds; and regressions for
 Power Shot, Entangling Roots, Barrage, Rain, Magic Arrow, Entangling Arrow and
 Caltrops.
+
+## User-confirmed runtime closeout
+
+All requested runtime checks passed:
+
+- Registration, level 1, zero mana and instant cast; exactly two wolves at
+  t=0 and t=+5, with front/right yaw-relative placement and terrain/collision
+  recovery.
+- The 20-tick spawn, 600-tick active and 20-tick despawn phases, without
+  premature removal. Wolf two retains its five-tick lifecycle offset.
+- Source icon, Direwolf model/texture, emissive rendering, spawn particles,
+  idle/run/bite animations, acceptable loop transitions, one-handed healing
+  release, despawn presentation and sounds.
+- Autonomous hostile targeting, owner assist, retaliation, friendly/owner
+  exclusion, melee pursuit, bite cadence and damage.
+- Follow starts beyond 10 blocks, stops at 4 blocks or closer, uses the
+  owner-relative follow point, and recovers beyond 32 blocks while clearing
+  the previous attack target.
+- Owner death/logout/dimension absence does not immediately despawn wolves;
+  aging continues, ownership resumes appropriately and never rebinds.
+- Active/despawn/pending-second-summon reload preserves lifetime, health,
+  owner and acceptable target/state continuity, without restarting lifecycle,
+  duplicating wolf one or repeating wolf two.
+- Low/high power validates health `20 + P`, armor `10 + 0.1P`, attack damage
+  `3 + 0.3P`, attack knockback `0.1P` and knockback resistance `5 + 0.05P`.
+  Creation snapshots survive equipment changes and reload without resampling.
+- Fixed 900-tick cooldown ignores ordinary Iron's cooldown reduction; the
+  neutral future adjustment seam remains available without equipment checks.
+- No one-pack cleanup or old-wolf replacement was introduced.
+- Power Shot, Entangling Roots, Barrage, Rain of Arrows, Magic Arrow,
+  Entangling Arrow and Caltrops all passed regression validation.
+
+Closeout changes are documentation and the audit's private-asset ownership
+check only. No gameplay is changed, no push is authorized and AR6 has not begun.
+
+Final closeout validation: AR5 static audit PASS; `gradlew clean build --offline`
+PASS (55 seconds, 12 executed tasks; existing deprecation warnings); and
+`git diff --check` PASS. The audit verifies all 106 intentionally tracked
+private assets against the accepted implementation commit without modifying
+them. Only this document and the corresponding audit adjustment are changed.

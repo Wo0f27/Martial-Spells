@@ -214,12 +214,25 @@ for rel in ("spells/PowerShotSpell.java", "spells/EntanglingRootsSpell.java",
     except subprocess.CalledProcessError:
         pass
 
-# The repository's unrelated private assets are expected to remain untracked and unstaged.
-status = git("status", "--short", "--untracked-files=all")
-cached = git("diff", "--cached", "--name-only")
-check(not cached.strip(), "AR5 audit must run before staging")
-check("sounds/holy_beam_casting.ogg" in status and "A  " not in status,
-      "unrelated Paladin/Priest private assets are not visibly untracked")
+# User-authorized closeout retains the mixed implementation commit. Its private
+# Paladin/Priest assets are now intentionally tracked; verify they stay intact.
+accepted_implementation = "f1f9ad5306d31ec988ede1bb7457f87043495d1b"
+added_resources = git("diff", "--name-only", "--diff-filter=A", base,
+                      accepted_implementation, "--", "src/main/resources").splitlines()
+ar5_assets = {f"src/main/resources/assets/martial_spells/{p}" for p in asset_pairs}
+private_assets = {p for p in added_resources
+                  if Path(p).suffix in (".png", ".ogg") and p not in ar5_assets}
+check(len(private_assets) == 106, "accepted private-asset inventory is not 106 files")
+tracked = set(git("ls-files").splitlines())
+staged = set(git("diff", "--cached", "--name-only").splitlines())
+check(not private_assets.intersection(staged), "unrelated private assets are staged")
+for rel in sorted(private_assets):
+    path = ROOT / rel
+    check(rel in tracked and path.is_file(), f"accepted private asset missing/untracked: {rel}")
+    if path.is_file():
+        accepted_bytes = source_blob(ROOT, accepted_implementation, rel)
+        check(hashlib.sha256(accepted_bytes).hexdigest() == sha256(path),
+              f"accepted private asset modified: {rel}")
 
 if errors:
     print("AR5 AUDIT FAILED")
